@@ -1,25 +1,19 @@
 require("dotenv").config();
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const fs = require("fs");
-const http = require('http');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-// Carregar comandos
 client.commands = new Collection();
 
-// Mapear comandos para arquivos
-const commandMap = {
-  'info': 'miscrits-info',
-  'days': 'miscrits-days',
-  'tier_list': 'miscrits-tier-list',
-  'relics_link': 'miscrits-relics'
-};
-
-const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
+// ✅ TESTE APENAS UM COMANDO POR VEZ
+// Carregue apenas miscrits-info.js primeiro
+try {
+  const command = require(`./commands/miscrits-info.js`);
   client.commands.set(command.data.name, command);
+  console.log(`✅ Carregado: miscrits-info.js`);
+} catch (error) {
+  console.log(`❌ Erro em miscrits-info.js:`, error.message);
 }
 
 client.once("ready", () => {
@@ -28,66 +22,37 @@ client.once("ready", () => {
 
 client.on("interactionCreate", async interaction => {
   if (interaction.isAutocomplete()) {
-    if (interaction.commandName === "miscrits") {
-      const subcommand = interaction.options.getSubcommand();
-      const subcommandGroup = interaction.options.getSubcommandGroup();
-      
-      if (!subcommandGroup && subcommand === "info") {
-        const command = client.commands.get("miscrits-info");
-        if (command && command.autocomplete) {
-          try {
-            await command.autocomplete(interaction);
-          } catch (error) {
-            console.error("❌ Erro no autocomplete:", error);
-          }
-        }
-      }
+    const command = client.commands.get(interaction.commandName);
+    if (!command || !command.autocomplete) return;
+    try {
+      await command.autocomplete(interaction);
+    } catch (error) {
+      console.error("❌ Erro no autocomplete:", error);
     }
     return;
   }
 
   if (interaction.isChatInputCommand()) {
-    if (interaction.commandName === "miscrits") {
-      const subcommand = interaction.options.getSubcommand();
-      const subcommandGroup = interaction.options.getSubcommandGroup();
-      
-      let commandName;
-      
-      if (!subcommandGroup) {
-        commandName = commandMap[subcommand];
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+    try {
+      await command.execute(interaction);
+    } catch (error) {
+      console.error(error);
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({
+          content: "❌ Ocorreu um erro ao executar esse comando!",
+          ephemeral: true
+        });
       } else {
-        const key = `${subcommandGroup}_${subcommand}`;
-        commandName = commandMap[key];
-      }
-      
-      const command = client.commands.get(commandName);
-      
-      if (!command) {
-        console.error(`Command not found: ${commandName} for subcommand: ${subcommand}, group: ${subcommandGroup}`);
-        return;
-      }
-      
-      try {
-        await command.execute(interaction);
-      } catch (error) {
-        console.error(error);
-        const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", ephemeral: true };
-        if (interaction.replied || interaction.deferred) await interaction.followUp(reply);
-        else await interaction.reply(reply);
+        await interaction.reply({
+          content: "❌ Ocorreu um erro ao executar esse comando!",
+          ephemeral: true
+        });
       }
     }
   }
 });
 
-// Servidor web para manter online
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Bot Miscrits Online!\n');
-});
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`✅ Servidor rodando na porta ${PORT}`);
-});
-
+console.log('✅ Bot token length:', process.env.BOT_TOKEN ? process.env.BOT_TOKEN.length : 'undefined');
 client.login(process.env.BOT_TOKEN);
