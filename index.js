@@ -4,16 +4,12 @@ const fs = require("fs");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
+// Carregar comandos
 client.commands = new Collection();
-
-// ✅ TESTE APENAS UM COMANDO POR VEZ
-// Carregue apenas miscrits-info.js primeiro
-try {
-  const command = require(`./commands/miscrits-info.js`);
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
   client.commands.set(command.data.name, command);
-  console.log(`✅ Carregado: miscrits-info.js`);
-} catch (error) {
-  console.log(`❌ Erro em miscrits-info.js:`, error.message);
 }
 
 client.once("ready", () => {
@@ -24,6 +20,7 @@ client.on("interactionCreate", async interaction => {
   if (interaction.isAutocomplete()) {
     const command = client.commands.get(interaction.commandName);
     if (!command || !command.autocomplete) return;
+
     try {
       await command.autocomplete(interaction);
     } catch (error) {
@@ -35,6 +32,7 @@ client.on("interactionCreate", async interaction => {
   if (interaction.isChatInputCommand()) {
     const command = client.commands.get(interaction.commandName);
     if (!command) return;
+
     try {
       await command.execute(interaction);
     } catch (error) {
@@ -54,5 +52,4 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-console.log('✅ Bot token length:', process.env.BOT_TOKEN ? process.env.BOT_TOKEN.length : 'undefined');
 client.login(process.env.BOT_TOKEN);
