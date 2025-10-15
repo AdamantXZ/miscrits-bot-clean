@@ -7,6 +7,15 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // Carregar comandos
 client.commands = new Collection();
+
+// Mapear subcomandos para arquivos
+const commandMap = {
+  'info': 'miscrits-info',
+  'days': 'miscrits-days',
+  'tier_list': 'miscrits-tier-list',
+  'relics_link': 'miscrits-relics'
+};
+
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
@@ -19,47 +28,63 @@ client.once("ready", () => {
 
 client.on("interactionCreate", async interaction => {
   if (interaction.isAutocomplete()) {
-    const command = client.commands.get(interaction.commandName);
-    if (!command || !command.autocomplete) return;
-
-    try {
-      await command.autocomplete(interaction);
-    } catch (error) {
-      console.error("❌ Erro no autocomplete:", error);
+    if (interaction.commandName === "miscrits") {
+      const subcommand = interaction.options.getSubcommand();
+      const subcommandGroup = interaction.options.getSubcommandGroup();
+      
+      if (!subcommandGroup && subcommand === "info") {
+        const command = client.commands.get("miscrits-info");
+        if (command && command.autocomplete) {
+          try {
+            await command.autocomplete(interaction);
+          } catch (error) {
+            console.error("❌ Erro no autocomplete:", error);
+          }
+        }
+      }
     }
     return;
   }
 
   if (interaction.isChatInputCommand()) {
-    const command = client.commands.get(interaction.commandName);
-    if (!command) return;
-
-    try {
-      await command.execute(interaction);
-    } catch (error) {
-      console.error(error);
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({
-          content: "❌ Ocorreu um erro ao executar esse comando!",
-          ephemeral: true
-        });
+    if (interaction.commandName === "miscrits") {
+      const subcommand = interaction.options.getSubcommand();
+      const subcommandGroup = interaction.options.getSubcommandGroup();
+      
+      let commandName;
+      
+      if (!subcommandGroup) {
+        commandName = commandMap[subcommand];
       } else {
-        await interaction.reply({
-          content: "❌ Ocorreu um erro ao executar esse comando!",
-          ephemeral: true
-        });
+        const key = `${subcommandGroup}_${subcommand}`;
+        commandName = commandMap[key];
+      }
+      
+      const command = client.commands.get(commandName);
+      
+      if (!command) {
+        console.error(`Command not found: ${commandName} for subcommand: ${subcommand}, group: ${subcommandGroup}`);
+        return;
+      }
+      
+      try {
+        await command.execute(interaction);
+      } catch (error) {
+        console.error(error);
+        const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", ephemeral: true };
+        if (interaction.replied || interaction.deferred) await interaction.followUp(reply);
+        else await interaction.reply(reply);
       }
     }
   }
 });
 
-// ✅ SERVIDOR WEB PARA O RENDER (IMPORTANTE!)
+// Servidor web para o Render
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('Bot Miscrits Online!\n');
 });
 
-// ✅ USA A PORTA DO RENDER CORRETAMENTE
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
