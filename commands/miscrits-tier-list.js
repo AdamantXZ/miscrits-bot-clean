@@ -1,4 +1,4 @@
-// commands/miscrits-tier-list.js
+// commands/miscrits-tier-list.js - VERSÃO CORRIGIDA
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 
 module.exports = {
@@ -9,9 +9,13 @@ module.exports = {
   async execute(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("Miscrits PvP Tier List")
-      .setImage("https://i.imgur.com/Tg3IQP4.png")
+      .setDescription("Check the tier list at: https://i.imgur.com/Tg3IQP4.png")
       .setColor(0x2b6cb0);
 
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.reply({ 
+      content: "https://i.imgur.com/Tg3IQP4.png",
+      embeds: [embed], 
+      ephemeral: true 
+    });
   },
 };
