@@ -9,11 +9,10 @@ module.exports = {
   async execute(interaction) {
     const embed = new EmbedBuilder()
       .setTitle("Miscrits PvP Tier List")
-      .setDescription("Check the tier list at: https://i.imgur.com/Tg3IQP4.png")
+      .setDescription("📊 Check the complete tier list:\nhttps://i.imgur.com/Tg3IQP4.png")
       .setColor(0x2b6cb0);
 
     await interaction.reply({ 
-      content: "https://i.imgur.com/Tg3IQP4.png",
       embeds: [embed], 
       ephemeral: true 
     });
