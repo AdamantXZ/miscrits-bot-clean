@@ -70,10 +70,27 @@ client.on("interactionCreate", async interaction => {
       try {
         await command.execute(interaction);
       } catch (error) {
-        console.error(error);
-        const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", ephemeral: true };
-        if (interaction.replied || interaction.deferred) await interaction.followUp(reply);
-        else await interaction.reply(reply);
+        // ✅ IGNORA erro "Unknown interaction" (10062) - usuário cancelou comando
+        if (error.code === 10062) {
+          console.log('⚠️ Interação cancelada pelo usuário (normal)');
+          return;
+        }
+        
+        console.error('❌ Erro no comando:', error);
+        
+        try {
+          const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", ephemeral: true };
+          if (interaction.replied || interaction.deferred) {
+            await interaction.followUp(reply);
+          } else {
+            await interaction.reply(reply);
+          }
+        } catch (replyError) {
+          // ✅ IGNORA se não conseguir responder (interação expirou/cancelada)
+          if (replyError.code !== 10062) {
+            console.error('❌ Erro ao enviar mensagem de erro:', replyError);
+          }
+        }
       }
     }
   }
