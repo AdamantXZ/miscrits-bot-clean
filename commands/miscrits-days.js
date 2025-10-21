@@ -10,7 +10,7 @@ module.exports = {
     .setDescription("Show Miscrits spawn for a specific day"),
 
   async execute(interaction) {
-    const day = interaction.options.getString("weekday"); // ⬅️ MUDEI PARA "weekday"
+    const day = interaction.options.getString("day"); // ⬅️ VOLTOU PARA "day"
     const filtered = miscrits.filter((m) => {
       const days = (m.days || "").toLowerCase();
       const rarity = (m.rarity || "").toLowerCase();

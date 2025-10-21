@@ -37,18 +37,18 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // day spawn (SUBCOMMAND GROUP - IGUAL AO RELICS)
+    // days spawn (SUBCOMMAND GROUP - CORRIGIDO)
     mainCommand.addSubcommandGroup(group =>
       group
-        .setName("day")
-        .setDescription("Day spawn commands")
+        .setName("days")
+        .setDescription("Days spawn commands")
         .addSubcommand(subcommand =>
           subcommand
             .setName("spawn")
             .setDescription("Show Miscrits spawn for a specific day")
             .addStringOption(option =>
               option
-                .setName("weekday")
+                .setName("day")
                 .setDescription("Day of the week")
                 .setRequired(true)
                 .addChoices(
@@ -95,7 +95,7 @@ if (!token || !clientId || !guildId) {
     console.log("✅ Commands deployed successfully!");
     console.log("📋 Available commands:");
     console.log("   /miscrits info");
-    console.log("   /miscrits day spawn"); 
+    console.log("   /miscrits days spawn"); 
     console.log("   /miscrits tier list");
     console.log("   /miscrits relics link");
   } catch (err) {

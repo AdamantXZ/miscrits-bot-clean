@@ -11,7 +11,7 @@ client.commands = new Collection();
 // Mapear subcomandos para arquivos - ATUALIZADO!
 const commandMap = {
   'info': 'miscrits-info',
-  'day_spawn': 'miscrits-days',  // ⬅️ AGORA USA UNDERLINE NO MAPEAMENTO
+  'days_spawn': 'miscrits-days',  // ⬅️ AGORA 'days_spawn'
   'tier_list': 'miscrits-tier-list',
   'relics_link': 'miscrits-relics'
 };
