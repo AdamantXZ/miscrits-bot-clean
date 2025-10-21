@@ -37,14 +37,14 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // days
+    // day spawn
     mainCommand.addSubcommand(subcommand =>
       subcommand
-        .setName("days")
-        .setDescription("Show all Miscrits that appear on a specific day")
+        .setName("day")
+        .setDescription("Show Miscrits spawn for a specific day")
         .addStringOption(option =>
           option
-            .setName("day")
+            .setName("spawn")
             .setDescription("Day of the week")
             .setRequired(true)
             .addChoices(
@@ -90,7 +90,7 @@ if (!token || !clientId || !guildId) {
     console.log("✅ Commands deployed successfully!");
     console.log("📋 Available commands:");
     console.log("   /miscrits info");
-    console.log("   /miscrits days"); 
+    console.log("   /miscrits day spawn"); 
     console.log("   /miscrits tier list");
     console.log("   /miscrits relics link");
   } catch (err) {
