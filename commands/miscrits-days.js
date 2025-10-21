@@ -4,49 +4,13 @@ const miscritsData = require("../data/miscrits.json");
 
 const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : miscritsData;
 
-// Função para formatar em 3 colunas
-function formatThreeColumns(miscritsList) {
-  const names = [];
-  const regions = [];
-  const pvpStatuses = [];
-  
-  miscritsList.forEach(m => {
-    let emoji = "⚪";
-    switch ((m.rarity || "").toLowerCase()) {
-      case "rare": emoji = "🔵"; break;
-      case "epic": emoji = "🟢"; break;
-      case "exotic": emoji = "🟣"; break;
-      case "legendary": emoji = "🟠"; break;
-    }
-    
-    names.push(`${emoji} ${m.name}`);
-    regions.push(m.region || "Unknown");
-    pvpStatuses.push(m.pvp_desired_status || "-");
-  });
-  
-  // Encontra o comprimento máximo de cada coluna para alinhar
-  const maxNameLength = Math.max(...names.map(n => n.length));
-  const maxRegionLength = Math.max(...regions.map(r => r.length));
-  
-  // Formata as linhas
-  const lines = [];
-  for (let i = 0; i < names.length; i++) {
-    const name = names[i].padEnd(maxNameLength + 2);
-    const region = regions[i].padEnd(maxRegionLength + 2);
-    const pvp = pvpStatuses[i];
-    lines.push(`${name}${region}${pvp}`);
-  }
-  
-  return lines;
-}
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-days")
     .setDescription("Show Miscrits spawn for a specific day"),
 
   async execute(interaction) {
-    const day = interaction.options.getString("day");
+    const day = interaction.options.getString("day"); // ⬅️ VOLTOU PARA "day"
     const filtered = miscrits.filter((m) => {
       const days = (m.days || "").toLowerCase();
       const rarity = (m.rarity || "").toLowerCase();
@@ -63,17 +27,33 @@ module.exports = {
       return await interaction.reply({ content: `❌ No Miscrits found for **${day}**.`, ephemeral: true });
     }
 
-    const chunkSize = 20; // Menos itens por embed para caber as colunas
+    const chunkSize = 30;
     const chunks = [];
     for (let i = 0; i < filtered.length; i += chunkSize) {
       chunks.push(filtered.slice(i, i + chunkSize));
     }
 
+    // ✅ ENVIA ATÉ 10 EMBEDS POR MENSAGEM (DISCORD LIMIT)
     const embedChunks = [];
     for (let i = 0; i < chunks.length; i++) {
-      // ✅ FORMATA EM 3 COLUNAS
-      const formattedLines = formatThreeColumns(chunks[i]);
-      
+      const lines = chunks[i].map((m) => {
+        let emoji = "⚪";
+        switch ((m.rarity || "").toLowerCase()) {
+          case "rare": emoji = "🔵"; break;
+          case "epic": emoji = "🟢"; break;
+          case "exotic": emoji = "🟣"; break;
+          case "legendary": emoji = "🟠"; break;
+        }
+        
+        // ✅ ADICIONA PVP STATUS
+        let pvpStatus = "";
+        if (m.pvp_desired_status) {
+          pvpStatus = ` — ${m.pvp_desired_status}`;
+        }
+        
+        return `${emoji} **${m.name}** — ${m.region || "Unknown Region"}${pvpStatus}`;
+      });
+
       const note =
         i === chunks.length - 1
           ? `\n\n*Only* **🔵 Rare** and **🟢 Epic** are shown.\n*⚪ Common, 🟣 Exotic, 🟠 Legendary and 🛒 Shop Miscrits are available every day.*`
@@ -81,13 +61,13 @@ module.exports = {
 
       const embed = new EmbedBuilder()
         .setTitle(`📅 Miscrits Spawn on ${day} (${i + 1}/${chunks.length})`)
-        .setDescription('```' + formattedLines.join('\n') + '```' + note)
+        .setDescription(lines.join("\n") + note)
         .setColor(0x2b6cb0);
 
       embedChunks.push(embed);
     }
 
-    // ✅ ENVIA MÚLTIPLOS EMBEDS JUNTOS
+    // ✅ ENVIA MÚLTIPLOS EMBEDS JUNTOS (ATÉ 10 POR MENSAGEM)
     const maxEmbedsPerMessage = 10;
     for (let i = 0; i < embedChunks.length; i += maxEmbedsPerMessage) {
       const embedsBatch = embedChunks.slice(i, i + maxEmbedsPerMessage);
