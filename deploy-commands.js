@@ -37,24 +37,29 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // day spawn
-    mainCommand.addSubcommand(subcommand =>
-      subcommand
+    // day spawn (SUBCOMMAND GROUP - IGUAL AO RELICS)
+    mainCommand.addSubcommandGroup(group =>
+      group
         .setName("day")
-        .setDescription("Show Miscrits spawn for a specific day")
-        .addStringOption(option =>
-          option
+        .setDescription("Day spawn commands")
+        .addSubcommand(subcommand =>
+          subcommand
             .setName("spawn")
-            .setDescription("Day of the week")
-            .setRequired(true)
-            .addChoices(
-              { name: "Monday", value: "Monday" },
-              { name: "Tuesday", value: "Tuesday" },
-              { name: "Wednesday", value: "Wednesday" },
-              { name: "Thursday", value: "Thursday" },
-              { name: "Friday", value: "Friday" },
-              { name: "Saturday", value: "Saturday" },
-              { name: "Sunday", value: "Sunday" }
+            .setDescription("Show Miscrits spawn for a specific day")
+            .addStringOption(option =>
+              option
+                .setName("weekday")
+                .setDescription("Day of the week")
+                .setRequired(true)
+                .addChoices(
+                  { name: "Monday", value: "Monday" },
+                  { name: "Tuesday", value: "Tuesday" },
+                  { name: "Wednesday", value: "Wednesday" },
+                  { name: "Thursday", value: "Thursday" },
+                  { name: "Friday", value: "Friday" },
+                  { name: "Saturday", value: "Saturday" },
+                  { name: "Sunday", value: "Sunday" }
+                )
             )
         )
     );

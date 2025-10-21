@@ -7,25 +7,10 @@ const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-days")
-    .setDescription("Show Miscrits spawn for a specific day")
-    .addStringOption((option) =>
-      option
-        .setName("spawn")
-        .setDescription("Day of the week")
-        .setRequired(true)
-        .addChoices(
-          { name: "Monday", value: "Monday" },
-          { name: "Tuesday", value: "Tuesday" },
-          { name: "Wednesday", value: "Wednesday" },
-          { name: "Thursday", value: "Thursday" },
-          { name: "Friday", value: "Friday" },
-          { name: "Saturday", value: "Saturday" },
-          { name: "Sunday", value: "Sunday" }
-        )
-    ),
+    .setDescription("Show Miscrits spawn for a specific day"),
 
   async execute(interaction) {
-    const day = interaction.options.getString("spawn");
+    const day = interaction.options.getString("weekday"); // ⬅️ MUDEI PARA "weekday"
     const filtered = miscrits.filter((m) => {
       const days = (m.days || "").toLowerCase();
       const rarity = (m.rarity || "").toLowerCase();

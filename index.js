@@ -8,10 +8,10 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos
+// Mapear subcomandos para arquivos - ATUALIZADO!
 const commandMap = {
   'info': 'miscrits-info',
-  'days': 'miscrits-days',
+  'day_spawn': 'miscrits-days',  // ⬅️ AGORA USA UNDERLINE NO MAPEAMENTO
   'tier_list': 'miscrits-tier-list',
   'relics_link': 'miscrits-relics'
 };
@@ -53,11 +53,11 @@ client.on("interactionCreate", async interaction => {
       
       let commandName;
       
-      if (!subcommandGroup) {
-        commandName = commandMap[subcommand];
-      } else {
+      if (subcommandGroup && subcommand) {
         const key = `${subcommandGroup}_${subcommand}`;
         commandName = commandMap[key];
+      } else {
+        commandName = commandMap[subcommand];
       }
       
       const command = client.commands.get(commandName);
