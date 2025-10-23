@@ -3,15 +3,20 @@ const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const fs = require("fs");
 const http = require('http');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ 
+  intents: [GatewayIntentBits.Guilds],
+  // ✅ RECONEXÃO AUTOMÁTICA
+  reconnect: true,
+  closeTimeout: 30000
+});
 
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos - ATUALIZADO!
+// Mapear subcomandos para arquivos
 const commandMap = {
   'info': 'miscrits-info',
-  'days_spawn': 'miscrits-days',  // ⬅️ AGORA 'days_spawn'
+  'days_spawn': 'miscrits-days',
   'tier_list': 'miscrits-tier-list',
   'relics_link': 'miscrits-relics'
 };
@@ -24,6 +29,16 @@ for (const file of commandFiles) {
 
 client.once("ready", () => {
   console.log(`✅ Bot online como ${client.user.tag}`);
+});
+
+// ✅ DETECTA QUANDO DESCONECTA
+client.on("disconnect", () => {
+  console.log('⚠️ Bot desconectado do Discord - tentando reconectar...');
+});
+
+// ✅ DETECTA ERROS DE CONEXÃO
+client.on("error", (error) => {
+  console.error('❌ Erro de conexão Discord:', error);
 });
 
 client.on("interactionCreate", async interaction => {
@@ -70,7 +85,6 @@ client.on("interactionCreate", async interaction => {
       try {
         await command.execute(interaction);
       } catch (error) {
-        // ✅ IGNORA erro "Unknown interaction" (10062) - usuário cancelou comando
         if (error.code === 10062) {
           console.log('⚠️ Interação cancelada pelo usuário (normal)');
           return;
@@ -86,7 +100,6 @@ client.on("interactionCreate", async interaction => {
             await interaction.reply(reply);
           }
         } catch (replyError) {
-          // ✅ IGNORA se não conseguir responder (interação expirou/cancelada)
           if (replyError.code !== 10062) {
             console.error('❌ Erro ao enviar mensagem de erro:', replyError);
           }
@@ -107,4 +120,11 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
 });
 
-client.login(process.env.BOT_TOKEN);
+// ✅ LOGIN COM TRATAMENTO DE ERRO
+client.login(process.env.BOT_TOKEN).catch(error => {
+  console.error('❌ ERRO CRÍTICO: Não foi possível conectar ao Discord:', error.message);
+  console.log('🔄 Tentando reconectar em 30 segundos...');
+  setTimeout(() => {
+    client.login(process.env.BOT_TOKEN);
+  }, 30000);
+});
