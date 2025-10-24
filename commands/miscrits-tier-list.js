@@ -8,7 +8,7 @@ module.exports = {
 
   async execute(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle("Miscrits PvP Tier List")
+      .setTitle("Miscrits PvP Tier List (Updated until v1.15)")
       .setImage("https://i.imgur.com/Tg3IQP4.png")
       .setColor(0x2b6cb0);
 
