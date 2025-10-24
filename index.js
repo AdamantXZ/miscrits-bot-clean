@@ -13,7 +13,7 @@ const client = new Client({
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos (ATUALIZADO)
+// Mapear subcomandos para arquivos
 const commandMap = {
   'info': 'miscrits-info',
   'spawn-days': 'miscrits-days',
@@ -82,7 +82,11 @@ client.on("interactionCreate", async interaction => {
           try {
             await command.autocomplete(interaction);
           } catch (error) {
-            console.error("❌ Erro no autocomplete:", error);
+            // ✅ IGNORA ERROS DE INTERAÇÃO DESCONHECIDA (USUÁRIO CANCELOU)
+            if (error.code === 10062) {
+              return; // Silenciosamente ignora
+            }
+            console.error("❌ Erro no autocomplete:", error.message);
           }
         }
       }
@@ -109,15 +113,15 @@ client.on("interactionCreate", async interaction => {
       try {
         await command.execute(interaction);
       } catch (error) {
+        // ✅ IGNORA ERROS DE INTERAÇÃO DESCONHECIDA (USUÁRIO CANCELOU)
         if (error.code === 10062) {
-          console.log('⚠️ Interação cancelada pelo usuário (normal)');
           return;
         }
         
-        console.error('❌ Erro no comando:', error);
+        console.error('❌ Erro no comando:', error.message);
         
         try {
-          const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", ephemeral: true };
+          const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", flags: 64 }; // ✅ FLAGS NO LUGAR DE EPHEMERAL
           if (interaction.replied || interaction.deferred) {
             await interaction.followUp(reply);
           } else {
@@ -125,7 +129,7 @@ client.on("interactionCreate", async interaction => {
           }
         } catch (replyError) {
           if (replyError.code !== 10062) {
-            console.error('❌ Erro ao enviar mensagem de erro:', replyError);
+            console.error('❌ Erro ao enviar mensagem de erro:', replyError.message);
           }
         }
       }
