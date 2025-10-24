@@ -10,7 +10,7 @@ module.exports = {
     .setDescription("Show Miscrits spawn for a specific day"),
 
   async execute(interaction) {
-    const day = interaction.options.getString("day"); // ⬅️ VOLTOU PARA "day"
+    const day = interaction.options.getString("day");
     const filtered = miscrits.filter((m) => {
       const days = (m.days || "").toLowerCase();
       const rarity = (m.rarity || "").toLowerCase();
@@ -54,13 +54,15 @@ module.exports = {
         return `${emoji} **${m.name}** — ${m.region || "Unknown Region"}${pvpStatus}`;
       });
 
+      // ✅ APENAS NO ÚLTIMO EMBED ADICIONA A NOTA
       const note =
         i === chunks.length - 1
           ? `\n\n*Only* **🔵 Rare** and **🟢 Epic** are shown.\n*⚪ Common, 🟣 Exotic, 🟠 Legendary and 🛒 Shop Miscrits are available every day.*`
           : "";
 
+      // ✅ REMOVE OS NÚMEROS (1/2), (2/2) - FICA SÓ O TÍTULO SIMPLES
       const embed = new EmbedBuilder()
-        .setTitle(`📅 Miscrits Spawn on ${day} (${i + 1}/${chunks.length})`)
+        .setTitle(`📅 Miscrits Spawn on ${day}`) // REMOVIDO: (${i + 1}/${chunks.length})
         .setDescription(lines.join("\n") + note)
         .setColor(0x2b6cb0);
 
