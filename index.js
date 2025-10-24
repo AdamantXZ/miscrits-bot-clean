@@ -16,9 +16,10 @@ client.commands = new Collection();
 // Mapear subcomandos para arquivos (ATUALIZADO)
 const commandMap = {
   'info': 'miscrits-info',
-  'spawn_day': 'miscrits-days', // ALTERADO: de 'days_spawn' para 'spawn_day'
-  'tier_list': 'miscrits-tier-list'
-  // REMOVIDO: 'relics_link': 'miscrits-relics'
+  'spawn_days': 'miscrits-days',
+  'tier_list': 'miscrits-tier-list',
+  'evos_moves': 'miscrits-evos-moves',
+  'relics_build': 'miscrits-relics'
 };
 
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
@@ -47,8 +48,21 @@ client.on("interactionCreate", async interaction => {
       const subcommand = interaction.options.getSubcommand();
       const subcommandGroup = interaction.options.getSubcommandGroup();
       
-      if (!subcommandGroup && subcommand === "info") {
-        const command = client.commands.get("miscrits-info");
+      // Autocomplete para info, evos moves e relics build
+      if ((!subcommandGroup && subcommand === "info") || 
+          (subcommandGroup === "evos" && subcommand === "moves") ||
+          (subcommandGroup === "relics" && subcommand === "build")) {
+        
+        let commandName;
+        if (!subcommandGroup) {
+          commandName = 'miscrits-info';
+        } else if (subcommandGroup === "evos") {
+          commandName = 'miscrits-evos-moves';
+        } else if (subcommandGroup === "relics") {
+          commandName = 'miscrits-relics';
+        }
+        
+        const command = client.commands.get(commandName);
         if (command && command.autocomplete) {
           try {
             await command.autocomplete(interaction);

@@ -37,14 +37,14 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // spawn days (SUBCOMMAND GROUP - NOME INVERTIDO)
+    // spawn days
     mainCommand.addSubcommandGroup(group =>
       group
-        .setName("spawn") // AGORA É "spawn" NO LUGAR DE "days"
+        .setName("spawn")
         .setDescription("Spawn commands")
         .addSubcommand(subcommand =>
           subcommand
-            .setName("day") // AGORA É "day" NO LUGAR DE "spawn"
+            .setName("days")
             .setDescription("Show Miscrits spawn for a specific day")
             .addStringOption(option =>
               option
@@ -76,7 +76,43 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // REMOVIDO: relics link
+    // Evos & Moves
+    mainCommand.addSubcommandGroup(group =>
+      group
+        .setName("evos")
+        .setDescription("Evolutions and moves commands")
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName("moves")
+            .setDescription("Show evolution and moves information for a specific Miscrit")
+            .addStringOption(option =>
+              option
+                .setName("name")
+                .setDescription("Name of the Miscrit")
+                .setRequired(true)
+                .setAutocomplete(true)
+            )
+        )
+    );
+
+    // Relics
+    mainCommand.addSubcommandGroup(group =>
+      group
+        .setName("relics")
+        .setDescription("Relics commands")
+        .addSubcommand(subcommand =>
+          subcommand
+            .setName("build")
+            .setDescription("Show relics information for a specific Miscrit")
+            .addStringOption(option =>
+              option
+                .setName("name")
+                .setDescription("Name of the Miscrit")
+                .setRequired(true)
+                .setAutocomplete(true)
+            )
+        )
+    );
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), { 
       body: [mainCommand.toJSON()] 
@@ -85,9 +121,10 @@ if (!token || !clientId || !guildId) {
     console.log("✅ Commands deployed successfully!");
     console.log("📋 Available commands:");
     console.log("   /miscrits info");
-    console.log("   /miscrits spawn day"); // AGORA É "spawn day"
+    console.log("   /miscrits spawn days");
     console.log("   /miscrits tier list");
-    console.log("   (relics link removido)");
+    console.log("   /miscrits evos moves");
+    console.log("   /miscrits relics build");
   } catch (err) {
     console.error("❌ Error deploying commands:", err);
   }
