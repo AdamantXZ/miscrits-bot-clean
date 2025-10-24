@@ -15,10 +15,10 @@ client.commands = new Collection();
 // Mapear subcomandos para arquivos (ATUALIZADO)
 const commandMap = {
   'info': 'miscrits-info',
+  'moves-and-evos': 'miscrits-evos-moves', // MUDOU: wiki-moves → moves-and-evos
   'relics': 'miscrits-relics',
   'spawn-days': 'miscrits-days',
-  'tierlist': 'miscrits-tier-list',
-  'wiki-moves': 'miscrits-evos-moves' // MUDOU: evos-moves → wiki-moves
+  'tierlist': 'miscrits-tier-list'
 };
 
 // ✅ CARREGAMENTO SEGURO DOS COMANDOS
@@ -61,12 +61,12 @@ client.on("interactionCreate", async interaction => {
     if (interaction.commandName === "miscrits") {
       const subcommand = interaction.options.getSubcommand();
       
-      if (subcommand === "info" || subcommand === "wiki-moves" || subcommand === "relics") {
+      if (subcommand === "info" || subcommand === "moves-and-evos" || subcommand === "relics") {
         
         let commandName;
         if (subcommand === "info") {
           commandName = 'miscrits-info';
-        } else if (subcommand === "wiki-moves") {
+        } else if (subcommand === "moves-and-evos") {
           commandName = 'miscrits-evos-moves';
         } else if (subcommand === "relics") {
           commandName = 'miscrits-relics';

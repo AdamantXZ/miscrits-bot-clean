@@ -44,7 +44,21 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 2. relics (vem depois de 'info')
+    // 2. moves-and-evos (MUDOU: wiki-moves → moves-and-evos - vem depois de 'info')
+    mainCommand.addSubcommand(subcommand =>
+      subcommand
+        .setName("moves-and-evos")
+        .setDescription("Show wiki page for a specific Miscrit")
+        .addStringOption(option =>
+          option
+            .setName("name")
+            .setDescription("Name of the Miscrit")
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
+    );
+
+    // 3. relics (vem depois de 'moves-and-evos')
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("relics")
@@ -58,7 +72,7 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 3. spawn-days (vem depois de 'relics')  
+    // 4. spawn-days (vem depois de 'relics')  
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("spawn-days")
@@ -80,25 +94,11 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 4. tierlist (vem depois de 'spawn-days')
+    // 5. tierlist (vem por último)
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("tierlist")
         .setDescription("Show the Miscrits PvP tier list")
-    );
-
-    // 5. wiki-moves (MUDOU: evos-moves → wiki-moves - vem por último)
-    mainCommand.addSubcommand(subcommand =>
-      subcommand
-        .setName("wiki-moves")
-        .setDescription("Show wiki page for a specific Miscrit")
-        .addStringOption(option =>
-          option
-            .setName("name")
-            .setDescription("Name of the Miscrit")
-            .setRequired(true)
-            .setAutocomplete(true)
-        )
     );
 
     console.log("🔄 Registering commands with Discord...");
@@ -109,10 +109,10 @@ if (!token || !clientId || !guildId) {
     console.log("✅ Commands deployed successfully!");
     console.log("📋 Alphabetical order:");
     console.log("   1. /miscrits info");
-    console.log("   2. /miscrits relics");
-    console.log("   3. /miscrits spawn-days");
-    console.log("   4. /miscrits tierlist");
-    console.log("   5. /miscrits wiki-moves");
+    console.log("   2. /miscrits moves-and-evos");
+    console.log("   3. /miscrits relics");
+    console.log("   4. /miscrits spawn-days");
+    console.log("   5. /miscrits tierlist");
     
     console.log("🕒 Waiting for Discord cache to update...");
   } catch (err) {
