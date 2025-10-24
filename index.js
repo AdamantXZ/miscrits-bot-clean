@@ -13,10 +13,10 @@ const client = new Client({
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos (ATUALIZADO)
+// Mapear subcomandos para arquivos (ATUALIZADO E CORRIGIDO)
 const commandMap = {
   'info': 'miscrits-info',
-  'spawn_days': 'miscrits-days',
+  'spawn_days': 'miscrits-days', // CORRIGIDO: estava 'spawn_day' mas no deploy é 'spawn_days'
   'tier_list': 'miscrits-tier-list',
   'evos_moves': 'miscrits-evos-moves',
   'relics_build': 'miscrits-relics'
@@ -48,6 +48,8 @@ client.on("interactionCreate", async interaction => {
       const subcommand = interaction.options.getSubcommand();
       const subcommandGroup = interaction.options.getSubcommandGroup();
       
+      console.log(`🔍 Autocomplete: group=${subcommandGroup}, subcommand=${subcommand}`);
+      
       // Autocomplete para info, evos moves e relics build
       if ((!subcommandGroup && subcommand === "info") || 
           (subcommandGroup === "evos" && subcommand === "moves") ||
@@ -62,6 +64,8 @@ client.on("interactionCreate", async interaction => {
           commandName = 'miscrits-relics';
         }
         
+        console.log(`🎯 Executing autocomplete for: ${commandName}`);
+        
         const command = client.commands.get(commandName);
         if (command && command.autocomplete) {
           try {
@@ -69,6 +73,8 @@ client.on("interactionCreate", async interaction => {
           } catch (error) {
             console.error("❌ Erro no autocomplete:", error);
           }
+        } else {
+          console.error(`❌ Command not found for autocomplete: ${commandName}`);
         }
       }
     }
@@ -80,20 +86,28 @@ client.on("interactionCreate", async interaction => {
       const subcommand = interaction.options.getSubcommand();
       const subcommandGroup = interaction.options.getSubcommandGroup();
       
+      console.log(`🚀 Executing: group=${subcommandGroup}, subcommand=${subcommand}`);
+      
       let commandName;
       
       if (subcommandGroup && subcommand) {
         const key = `${subcommandGroup}_${subcommand}`;
         commandName = commandMap[key];
+        console.log(`🔑 Looking for command: ${key} -> ${commandName}`);
       } else {
         commandName = commandMap[subcommand];
+        console.log(`🔑 Looking for command: ${subcommand} -> ${commandName}`);
       }
       
       const command = client.commands.get(commandName);
       
       if (!command) {
-        console.error(`Command not found: ${commandName} for subcommand: ${subcommand}, group: ${subcommandGroup}`);
-        return;
+        console.error(`❌ Command not found: ${commandName} for subcommand: ${subcommand}, group: ${subcommandGroup}`);
+        console.log(`📋 Available commands:`, Object.keys(commandMap));
+        return await interaction.reply({ 
+          content: "❌ Command not configured properly!", 
+          ephemeral: true 
+        });
       }
       
       try {
