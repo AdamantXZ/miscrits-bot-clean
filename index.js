@@ -13,23 +13,41 @@ const client = new Client({
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos (VOLTOU PARA O ORIGINAL)
+// Mapear subcomandos para arquivos
 const commandMap = {
   'info': 'miscrits-info',
-  'days_spawn': 'miscrits-days', // VOLTOU PARA 'days_spawn'
+  'days_spawn': 'miscrits-days',
   'tier_list': 'miscrits-tier-list',
   'evos_moves': 'miscrits-evos-moves',
   'relics_build': 'miscrits-relics'
 };
 
-const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
-for (const file of commandFiles) {
-  const command = require(`./commands/${file}`);
-  client.commands.set(command.data.name, command);
+// ✅ CARREGAMENTO SEGURO DOS COMANDOS
+try {
+  const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+  
+  for (const file of commandFiles) {
+    try {
+      const command = require(`./commands/${file}`);
+      
+      // ✅ VERIFICA SE O COMANDO TEM A ESTRUTURA CORRETA
+      if (command.data && command.data.name) {
+        client.commands.set(command.data.name, command);
+        console.log(`✅ Comando carregado: ${command.data.name}`);
+      } else {
+        console.error(`❌ Comando inválido: ${file} - falta propriedade 'data' ou 'data.name'`);
+      }
+    } catch (error) {
+      console.error(`❌ Erro ao carregar comando ${file}:`, error.message);
+    }
+  }
+} catch (error) {
+  console.error('❌ Erro ao ler pasta commands:', error.message);
 }
 
 client.once("ready", () => {
   console.log(`✅ Bot online como ${client.user.tag}`);
+  console.log(`📋 Comandos carregados: ${client.commands.size}`);
 });
 
 // ✅ DETECTA QUANDO DESCONECTA
@@ -93,7 +111,10 @@ client.on("interactionCreate", async interaction => {
       
       if (!command) {
         console.error(`Command not found: ${commandName} for subcommand: ${subcommand}, group: ${subcommandGroup}`);
-        return;
+        return await interaction.reply({ 
+          content: "❌ Command not configured properly!", 
+          ephemeral: true 
+        });
       }
       
       try {
