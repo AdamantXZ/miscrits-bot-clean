@@ -1,5 +1,5 @@
 // commands/miscrits-relics.js
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const miscritsData = require("../data/miscrits.json");
 
 const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : miscritsData;
@@ -52,33 +52,20 @@ module.exports = {
         return await interaction.reply({ content: "❌ Miscrit not found!", ephemeral: true });
       }
 
-      const embedColor = 0x2b6cb0;
-
-      // Embed com apenas o link das relics
       let description = "";
       
       if (miscrit.relics_site) {
-        description += `**Relics Build:**\n🔗 ${miscrit.relics_site}`;
+        description += `**Relics Build:**\n${miscrit.relics_site}`;
       } else {
         description += `**Relics Build:** No relics data available`;
       }
 
       const embed = new EmbedBuilder()
-        .setTitle(`${miscrit.name} - Relics Build`)
         .setDescription(description)
-        .setColor(embedColor);
-
-      // Botão para o site de relics
-      const row = miscrit.relics_site ? new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setLabel('💎 Open Relics Build')
-          .setURL(miscrit.relics_site)
-          .setStyle(ButtonStyle.Link)
-      ) : null;
+        .setColor(0x2b6cb0);
 
       await interaction.reply({ 
         embeds: [embed], 
-        components: row ? [row] : [],
         ephemeral: true 
       });
     } catch (err) {

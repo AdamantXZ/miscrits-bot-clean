@@ -1,5 +1,5 @@
 // commands/miscrits-evos-moves.js
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const miscritsData = require("../data/miscrits.json");
 
 const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : miscritsData;
@@ -52,33 +52,20 @@ module.exports = {
         return await interaction.reply({ content: "❌ Miscrit not found!", ephemeral: true });
       }
 
-      const embedColor = 0x2b6cb0;
-
-      // Embed com apenas o link da wiki
       let description = "";
       
       if (miscrit.wiki_page) {
-        description += `**Wiki Page:**\n🔗 ${miscrit.wiki_page}`;
+        description += `**Wiki Page:**\n${miscrit.wiki_page}`;
       } else {
         description += `**Wiki Page:** No wiki data available`;
       }
 
       const embed = new EmbedBuilder()
-        .setTitle(`${miscrit.name} - Wiki Page`)
         .setDescription(description)
-        .setColor(embedColor);
-
-      // Botão para a wiki
-      const row = miscrit.wiki_page ? new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setLabel('📖 Open Wiki Page')
-          .setURL(miscrit.wiki_page)
-          .setStyle(ButtonStyle.Link)
-      ) : null;
+        .setColor(0x2b6cb0);
 
       await interaction.reply({ 
         embeds: [embed], 
-        components: row ? [row] : [],
         ephemeral: true 
       });
     } catch (err) {
