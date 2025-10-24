@@ -37,14 +37,14 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // days spawn (SUBCOMMAND GROUP - CORRIGIDO)
+    // spawn days (SUBCOMMAND GROUP - NOME INVERTIDO)
     mainCommand.addSubcommandGroup(group =>
       group
-        .setName("days")
-        .setDescription("Days spawn commands")
+        .setName("spawn") // AGORA É "spawn" NO LUGAR DE "days"
+        .setDescription("Spawn commands")
         .addSubcommand(subcommand =>
           subcommand
-            .setName("spawn")
+            .setName("day") // AGORA É "day" NO LUGAR DE "spawn"
             .setDescription("Show Miscrits spawn for a specific day")
             .addStringOption(option =>
               option
@@ -76,17 +76,7 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // relics link
-    mainCommand.addSubcommandGroup(group =>
-      group
-        .setName("relics")
-        .setDescription("Relics commands")
-        .addSubcommand(subcommand =>
-          subcommand
-            .setName("link")
-            .setDescription("Show link to Miscrits Relics information")
-        )
-    );
+    // REMOVIDO: relics link
 
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), { 
       body: [mainCommand.toJSON()] 
@@ -95,9 +85,9 @@ if (!token || !clientId || !guildId) {
     console.log("✅ Commands deployed successfully!");
     console.log("📋 Available commands:");
     console.log("   /miscrits info");
-    console.log("   /miscrits days spawn"); 
+    console.log("   /miscrits spawn day"); // AGORA É "spawn day"
     console.log("   /miscrits tier list");
-    console.log("   /miscrits relics link");
+    console.log("   (relics link removido)");
   } catch (err) {
     console.error("❌ Error deploying commands:", err);
   }

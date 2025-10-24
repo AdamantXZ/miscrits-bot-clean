@@ -13,12 +13,12 @@ const client = new Client({
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos
+// Mapear subcomandos para arquivos (ATUALIZADO)
 const commandMap = {
   'info': 'miscrits-info',
-  'days_spawn': 'miscrits-days',
-  'tier_list': 'miscrits-tier-list',
-  'relics_link': 'miscrits-relics'
+  'spawn_day': 'miscrits-days', // ALTERADO: de 'days_spawn' para 'spawn_day'
+  'tier_list': 'miscrits-tier-list'
+  // REMOVIDO: 'relics_link': 'miscrits-relics'
 };
 
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
