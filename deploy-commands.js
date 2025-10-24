@@ -37,14 +37,14 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // spawn days
+    // days spawn (SUBCOMMAND GROUP - VOLTOU PARA O ORIGINAL)
     mainCommand.addSubcommandGroup(group =>
       group
-        .setName("spawn")
-        .setDescription("Spawn commands")
+        .setName("days")
+        .setDescription("Days spawn commands")
         .addSubcommand(subcommand =>
           subcommand
-            .setName("days")
+            .setName("spawn")
             .setDescription("Show Miscrits spawn for a specific day")
             .addStringOption(option =>
               option
@@ -121,7 +121,7 @@ if (!token || !clientId || !guildId) {
     console.log("✅ Commands deployed successfully!");
     console.log("📋 Available commands:");
     console.log("   /miscrits info");
-    console.log("   /miscrits spawn days");
+    console.log("   /miscrits days spawn"); // VOLTOU PARA "days spawn"
     console.log("   /miscrits tier list");
     console.log("   /miscrits evos moves");
     console.log("   /miscrits relics build");

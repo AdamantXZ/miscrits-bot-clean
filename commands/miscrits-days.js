@@ -10,11 +10,7 @@ module.exports = {
     .setDescription("Show Miscrits spawn for a specific day"),
 
   async execute(interaction) {
-    console.log('🎯 Executing miscrits-days command');
-    
-    const day = interaction.options.getString("day");
-    console.log(`📅 Day selected: ${day}`);
-    
+    const day = interaction.options.getString("day"); // ⬅️ VOLTOU PARA "day"
     const filtered = miscrits.filter((m) => {
       const days = (m.days || "").toLowerCase();
       const rarity = (m.rarity || "").toLowerCase();
@@ -26,8 +22,6 @@ module.exports = {
 
       return appears && isRareOrEpic && !excluded;
     });
-
-    console.log(`🔍 Found ${filtered.length} miscrits for ${day}`);
 
     if (filtered.length === 0) {
       return await interaction.reply({ content: `❌ No Miscrits found for **${day}**.`, ephemeral: true });
