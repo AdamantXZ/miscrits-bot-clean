@@ -18,6 +18,9 @@ module.exports = {
 
   async autocomplete(interaction) {
     try {
+      // ✅ PEQUENO DELAY PARA EVITAR CONFLITO
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const focused = (interaction.options.getFocused() || "").trim().toLowerCase();
       let results;
 
