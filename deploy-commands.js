@@ -16,14 +16,21 @@ if (!token || !clientId || !guildId) {
 
     const rest = new REST({ version: "10" }).setToken(token);
 
-    console.log("🧹 Clearing old commands...");
+    console.log("🧹 CLEARING ALL COMMANDS...");
+    await rest.put(Routes.applicationCommands(clientId), { body: [] });
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] });
+    
+    console.log("✅ All commands cleared, waiting 2 seconds...");
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     const mainCommand = new SlashCommandBuilder()
       .setName("miscrits")
       .setDescription("Comandos para informações sobre Miscrits");
 
-    // info (PRIMEIRO)
+    // Vamos usar nomes que forcem a ordem alfabética correta
+    console.log("📝 Adding commands with alphabetical order...");
+
+    // 1. info (vem primeiro alfabeticamente)
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("info")
@@ -37,7 +44,21 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // spawn-days (SEGUNDO)
+    // 2. relics (vem depois de 'info')
+    mainCommand.addSubcommand(subcommand =>
+      subcommand
+        .setName("relics")
+        .setDescription("Show relics build for a specific Miscrit")
+        .addStringOption(option =>
+          option
+            .setName("name")
+            .setDescription("Name of the Miscrit")
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
+    );
+
+    // 3. spawn-days (vem depois de 'relics')  
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("spawn-days")
@@ -59,31 +80,17 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // tierlist (TERCEIRO)
+    // 4. tierlist (vem depois de 'spawn-days')
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("tierlist")
         .setDescription("Show the Miscrits PvP tier list")
     );
 
-    // relics (QUARTO)
+    // 5. wiki-moves (MUDOU: evos-moves → wiki-moves - vem por último)
     mainCommand.addSubcommand(subcommand =>
       subcommand
-        .setName("relics")
-        .setDescription("Show relics build for a specific Miscrit")
-        .addStringOption(option =>
-          option
-            .setName("name")
-            .setDescription("Name of the Miscrit")
-            .setRequired(true)
-            .setAutocomplete(true)
-        )
-    );
-
-    // evos-moves (QUINTO)
-    mainCommand.addSubcommand(subcommand =>
-      subcommand
-        .setName("evos-moves")
+        .setName("wiki-moves")
         .setDescription("Show wiki page for a specific Miscrit")
         .addStringOption(option =>
           option
@@ -94,17 +101,20 @@ if (!token || !clientId || !guildId) {
         )
     );
 
+    console.log("🔄 Registering commands with Discord...");
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), { 
       body: [mainCommand.toJSON()] 
     });
 
     console.log("✅ Commands deployed successfully!");
-    console.log("📋 Available commands in order:");
+    console.log("📋 Alphabetical order:");
     console.log("   1. /miscrits info");
-    console.log("   2. /miscrits spawn-days");
-    console.log("   3. /miscrits tierlist");
-    console.log("   4. /miscrits relics");
-    console.log("   5. /miscrits evos-moves");
+    console.log("   2. /miscrits relics");
+    console.log("   3. /miscrits spawn-days");
+    console.log("   4. /miscrits tierlist");
+    console.log("   5. /miscrits wiki-moves");
+    
+    console.log("🕒 Waiting for Discord cache to update...");
   } catch (err) {
     console.error("❌ Error deploying commands:", err);
   }

@@ -5,7 +5,6 @@ const http = require('http');
 
 const client = new Client({ 
   intents: [GatewayIntentBits.Guilds],
-  // ✅ RECONEXÃO AUTOMÁTICA
   reconnect: true,
   closeTimeout: 30000
 });
@@ -13,13 +12,13 @@ const client = new Client({
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos
+// Mapear subcomandos para arquivos (ATUALIZADO)
 const commandMap = {
   'info': 'miscrits-info',
+  'relics': 'miscrits-relics',
   'spawn-days': 'miscrits-days',
   'tierlist': 'miscrits-tier-list',
-  'evos-moves': 'miscrits-evos-moves',
-  'relics': 'miscrits-relics'
+  'wiki-moves': 'miscrits-evos-moves' // MUDOU: evos-moves → wiki-moves
 };
 
 // ✅ CARREGAMENTO SEGURO DOS COMANDOS
@@ -30,7 +29,6 @@ try {
     try {
       const command = require(`./commands/${file}`);
       
-      // ✅ VERIFICA SE O COMANDO TEM A ESTRUTURA CORRETA
       if (command.data && command.data.name) {
         client.commands.set(command.data.name, command);
         console.log(`✅ Comando carregado: ${command.data.name}`);
@@ -50,12 +48,10 @@ client.once("ready", () => {
   console.log(`📋 Comandos carregados: ${client.commands.size}`);
 });
 
-// ✅ DETECTA QUANDO DESCONECTA
 client.on("disconnect", () => {
   console.log('⚠️ Bot desconectado do Discord - tentando reconectar...');
 });
 
-// ✅ DETECTA ERROS DE CONEXÃO
 client.on("error", (error) => {
   console.error('❌ Erro de conexão Discord:', error);
 });
@@ -65,13 +61,12 @@ client.on("interactionCreate", async interaction => {
     if (interaction.commandName === "miscrits") {
       const subcommand = interaction.options.getSubcommand();
       
-      // Autocomplete para info, evos-moves e relics
-      if (subcommand === "info" || subcommand === "evos-moves" || subcommand === "relics") {
+      if (subcommand === "info" || subcommand === "wiki-moves" || subcommand === "relics") {
         
         let commandName;
         if (subcommand === "info") {
           commandName = 'miscrits-info';
-        } else if (subcommand === "evos-moves") {
+        } else if (subcommand === "wiki-moves") {
           commandName = 'miscrits-evos-moves';
         } else if (subcommand === "relics") {
           commandName = 'miscrits-relics';
@@ -82,10 +77,7 @@ client.on("interactionCreate", async interaction => {
           try {
             await command.autocomplete(interaction);
           } catch (error) {
-            // ✅ IGNORA ERROS DE INTERAÇÃO DESCONHECIDA (USUÁRIO CANCELOU)
-            if (error.code === 10062) {
-              return; // Silenciosamente ignora
-            }
+            if (error.code === 10062) return;
             console.error("❌ Erro no autocomplete:", error.message);
           }
         }
@@ -106,22 +98,19 @@ client.on("interactionCreate", async interaction => {
         console.error(`Command not found: ${commandName} for subcommand: ${subcommand}`);
         return await interaction.reply({ 
           content: "❌ Command not configured properly!", 
-          ephemeral: true 
+          flags: 64 
         });
       }
       
       try {
         await command.execute(interaction);
       } catch (error) {
-        // ✅ IGNORA ERROS DE INTERAÇÃO DESCONHECIDA (USUÁRIO CANCELOU)
-        if (error.code === 10062) {
-          return;
-        }
+        if (error.code === 10062) return;
         
         console.error('❌ Erro no comando:', error.message);
         
         try {
-          const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", flags: 64 }; // ✅ FLAGS NO LUGAR DE EPHEMERAL
+          const reply = { content: "❌ Ocorreu um erro ao executar esse comando!", flags: 64 };
           if (interaction.replied || interaction.deferred) {
             await interaction.followUp(reply);
           } else {
@@ -148,7 +137,6 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
 });
 
-// ✅ LOGIN COM TRATAMENTO DE ERRO
 client.login(process.env.BOT_TOKEN).catch(error => {
   console.error('❌ ERRO CRÍTICO: Não foi possível conectar ao Discord:', error.message);
   console.log('🔄 Tentando reconectar em 30 segundos...');
