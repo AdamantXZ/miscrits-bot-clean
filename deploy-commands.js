@@ -23,7 +23,7 @@ if (!token || !clientId || !guildId) {
       .setName("miscrits")
       .setDescription("Comandos para informações sobre Miscrits");
 
-    // info
+    // info (PRIMEIRO)
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("info")
@@ -37,7 +37,7 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // spawn-days (SUBCOMMAND SIMPLES - NOME ALTERADO)
+    // spawn-days (SEGUNDO)
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("spawn-days")
@@ -59,18 +59,18 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // tierlist (SUBCOMMAND SIMPLES - NOME ALTERADO)
+    // tierlist (TERCEIRO)
     mainCommand.addSubcommand(subcommand =>
       subcommand
         .setName("tierlist")
         .setDescription("Show the Miscrits PvP tier list")
     );
 
-    // evos-moves (SUBCOMMAND SIMPLES - NOME ALTERADO - SEM &)
+    // relics (QUARTO)
     mainCommand.addSubcommand(subcommand =>
       subcommand
-        .setName("evos-moves")
-        .setDescription("Show wiki page for a specific Miscrit")
+        .setName("relics")
+        .setDescription("Show relics build for a specific Miscrit")
         .addStringOption(option =>
           option
             .setName("name")
@@ -80,11 +80,11 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // relics (SUBCOMMAND SIMPLES - NOME ALTERADO)
+    // evos-moves (QUINTO)
     mainCommand.addSubcommand(subcommand =>
       subcommand
-        .setName("relics")
-        .setDescription("Show relics build for a specific Miscrit")
+        .setName("evos-moves")
+        .setDescription("Show wiki page for a specific Miscrit")
         .addStringOption(option =>
           option
             .setName("name")
@@ -99,12 +99,12 @@ if (!token || !clientId || !guildId) {
     });
 
     console.log("✅ Commands deployed successfully!");
-    console.log("📋 Available commands:");
-    console.log("   /miscrits info");
-    console.log("   /miscrits spawn-days");
-    console.log("   /miscrits tierlist");
-    console.log("   /miscrits evos-moves");
-    console.log("   /miscrits relics");
+    console.log("📋 Available commands in order:");
+    console.log("   1. /miscrits info");
+    console.log("   2. /miscrits spawn-days");
+    console.log("   3. /miscrits tierlist");
+    console.log("   4. /miscrits relics");
+    console.log("   5. /miscrits evos-moves");
   } catch (err) {
     console.error("❌ Error deploying commands:", err);
   }
