@@ -60,11 +60,15 @@ module.exports = {
           ? `\n\n*Only* **🔵 Rare** and **🟢 Epic** are shown.\n*⚪ Common, 🟣 Exotic, 🟠 Legendary and 🛒 Shop Miscrits are available every day.*`
           : "";
 
-      // ✅ REMOVE OS NÚMEROS (1/2), (2/2) - FICA SÓ O TÍTULO SIMPLES
+      // ✅ PRIMEIRO EMBED TEM TÍTULO, OS DEMAIS NÃO
       const embed = new EmbedBuilder()
-        .setTitle(`📅 Miscrits Spawn on ${day}`) // REMOVIDO: (${i + 1}/${chunks.length})
         .setDescription(lines.join("\n") + note)
         .setColor(0x2b6cb0);
+
+      // ✅ APENAS O PRIMEIRO EMBED TEM TÍTULO COM EMOJI NOVO
+      if (i === 0) {
+        embed.setTitle(`🗓️ Miscrits Spawn on ${day}`); // 📅 → 🗓️
+      }
 
       embedChunks.push(embed);
     }
