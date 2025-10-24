@@ -37,80 +37,60 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // days spawn (SUBCOMMAND GROUP - VOLTOU PARA O ORIGINAL)
-    mainCommand.addSubcommandGroup(group =>
-      group
-        .setName("days")
-        .setDescription("Days spawn commands")
-        .addSubcommand(subcommand =>
-          subcommand
-            .setName("spawn")
-            .setDescription("Show Miscrits spawn for a specific day")
-            .addStringOption(option =>
-              option
-                .setName("day")
-                .setDescription("Day of the week")
-                .setRequired(true)
-                .addChoices(
-                  { name: "Monday", value: "Monday" },
-                  { name: "Tuesday", value: "Tuesday" },
-                  { name: "Wednesday", value: "Wednesday" },
-                  { name: "Thursday", value: "Thursday" },
-                  { name: "Friday", value: "Friday" },
-                  { name: "Saturday", value: "Saturday" },
-                  { name: "Sunday", value: "Sunday" }
-                )
+    // spawn-days (SUBCOMMAND SIMPLES - NOME ALTERADO)
+    mainCommand.addSubcommand(subcommand =>
+      subcommand
+        .setName("spawn-days")
+        .setDescription("Show Miscrits spawn for a specific day")
+        .addStringOption(option =>
+          option
+            .setName("day")
+            .setDescription("Day of the week")
+            .setRequired(true)
+            .addChoices(
+              { name: "Monday", value: "Monday" },
+              { name: "Tuesday", value: "Tuesday" },
+              { name: "Wednesday", value: "Wednesday" },
+              { name: "Thursday", value: "Thursday" },
+              { name: "Friday", value: "Friday" },
+              { name: "Saturday", value: "Saturday" },
+              { name: "Sunday", value: "Sunday" }
             )
         )
     );
 
-    // tier list
-    mainCommand.addSubcommandGroup(group =>
-      group
-        .setName("tier")
-        .setDescription("Tier list commands")
-        .addSubcommand(subcommand =>
-          subcommand
-            .setName("list")
-            .setDescription("Show the Miscrits PvP tier list")
+    // tierlist (SUBCOMMAND SIMPLES - NOME ALTERADO)
+    mainCommand.addSubcommand(subcommand =>
+      subcommand
+        .setName("tierlist")
+        .setDescription("Show the Miscrits PvP tier list")
+    );
+
+    // evos-moves (SUBCOMMAND SIMPLES - NOME ALTERADO - SEM &)
+    mainCommand.addSubcommand(subcommand =>
+      subcommand
+        .setName("evos-moves")
+        .setDescription("Show wiki page for a specific Miscrit")
+        .addStringOption(option =>
+          option
+            .setName("name")
+            .setDescription("Name of the Miscrit")
+            .setRequired(true)
+            .setAutocomplete(true)
         )
     );
 
-    // Evos & Moves
-    mainCommand.addSubcommandGroup(group =>
-      group
-        .setName("evos")
-        .setDescription("Evolutions and moves commands")
-        .addSubcommand(subcommand =>
-          subcommand
-            .setName("moves")
-            .setDescription("Show evolution and moves information for a specific Miscrit")
-            .addStringOption(option =>
-              option
-                .setName("name")
-                .setDescription("Name of the Miscrit")
-                .setRequired(true)
-                .setAutocomplete(true)
-            )
-        )
-    );
-
-    // Relics
-    mainCommand.addSubcommandGroup(group =>
-      group
+    // relics (SUBCOMMAND SIMPLES - NOME ALTERADO)
+    mainCommand.addSubcommand(subcommand =>
+      subcommand
         .setName("relics")
-        .setDescription("Relics commands")
-        .addSubcommand(subcommand =>
-          subcommand
-            .setName("build")
-            .setDescription("Show relics information for a specific Miscrit")
-            .addStringOption(option =>
-              option
-                .setName("name")
-                .setDescription("Name of the Miscrit")
-                .setRequired(true)
-                .setAutocomplete(true)
-            )
+        .setDescription("Show relics build for a specific Miscrit")
+        .addStringOption(option =>
+          option
+            .setName("name")
+            .setDescription("Name of the Miscrit")
+            .setRequired(true)
+            .setAutocomplete(true)
         )
     );
 
@@ -121,10 +101,10 @@ if (!token || !clientId || !guildId) {
     console.log("✅ Commands deployed successfully!");
     console.log("📋 Available commands:");
     console.log("   /miscrits info");
-    console.log("   /miscrits days spawn"); // VOLTOU PARA "days spawn"
-    console.log("   /miscrits tier list");
-    console.log("   /miscrits evos moves");
-    console.log("   /miscrits relics build");
+    console.log("   /miscrits spawn-days");
+    console.log("   /miscrits tierlist");
+    console.log("   /miscrits evos-moves");
+    console.log("   /miscrits relics");
   } catch (err) {
     console.error("❌ Error deploying commands:", err);
   }

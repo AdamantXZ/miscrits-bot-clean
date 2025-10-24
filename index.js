@@ -13,13 +13,13 @@ const client = new Client({
 // Carregar comandos
 client.commands = new Collection();
 
-// Mapear subcomandos para arquivos
+// Mapear subcomandos para arquivos (ATUALIZADO)
 const commandMap = {
   'info': 'miscrits-info',
-  'days_spawn': 'miscrits-days',
-  'tier_list': 'miscrits-tier-list',
-  'evos_moves': 'miscrits-evos-moves',
-  'relics_build': 'miscrits-relics'
+  'spawn-days': 'miscrits-days',
+  'tierlist': 'miscrits-tier-list',
+  'evos-moves': 'miscrits-evos-moves',
+  'relics': 'miscrits-relics'
 };
 
 // ✅ CARREGAMENTO SEGURO DOS COMANDOS
@@ -52,7 +52,7 @@ client.once("ready", () => {
 
 // ✅ DETECTA QUANDO DESCONECTA
 client.on("disconnect", () => {
-  console.log('⚠️ Bot desconectado do Discord - tentando reconectar...');
+  console.log(⚠️ Bot desconectado do Discord - tentando reconectar...');
 });
 
 // ✅ DETECTA ERROS DE CONEXÃO
@@ -64,19 +64,16 @@ client.on("interactionCreate", async interaction => {
   if (interaction.isAutocomplete()) {
     if (interaction.commandName === "miscrits") {
       const subcommand = interaction.options.getSubcommand();
-      const subcommandGroup = interaction.options.getSubcommandGroup();
       
-      // Autocomplete para info, evos moves e relics build
-      if ((!subcommandGroup && subcommand === "info") || 
-          (subcommandGroup === "evos" && subcommand === "moves") ||
-          (subcommandGroup === "relics" && subcommand === "build")) {
+      // Autocomplete para info, evos-moves e relics
+      if (subcommand === "info" || subcommand === "evos-moves" || subcommand === "relics") {
         
         let commandName;
-        if (!subcommandGroup) {
+        if (subcommand === "info") {
           commandName = 'miscrits-info';
-        } else if (subcommandGroup === "evos") {
+        } else if (subcommand === "evos-moves") {
           commandName = 'miscrits-evos-moves';
-        } else if (subcommandGroup === "relics") {
+        } else if (subcommand === "relics") {
           commandName = 'miscrits-relics';
         }
         
@@ -96,21 +93,13 @@ client.on("interactionCreate", async interaction => {
   if (interaction.isChatInputCommand()) {
     if (interaction.commandName === "miscrits") {
       const subcommand = interaction.options.getSubcommand();
-      const subcommandGroup = interaction.options.getSubcommandGroup();
       
-      let commandName;
-      
-      if (subcommandGroup && subcommand) {
-        const key = `${subcommandGroup}_${subcommand}`;
-        commandName = commandMap[key];
-      } else {
-        commandName = commandMap[subcommand];
-      }
+      let commandName = commandMap[subcommand];
       
       const command = client.commands.get(commandName);
       
       if (!command) {
-        console.error(`Command not found: ${commandName} for subcommand: ${subcommand}, group: ${subcommandGroup}`);
+        console.error(`Command not found: ${commandName} for subcommand: ${subcommand}`);
         return await interaction.reply({ 
           content: "❌ Command not configured properly!", 
           ephemeral: true 
