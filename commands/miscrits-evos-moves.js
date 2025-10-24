@@ -92,6 +92,12 @@ module.exports = {
       // Embed 2: Informações de Evolução e Moves
       let description = "";
 
+      if (miscrit.wiki_page) {
+        description += `**Wiki Page:**\n🔗 ${miscrit.wiki_page}\n\n`;
+      } else {
+        description += `**Wiki Page:** No wiki data available\n\n`;
+      }
+
       if (miscrit.evolutions) {
         description += `**Evolutions:** ${miscrit.evolutions}\n\n`;
       } else {
@@ -108,28 +114,13 @@ module.exports = {
         .setDescription(description)
         .setColor(embedColor);
 
-      // Botões para Wiki e Relics
-      const buttons = [];
-      
-      if (miscrit.wiki_page) {
-        buttons.push(
-          new ButtonBuilder()
-            .setLabel('📖 Wiki Page')
-            .setURL(miscrit.wiki_page)
-            .setStyle(ButtonStyle.Link)
-        );
-      }
-      
-      if (miscrit.relics_site) {
-        buttons.push(
-          new ButtonBuilder()
-            .setLabel('💎 Relics Site')
-            .setURL(miscrit.relics_site)
-            .setStyle(ButtonStyle.Link)
-        );
-      }
-
-      const row = buttons.length > 0 ? new ActionRowBuilder().addComponents(...buttons) : null;
+      // Botão para a wiki
+      const row = miscrit.wiki_page ? new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setLabel('📖 View Wiki Page')
+          .setURL(miscrit.wiki_page)
+          .setStyle(ButtonStyle.Link)
+      ) : null;
 
       await interaction.reply({ 
         embeds: [embed1, embed2], 
