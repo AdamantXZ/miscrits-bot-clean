@@ -52,7 +52,7 @@ client.once("ready", () => {
 
 // ✅ DETECTA QUANDO DESCONECTA
 client.on("disconnect", () => {
-  console.log(⚠️ Bot desconectado do Discord - tentando reconectar...');
+  console.log('⚠️ Bot desconectado do Discord - tentando reconectar...');
 });
 
 // ✅ DETECTA ERROS DE CONEXÃO
