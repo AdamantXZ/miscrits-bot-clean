@@ -4,15 +4,10 @@ const miscritsData = require("../data/miscrits.json");
 
 const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : miscritsData;
 
-function capitalize(str) {
-  if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-relics")
-    .setDescription("Show relics information for a specific Miscrit")
+    .setDescription("Show relics build for a specific Miscrit")
     .addStringOption((option) =>
       option
         .setName("name")
@@ -57,67 +52,32 @@ module.exports = {
         return await interaction.reply({ content: "❌ Miscrit not found!", ephemeral: true });
       }
 
-      let rarityDot = "⚪";
-      switch ((miscrit.rarity || "").toLowerCase()) {
-        case "rare":
-          rarityDot = "🔵";
-          break;
-        case "epic":
-          rarityDot = "🟢";
-          break;
-        case "exotic":
-          rarityDot = "🟣";
-          break;
-        case "legendary":
-          rarityDot = "🟠";
-          break;
-      }
+      const embedColor = 0x2b6cb0;
 
-      const rarityColors = {
-        common: 0xaaaaaa,
-        rare: 0x2b6cb0,
-        epic: 0x2ecc71,
-        exotic: 0x9b59b6,
-        legendary: 0xe67e22,
-      };
-
-      const embedColor = rarityColors[(miscrit.rarity || "").toLowerCase()] || 0x2b6cb0;
-
-      // Embed 1: Imagem do Miscrit
-      const embed1 = new EmbedBuilder()
-        .setTitle(`${miscrit.name} - Relics Information`)
-        .setImage(miscrit.image_url || null)
-        .setColor(embedColor);
-
-      // Embed 2: Informações de Relics
+      // Embed com apenas o link das relics
       let description = "";
-
+      
       if (miscrit.relics_site) {
-        description += `**Relics Build:**\n🔗 ${miscrit.relics_site}\n\n`;
+        description += `**Relics Build:**\n🔗 ${miscrit.relics_site}`;
       } else {
-        description += `**Relics Build:** No relics data available\n\n`;
+        description += `**Relics Build:** No relics data available`;
       }
 
-      if (miscrit.pvp_desired_status) {
-        description += `⚔️ **PVP Desired Status:** ${miscrit.pvp_desired_status}\n`;
-      }
-
-      description += `\n*Click the button below for detailed relics information*`;
-
-      const embed2 = new EmbedBuilder()
+      const embed = new EmbedBuilder()
+        .setTitle(`${miscrit.name} - Relics Build`)
         .setDescription(description)
         .setColor(embedColor);
 
       // Botão para o site de relics
       const row = miscrit.relics_site ? new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-          .setLabel('💎 View Detailed Relics')
+          .setLabel('💎 Open Relics Build')
           .setURL(miscrit.relics_site)
           .setStyle(ButtonStyle.Link)
       ) : null;
 
       await interaction.reply({ 
-        embeds: [embed1, embed2], 
+        embeds: [embed], 
         components: row ? [row] : [],
         ephemeral: true 
       });

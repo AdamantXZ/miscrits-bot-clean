@@ -4,15 +4,10 @@ const miscritsData = require("../data/miscrits.json");
 
 const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : miscritsData;
 
-function capitalize(str) {
-  if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-evos-moves")
-    .setDescription("Show evolution and moves information for a specific Miscrit")
+    .setDescription("Show wiki page for a specific Miscrit")
     .addStringOption((option) =>
       option
         .setName("name")
@@ -57,73 +52,32 @@ module.exports = {
         return await interaction.reply({ content: "❌ Miscrit not found!", ephemeral: true });
       }
 
-      let rarityDot = "⚪";
-      switch ((miscrit.rarity || "").toLowerCase()) {
-        case "rare":
-          rarityDot = "🔵";
-          break;
-        case "epic":
-          rarityDot = "🟢";
-          break;
-        case "exotic":
-          rarityDot = "🟣";
-          break;
-        case "legendary":
-          rarityDot = "🟠";
-          break;
-      }
+      const embedColor = 0x2b6cb0;
 
-      const rarityColors = {
-        common: 0xaaaaaa,
-        rare: 0x2b6cb0,
-        epic: 0x2ecc71,
-        exotic: 0x9b59b6,
-        legendary: 0xe67e22,
-      };
-
-      const embedColor = rarityColors[(miscrit.rarity || "").toLowerCase()] || 0x2b6cb0;
-
-      // Embed 1: Imagem do Miscrit
-      const embed1 = new EmbedBuilder()
-        .setTitle(`${miscrit.name} - Evolutions & Moves`)
-        .setImage(miscrit.image_url || null)
-        .setColor(embedColor);
-
-      // Embed 2: Informações de Evolução e Moves
+      // Embed com apenas o link da wiki
       let description = "";
-
+      
       if (miscrit.wiki_page) {
-        description += `**Wiki Page:**\n🔗 ${miscrit.wiki_page}\n\n`;
+        description += `**Wiki Page:**\n🔗 ${miscrit.wiki_page}`;
       } else {
-        description += `**Wiki Page:** No wiki data available\n\n`;
+        description += `**Wiki Page:** No wiki data available`;
       }
 
-      if (miscrit.evolutions) {
-        description += `**Evolutions:** ${miscrit.evolutions}\n\n`;
-      } else {
-        description += `**Evolutions:** No evolution data available\n\n`;
-      }
-
-      if (miscrit.moves) {
-        description += `**Moves:**\n${miscrit.moves}`;
-      } else {
-        description += `**Moves:** No moves data available`;
-      }
-
-      const embed2 = new EmbedBuilder()
+      const embed = new EmbedBuilder()
+        .setTitle(`${miscrit.name} - Wiki Page`)
         .setDescription(description)
         .setColor(embedColor);
 
       // Botão para a wiki
       const row = miscrit.wiki_page ? new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-          .setLabel('📖 View Wiki Page')
+          .setLabel('📖 Open Wiki Page')
           .setURL(miscrit.wiki_page)
           .setStyle(ButtonStyle.Link)
       ) : null;
 
       await interaction.reply({ 
-        embeds: [embed1, embed2], 
+        embeds: [embed], 
         components: row ? [row] : [],
         ephemeral: true 
       });
