@@ -3350,7 +3350,7 @@
     {
       "name": "Grimm Kiloray",
       "image_url": "https://i.imgur.com/EC6kRTp.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+",
       "days": "Monday",
       "type": "Lightning",
       "rarity": "Epic",
@@ -3513,7 +3513,7 @@
     {
       "name": "Deetle",
       "image_url": "https://i.imgur.com/KY4sE5x.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+",
       "days": "Monday",
       "type": "Earth",
       "rarity": "Rare",
