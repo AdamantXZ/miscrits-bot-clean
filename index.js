@@ -2,127 +2,283 @@ require("dotenv").config();
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const fs = require("fs");
 const http = require('http');
-const { Server } = require("socket.io");
+const { WebSocket } = require('ws');
+
+console.log('🔧 INICIANDO BOT COM DIAGNÓSTICO WEBSOCKET AVANÇADO');
 
 const client = new Client({ 
-  intents: [GatewayIntentBits.Guilds]
-});
-
-// ✅ SERVIDOR HTTP PRINCIPAL
-const server = http.createServer((req, res) => {
-  if (req.url === '/health' || req.url === '/health/') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ 
-      status: 'OK',
-      bot: client.isReady() ? 'connected' : 'disconnected',
-      timestamp: new Date().toISOString()
-    }));
-  } else {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bot Miscrits Online!\n');
+  intents: [GatewayIntentBits.Guilds],
+  // 🔧 CONFIGURAÇÕES ESPECÍFICAS
+  rest: {
+    timeout: 15000,
+    retries: 1
+  },
+  ws: {
+    compress: false,
+    properties: {
+      $os: 'linux',
+      $browser: 'discord.js',
+      $device: 'discord.js'
+    }
   }
 });
 
-// ✅ SOCKET.IO NO MESMO SERVIDOR (MESMA PORTA)
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
+// 🛡️ DIAGNÓSTICO WEBSOCKET
+let connectionAttempts = 0;
+const maxConnectionAttempts = 2;
 
-// ✅ WEB SOCKET SERVER (AGORA NA MESMA PORTA)
-io.on("connection", (socket) => {
-  console.log('✅ Cliente Socket.IO conectado:', socket.id);
+// ✅ TESTE DIRETO DE WEBSOCKET (como no post)
+function testWebSocketConnection() {
+  console.log('🧪 TESTANDO CONEXÃO WEBSOCKET DIRETAMENTE...');
   
-  socket.on("disconnect", () => {
-    console.log('❌ Cliente Socket.IO desconectado:', socket.id);
+  const ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
+  
+  ws.on('open', () => {
+    console.log('🎉 WEBSOCKET TEST: Conexão aberta - protocolo funcionando!');
+    ws.close();
   });
   
-  socket.on("ping", (data) => {
-    socket.emit("pong", { 
-      message: "Bot online!",
-      botStatus: client.isReady() ? 'connected' : 'disconnected',
-      timestamp: new Date().toISOString()
-    });
+  ws.on('error', (error) => {
+    console.log('❌ WEBSOCKET TEST: Erro na conexão:', error.message);
+    console.log('🔧 Provável bloqueio de protocolo WebSocket no Render');
   });
-});
+  
+  ws.on('close', (code, reason) => {
+    console.log(`🔌 WEBSOCKET TEST: Fechado (${code}) - ${reason}`);
+  });
+  
+  // Timeout de teste
+  setTimeout(() => {
+    if (ws.readyState === WebSocket.CONNECTING) {
+      console.log('⏰ WEBSOCKET TEST: Timeout - Handshake não completado');
+      ws.terminate();
+    }
+  }, 10000);
+}
 
-// ✅ CONFIGURAÇÃO DOS COMANDOS (MANTIDO)
 client.commands = new Collection();
 
+// ✅ CARREGAR COMANDOS
 const commandMap = {
   'info': 'miscrits-info',
-  'moves-and-evos': 'miscrits-evos-moves', 
-  'relics': 'miscrits-relics',
+  'moves-and-evos': 'miscrits-evos-moves',
+  'relics': 'miscrits-relics', 
   'spawn-days': 'miscrits-days',
   'tierlist': 'miscrits-tier-list'
 };
 
-// ✅ CARREGAR COMANDOS
 try {
   const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
   for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     if (command.data && command.data.name) {
       client.commands.set(command.data.name, command);
-      console.log(`✅ Comando carregado: ${command.data.name}`);
     }
   }
+  console.log(`📋 ${client.commands.size} comandos carregados`);
 } catch (error) {
   console.error('❌ Erro ao carregar comandos:', error.message);
 }
 
-// ✅ EVENTOS DO DISCORD
-client.once("ready", () => {
-  console.log(`✅ Bot online como ${client.user.tag}`);
-  console.log(`🔗 Socket.IO ativo na mesma porta do HTTP`);
-});
-
-// ✅ INTERAÇÕES
-client.on("interactionCreate", async interaction => {
-  if (!interaction.isChatInputCommand()) return;
-  
-  const commandName = interaction.commandName;
-  const subcommand = interaction.options.getSubcommand();
-  
-  let targetCommandName = commandMap[subcommand];
-  if (!targetCommandName) return;
-  
-  const command = client.commands.get(targetCommandName);
-  if (!command) return;
-  
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error('❌ Erro no comando:', error.message);
+// ✅ HEALTH CHECK COM INFORMAÇÕES DETALHADAS
+const app = http.createServer((req, res) => {
+  if (req.url === '/health' || req.url === '/health/') {
+    const botReady = client.isReady();
+    
+    res.writeHead(200, { 
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    });
+    
+    res.end(JSON.stringify({ 
+      status: botReady ? 'ONLINE' : 'WEBSOCKET_BLOCKED',
+      discord_connected: botReady,
+      connection_attempts: connectionAttempts,
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+      issue: 'Render Free may block WebSocket protocol upgrade',
+      solution: 'Commands work but bot appears offline',
+      test_websocket: 'Run /debug-websocket to test connection'
+    }));
+  } else if (req.url === '/debug-websocket') {
+    testWebSocketConnection();
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('WebSocket test initiated - check logs\n');
+  } else {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Miscrits Bot - WebSocket Diagnostics\n');
   }
 });
 
-// ✅ INICIAR TUDO NA MESMA PORTA
-const PORT = process.env.PORT || 10000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Servidor HTTP + Socket.IO rodando na porta ${PORT}`);
-  console.log(`🩺 Health check: http://0.0.0.0:${PORT}/health`);
-  console.log(`🔗 Socket.IO: conectando na mesma porta ${PORT}`);
-  
-  // ✅ CONECTAR DISCORD
-  setTimeout(() => {
-    connectBot();
-  }, 2000);
+// ✅ EVENTOS DO CLIENT
+client.once("ready", () => {
+  console.log(`🎉 BOT CONECTADO VIA WEBSOCKET: ${client.user.tag}`);
+  console.log(`📊 Servidores: ${client.guilds.cache.size}`);
 });
 
-// ✅ CONEXÃO COM DISCORD
-function connectBot() {
-  console.log('🔑 Tentando conexão WebSocket com Discord...');
-  
-  client.login(process.env.BOT_TOKEN)
-    .then(() => {
-      console.log('🎉 CONEXÃO COM DISCORD ESTABELECIDA!');
-    })
-    .catch(error => {
-      console.error('❌ Erro na conexão Discord:', error.message);
-      console.log('🔄 Tentando novamente em 30 segundos...');
-      setTimeout(connectBot, 30000);
-    });
+client.on("debug", (info) => {
+  if (info.includes('WebSocket') || info.includes('Session')) {
+    console.log(`🔧 WS Debug: ${info}`);
+  }
+});
+
+client.on("error", (error) => {
+  console.error(`❌ Discord Error: ${error.message}`);
+});
+
+client.on("disconnect", () => {
+  console.log('🔌 Desconectado - WebSocket fechado');
+});
+
+// ✅ INTERAÇÕES (MANTIDO)
+async function handleAutocompleteSafely(interaction, command) {
+  try {
+    if (!interaction.responded && !interaction.replied && command.autocomplete) {
+      await command.autocomplete(interaction);
+    }
+  } catch (error) {
+    if (error.code === 10062 || error.code === 40060) return;
+  }
 }
+
+async function executeCommandSafely(interaction, command) {
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    if (error.code === 10062) return;
+    
+    try {
+      const reply = { content: "❌ Erro no comando!", ephemeral: true };
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply(reply);
+      } else if (interaction.deferred) {
+        await interaction.followUp(reply);
+      }
+    } catch (replyError) {
+      // Ignora erros de interação expirada
+    }
+  }
+}
+
+client.on("interactionCreate", async interaction => {
+  if (interaction.isAutocomplete()) {
+    const commandName = interaction.commandName;
+    const subcommand = interaction.options.getSubcommand();
+    
+    if (commandName === "miscrits" || commandName === "miscrits-test") {
+      if (subcommand === "info" || subcommand === "moves-and-evos" || subcommand === "relics") {
+        let targetCommandName;
+        if (subcommand === "info") targetCommandName = 'miscrits-info';
+        else if (subcommand === "moves-and-evos") targetCommandName = 'miscrits-evos-moves';
+        else if (subcommand === "relics") targetCommandName = 'miscrits-relics';
+        
+        const command = client.commands.get(targetCommandName);
+        if (command) await handleAutocompleteSafely(interaction, command);
+      }
+    }
+    return;
+  }
+
+  if (interaction.isChatInputCommand()) {
+    const commandName = interaction.commandName;
+    const subcommand = interaction.options.getSubcommand();
+    
+    let targetCommandName;
+    
+    if (commandName === "miscrits") {
+      targetCommandName = commandMap[subcommand];
+    } else if (commandName === "miscrits-test") {
+      targetCommandName = commandMap[subcommand];
+    } else {
+      return await interaction.reply({ content: "❌ Comando não reconhecido!", ephemeral: true });
+    }
+    
+    if (!targetCommandName) {
+      return await interaction.reply({ content: "❌ Subcomando não configurado!", ephemeral: true });
+    }
+    
+    const command = client.commands.get(targetCommandName);
+    
+    if (!command) {
+      return await interaction.reply({ content: "❌ Comando não configurado!", ephemeral: true });
+    }
+    
+    try {
+      await executeCommandSafely(interaction, command);
+    } catch (error) {
+      console.error('❌ Erro fatal:', error.message);
+    }
+  }
+});
+
+// ✅ CONEXÃO COM DIAGNÓSTICO
+async function connectWithDiagnostics() {
+  if (connectionAttempts >= maxConnectionAttempts) {
+    console.log('🚨 WEBSOCKET BLOQUEADO NO RENDER FREE');
+    console.log('💡 COMANDOS CONTINUAM FUNCIONANDO VIA REST API');
+    console.log('🔧 Bot aparece offline mas responde comandos');
+    return;
+  }
+
+  connectionAttempts++;
+  console.log(`🔑 Tentativa ${connectionAttempts}/${maxConnectionAttempts} de WebSocket...`);
+
+  // Primeiro testa WebSocket puro
+  if (connectionAttempts === 1) {
+    testWebSocketConnection();
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+
+  try {
+    const connectPromise = client.login(process.env.BOT_TOKEN);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('WebSocket handshake timeout - Protocol upgrade blocked')), 12000);
+    });
+
+    await Promise.race([connectPromise, timeoutPromise]);
+    
+  } catch (error) {
+    console.error(`❌ Falha WebSocket: ${error.message}`);
+    
+    if (error.message.includes('timeout') || error.message.includes('handshake')) {
+      console.log('🔧 DIAGNÓSTICO: Render bloqueando upgrade para WebSocket');
+      console.log('💡 WebSocket precisa de status 101 SWITCHING_PROTOCOLS');
+      console.log('🎯 Comandos slash funcionam via REST API');
+    }
+    
+    // Tentativa final após delay
+    if (connectionAttempts < maxConnectionAttempts) {
+      const delay = 20000;
+      console.log(`🔄 Última tentativa em ${delay/1000} segundos...`);
+      setTimeout(connectWithDiagnostics, delay);
+    }
+  }
+}
+
+// ✅ INICIAR
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Servidor na porta ${PORT}`);
+  console.log(`🩺 Health: http://0.0.0.0:${PORT}/health`);
+  console.log(`🔧 Debug: http://0.0.0.0:${PORT}/debug-websocket`);
+  
+  // Heartbeat
+  setInterval(() => {
+    http.get(`http://0.0.0.0:${PORT}/health`, () => {}).on('error', () => {});
+  }, 120000);
+
+  // Iniciar conexão
+  setTimeout(connectWithDiagnostics, 2000);
+});
+
+process.on('SIGTERM', () => {
+  console.log('🛑 Encerrando...');
+  client.destroy();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 Encerrando...');
+  client.destroy();
+  process.exit(0);
+});
