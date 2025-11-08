@@ -1,5 +1,5 @@
-// index.js — Miscrits Bot (Render WebSocket Proxy compatível)
-// ------------------------------------------------------------
+// index.js — Miscrits Bot (Render WebSocket compatível universal)
+// ---------------------------------------------------------------
 require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
@@ -15,26 +15,20 @@ if (!TOKEN) {
   process.exit(1);
 }
 
-// ✅ CLIENTE DISCORD.JS COM CONFIGURAÇÃO DE WEBSOCKET COMPATÍVEL RENDER
+// ✅ CLIENTE DISCORD.JS (CONFIG RENDER-FRIENDLY)
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
-  ws: {
-    version: 10,
-    // 🚀 Força o uso direto do gateway público, evitando bloqueio do Render
-    buildStrategy: (manager) => ({
-      url: "wss://gateway.discord.gg/?v=10&encoding=json",
-      agent: undefined,
-      buildIdentifyPayload: manager.buildIdentifyPayload.bind(manager),
-      buildHeartbeatPayload: manager.buildHeartbeatPayload.bind(manager),
-    }),
-  },
+  ws: { compress: false, large_threshold: 50 },
   rest: { timeout: 30000, retries: 3 },
+  presence: {
+    status: "online",
+    activities: [{ name: "/miscrits help", type: 0 }],
+  },
 });
 
-// ✅ COLEÇÃO DE COMANDOS
+// ✅ CARREGAR COMANDOS
 client.commands = new Collection();
 
-// ✅ CARREGAR COMANDOS AUTOMATICAMENTE
 try {
   const commandsPath = path.join(__dirname, "commands");
   const commandFiles = fs.readdirSync(commandsPath).filter((f) => f.endsWith(".js"));
@@ -52,7 +46,7 @@ try {
   console.error("❌ Erro ao carregar comandos:", err);
 }
 
-// ✅ EVENTO READY – CONFIRMA QUE O BOT CONECTOU
+// ✅ EVENTO READY
 client.once("ready", () => {
   console.log("=".repeat(50));
   console.log(`🎉 BOT ONLINE: ${client.user.tag}`);
@@ -86,11 +80,13 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// ✅ EVENTOS DE ERRO E AVISO
+// ✅ EVENTOS DE CONEXÃO / WEBSOCKET
 client.on("error", (err) => console.error("🚨 Erro Discord:", err.message));
 client.on("warn", (info) => console.warn("⚠️ Aviso Discord:", info));
+client.on("reconnecting", () => console.log("🔁 Reconectando..."));
+client.on("disconnect", (e) => console.log(`🔌 Desconectado: ${e?.code || "?"}`));
 
-// ✅ SERVIDOR HTTP PARA HEALTH CHECK (RENDER)
+// ✅ SERVIDOR HTTP PARA HEALTH CHECK
 const server = http.createServer((req, res) => {
   if (req.url === "/health" || req.url === "/") {
     res.writeHead(200, { "Content-Type": "application/json" });
@@ -115,16 +111,18 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`🌐 HTTP ativo na porta ${PORT}`);
 });
 
-// ✅ LOGIN DISCORD
-(async () => {
+// ✅ LOGIN AUTOMÁTICO COM RECONEXÃO
+async function connect() {
   try {
     console.log("🚀 Conectando ao Discord...");
     await client.login(TOKEN);
   } catch (err) {
-    console.error("❌ Falha no login:", err);
-    process.exit(1);
+    console.error("❌ Falha no login:", err.message);
+    console.log("⏳ Tentando novamente em 30s...");
+    setTimeout(connect, 30000);
   }
-})();
+}
+connect();
 
 // ✅ ENCERRAMENTO GRACIOSO
 process.on("SIGTERM", () => {
