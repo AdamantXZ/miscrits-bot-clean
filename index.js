@@ -4,6 +4,10 @@ const fs = require("fs");
 const http = require('http');
 const https = require('https');
 
+// 🚨 DEBUG INICIAL
+console.log('🔧 Discord.js version:', require('discord.js/package.json').version);
+console.log('🔧 Node.js version:', process.version);
+
 const client = new Client({ 
   intents: [GatewayIntentBits.Guilds]
 });
@@ -280,17 +284,30 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log("🔁 Self-ping system activated");
 });
 
-// 🚀 FORCED CONNECTION WITH AGGRESSIVE RETRY (ENGLISH)
+// 🚀 FORCED CONNECTION WITH WEB SOCKET DEBUG
 function connectBot() {
-  console.log('🔑 Attempting to connect to Discord...');
+  console.log('🔑 Starting Discord connection with WebSocket debug...');
   
-  client.login(process.env.BOT_TOKEN)
+  const loginPromise = client.login(process.env.BOT_TOKEN);
+
+  // Timeout de 15 segundos para WebSocket
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('DISCORD_WS_TIMEOUT: WebSocket handshake timeout after 15s')), 15000);
+  });
+
+  Promise.race([loginPromise, timeoutPromise])
     .then(() => {
-      console.log('🎉 CONNECTED TO DISCORD!');
+      console.log('🎉 Discord WebSocket connected successfully!');
     })
     .catch(error => {
-      console.error('❌ CONNECTION FAILED:', error.message);
-      console.error('Error code:', error.code);
+      console.error('❌ WEB SOCKET ERROR:', error.message);
+      console.log('🔧 Error type:', error.code || 'NO_CODE');
+      
+      if (error.message.includes('DISCORD_WS_TIMEOUT')) {
+        console.log('🚨 CONFIRMED: Render is blocking WebSocket connection to Discord');
+        console.log('💡 Solution required: Render support needs to allow Discord WebSocket connections');
+      }
+      
       console.log('🔄 Retrying in 30 seconds...');
       setTimeout(connectBot, 30000);
     });
