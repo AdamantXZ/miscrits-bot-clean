@@ -5,8 +5,8 @@ const http = require('http');
 const https = require('https');
 
 // 🚨 DEBUG INICIAL
-console.log('🔧 Discord.js version:', require('discord.js/package.json').version);
 console.log('🔧 Node.js version:', process.version);
+console.log('🔧 Starting Discord bot...');
 
 const client = new Client({ 
   intents: [GatewayIntentBits.Guilds]
