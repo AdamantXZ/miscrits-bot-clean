@@ -280,13 +280,31 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log("🔁 Sistema de self-ping ativado");
 });
 
-// 🛡️ CONEXÃO SEGURA COM RETRY
+// 🚀 CONEXÃO FORÇADA COM RETRY AGGRESSIVO
 function connectBot() {
-  client.login(process.env.BOT_TOKEN).catch(error => {
-    console.error('❌ ERRO CRÍTICO: Não foi possível conectar ao Discord:', error.message);
-    console.log('🔄 Tentando reconectar em 30 segundos...');
-    setTimeout(connectBot, 30000);
-  });
+  console.log('🔑 Tentando conectar ao Discord...');
+  
+  client.login(process.env.BOT_TOKEN)
+    .then(() => {
+      console.log('🎉 CONECTOU AO DISCORD!');
+    })
+    .catch(error => {
+      console.error('❌ FALHA NA CONEXÃO:', error.message);
+      console.error('Código do erro:', error.code);
+      console.log('🔄 Tentando novamente em 30 segundos...');
+      setTimeout(connectBot, 30000);
+    });
 }
 
+// Conexão inicial + verificação periódica
 connectBot();
+
+// Verifica a cada minuto se ainda está conectado
+setInterval(() => {
+  if (!client.isReady()) {
+    console.log('⚠️ Bot desconectado - reconectando...');
+    client.destroy().then(() => {
+      setTimeout(connectBot, 5000);
+    });
+  }
+}, 60000);
