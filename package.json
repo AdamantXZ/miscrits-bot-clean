@@ -1,20 +1,17 @@
 {
-  "name": "miscritsbot",
+  "name": "miscrits-bot",
   "version": "1.0.0",
-  "description": "Discord bot for Miscrits information",
+  "description": "Discord bot for Miscrits game",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "deploy": "node deploy-commands.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy-test": "node deploy-commands-test.js"
   },
-  "keywords": ["discord", "bot", "miscrits"],
-  "author": "Seu Nome",
-  "license": "ISC",
   "dependencies": {
-    "discord.js": "^14.23.2",
-    "dotenv": "^17.2.3",
-    "socket.io": "^4.7.5"
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^2.7.0"
   },
   "engines": {
     "node": ">=18.0.0"
