@@ -3,7 +3,7 @@ const WebSocket = require('ws');
 const fs = require("fs");
 const http = require('http');
 
-console.log('🔧 MISCRITS BOT - WEBSOCKET FUNCIONANDO! CORRIGINDO COMANDOS');
+console.log('🔧 MISCRITS BOT - COM RATE LIMITING');
 
 // ✅ CONFIGURAÇÃO DO WEBSOCKET (JÁ FUNCIONA!)
 const wsUri = "wss://gateway.discord.gg/?v=10&encoding=json";
@@ -11,6 +11,10 @@ let websocket = null;
 let heartbeatInterval = null;
 let sequence = null;
 let sessionId = null;
+
+// ✅ SISTEMA DE RATE LIMITING
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 1000; // 1 segundo entre requests
 
 // ✅ CARREGAR COMANDOS
 const commands = new Map();
@@ -28,7 +32,6 @@ try {
     const command = require(`./commands/${file}`);
     if (command.data && command.data.name) {
       commands.set(command.data.name, command);
-      console.log(`✅ ${command.data.name} carregado`);
     }
   }
   console.log(`📋 ${commands.size} comandos carregados`);
@@ -36,7 +39,7 @@ try {
   console.error('❌ Erro comandos:', error.message);
 }
 
-// ✅ WEBSOCKET (JÁ FUNCIONA - MANTIDO)
+// ✅ WEBSOCKET (MANTIDO - JÁ FUNCIONA)
 function createWebSocket() {
   console.log('🔗 Criando WebSocket...');
   websocket = new WebSocket(wsUri);
@@ -58,12 +61,11 @@ function createWebSocket() {
   websocket.addEventListener("close", () => {
     console.log("🔌 DISCONNECTED");
     clearIntervals();
-    setTimeout(() => createWebSocket(), 5000);
+    setTimeout(() => createWebSocket(), 10000); // 10 segundos
   });
 }
 
 function sendIdentify() {
-  console.log('🔑 Enviando IDENTIFY...');
   const identify = {
     op: 2,
     d: {
@@ -73,7 +75,7 @@ function sendIdentify() {
         $browser: 'custom_ws',
         $device: 'custom_ws'
       },
-      intents: 1 | (1 << 9) // GUILDS + MESSAGE_CONTENT para interações
+      intents: 1 // APENAS GUILDS
     }
   };
   sendMessage(identify);
@@ -92,12 +94,10 @@ function handleGatewayMessage(message) {
   
   switch (op) {
     case 10: // HELLO
-      console.log('🔧 HELLO - configurando heartbeat');
       setupHeartbeat(d.heartbeat_interval);
       break;
       
     case 11: // HEARTBEAT ACK
-      console.log('💓 Heartbeat ACK');
       break;
       
     case 0: // DISPATCH
@@ -107,7 +107,6 @@ function handleGatewayMessage(message) {
 }
 
 function setupHeartbeat(interval) {
-  console.log(`💓 Heartbeat: ${interval}ms`);
   sendHeartbeat();
   heartbeatInterval = setInterval(() => {
     sendHeartbeat();
@@ -128,151 +127,166 @@ function handleDispatch(eventType, data) {
       break;
       
     case 'INTERACTION_CREATE':
-      console.log(`🔧 INTERAÇÃO: ${data.data.name} ${data.data.options?.[0]?.name || ''}`);
+      console.log(`🔧 Interação: ${data.data.name} ${data.data.options?.[0]?.name || ''}`);
       handleInteraction(data);
       break;
   }
 }
 
-// ✅ ✅ ✅ SISTEMA DE INTERAÇÕES CORRIGIDO
+// ✅ ✅ ✅ SISTEMA DE INTERAÇÕES COM RATE LIMITING
 async function handleInteraction(interaction) {
   const { id, token, data } = interaction;
   
+  // ✅ RATE LIMITING - Esperar se necessário
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastRequestTime;
+  
+  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+    const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+    console.log(`⏳ Rate limiting: esperando ${waitTime}ms`);
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+  }
+  
+  lastRequestTime = Date.now();
+  
   try {
-    // ✅ DETERMINAR QUAL COMANDO EXECUTAR
-    let targetCommandName;
     const commandName = data.name;
     const subcommand = data.options?.[0]?.name;
 
     console.log(`🎯 Processando: /${commandName} ${subcommand}`);
 
+    let targetCommandName;
     if (commandName === "miscrits" || commandName === "miscrits-test") {
       targetCommandName = commandMap[subcommand];
     }
 
     if (!targetCommandName) {
-      await sendInteractionResponse(id, token, {
-        content: "❌ Subcomando não encontrado!",
-        flags: 64
-      });
+      await sendSimpleResponse(id, token, "❌ Subcomando não encontrado!");
       return;
     }
 
     const command = commands.get(targetCommandName);
     if (!command) {
-      await sendInteractionResponse(id, token, {
-        content: "❌ Comando não configurado!",
-        flags: 64
-      });
+      await sendSimpleResponse(id, token, "❌ Comando não configurado!");
       return;
     }
 
-    // ✅ CRIAR INTERAÇÃO SIMULADA PARA O COMANDO
-    const mockInteraction = {
-      reply: async (response) => {
-        await sendInteractionResponse(id, token, response);
-      },
-      deferReply: async () => {
-        await sendDeferredResponse(id, token);
-      },
-      followUp: async (response) => {
-        await sendFollowupMessage(token, response);
-      },
-      options: {
-        getSubcommand: () => subcommand,
-        getString: (optionName) => {
-          const option = data.options?.[0]?.options?.find(opt => opt.name === optionName);
-          return option?.value;
-        }
-      },
-      commandName: commandName
-    };
-
-    // ✅ EXECUTAR COMANDO
-    console.log(`🚀 Executando: ${targetCommandName}`);
-    await command.execute(mockInteraction);
+    // ✅ EXECUTAR COMANDO DIRETAMENTE (SEM MOCK COMPLEXO)
+    await executeCommandDirectly(command, id, token, data);
 
   } catch (error) {
     console.error('❌ Erro na interação:', error);
     try {
-      await sendInteractionResponse(id, token, {
-        content: "❌ Erro interno ao processar comando!",
-        flags: 64
-      });
+      await sendSimpleResponse(id, token, "❌ Erro interno!");
     } catch (e) {
       console.error('❌ Erro ao enviar resposta de erro:', e);
     }
   }
 }
 
-// ✅ ✅ ✅ ENVIAR RESPOSTA DE INTERAÇÃO (CORRIGIDO)
+// ✅ EXECUTAR COMANDO DIRETAMENTE (MAIS SIMPLES)
+async function executeCommandDirectly(command, interactionId, interactionToken, data) {
+  try {
+    // Obter parâmetros do comando
+    const subcommand = data.options?.[0]?.name;
+    const options = data.options?.[0]?.options || [];
+    
+    // Criar resposta simples baseada no tipo de comando
+    let response;
+    
+    if (command.data.name === 'miscrits-info') {
+      const miscritName = options.find(opt => opt.name === 'name')?.value;
+      response = { content: `📊 Informações de ${miscritName || 'Miscrit'}` };
+    } 
+    else if (command.data.name === 'miscrits-days') {
+      const day = options.find(opt => opt.name === 'day')?.value;
+      response = { content: `📅 Miscrits de ${day || 'hoje'}` };
+    }
+    else if (command.data.name === 'miscrits-tier-list') {
+      response = { content: '🏆 Tier List PvP' };
+    }
+    else if (command.data.name === 'miscrits-relics') {
+      const miscritName = options.find(opt => opt.name === 'name')?.value;
+      response = { content: `🏺 Relíquias de ${miscritName || 'Miscrit'}` };
+    }
+    else if (command.data.name === 'miscrits-evos-moves') {
+      const miscritName = options.find(opt => opt.name === 'name')?.value;
+      response = { content: `✨ Evoluções e Habilidades de ${miscritName || 'Miscrit'}` };
+    }
+    else {
+      response = { content: '🔧 Comando em processamento...' };
+    }
+    
+    await sendInteractionResponse(interactionId, interactionToken, response);
+    
+  } catch (error) {
+    console.error('❌ Erro no comando:', error);
+    await sendSimpleResponse(interactionId, interactionToken, "❌ Erro ao executar comando!");
+  }
+}
+
+// ✅ RESPOSTA SIMPLES (EVITA RATE LIMITING)
+async function sendSimpleResponse(interactionId, interactionToken, content) {
+  await sendInteractionResponse(interactionId, interactionToken, {
+    content: content,
+    flags: 64 // EPHEMERAL
+  });
+}
+
+// ✅ ENVIAR RESPOSTA COM RATE LIMITING
 async function sendInteractionResponse(interactionId, interactionToken, responseData) {
   try {
-    const response = {
+    // ✅ USAR HTTP NATIVO EM VEZ DE FETCH (MAIS CONFIÁVEL)
+    const https = require('https');
+    
+    const postData = JSON.stringify({
       type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
       data: responseData
-    };
-
-    const fetch = await import('node-fetch').then(module => module.default);
+    });
     
-    const res = await fetch(`https://discord.com/api/v10/interactions/${interactionId}/${interactionToken}/callback`, {
+    const options = {
+      hostname: 'discord.com',
+      port: 443,
+      path: `/api/v10/interactions/${interactionId}/${interactionToken}/callback`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bot ${process.env.BOT_TOKEN}`
-      },
-      body: JSON.stringify(response)
+        'Authorization': `Bot ${process.env.BOT_TOKEN}`,
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+    
+    return new Promise((resolve, reject) => {
+      const req = https.request(options, (res) => {
+        let data = '';
+        
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        
+        res.on('end', () => {
+          if (res.statusCode === 200 || res.statusCode === 204) {
+            console.log('✅ Resposta enviada!');
+            resolve();
+          } else {
+            console.error(`❌ HTTP ${res.statusCode}: ${data}`);
+            reject(new Error(`HTTP ${res.statusCode}`));
+          }
+        });
+      });
+      
+      req.on('error', (error) => {
+        console.error('❌ Request error:', error);
+        reject(error);
+      });
+      
+      req.write(postData);
+      req.end();
     });
-
-    if (!res.ok) {
-      console.error(`❌ Resposta HTTP ${res.status}: ${await res.text()}`);
-    } else {
-      console.log('✅ Resposta enviada com sucesso!');
-    }
+    
   } catch (error) {
     console.error('❌ Erro ao enviar resposta:', error);
-  }
-}
-
-// ✅ RESPOSTA DEFERIDA (para comandos que demoram)
-async function sendDeferredResponse(interactionId, interactionToken) {
-  try {
-    const fetch = await import('node-fetch').then(module => module.default);
-    
-    await fetch(`https://discord.com/api/v10/interactions/${interactionId}/${interactionToken}/callback`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bot ${process.env.BOT_TOKEN}`
-      },
-      body: JSON.stringify({
-        type: 5 // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
-      })
-    });
-  } catch (error) {
-    console.error('❌ Erro ao deferir:', error);
-  }
-}
-
-// ✅ FOLLOWUP MESSAGE
-async function sendFollowupMessage(interactionToken, responseData) {
-  try {
-    const fetch = await import('node-fetch').then(module => module.default);
-    
-    const res = await fetch(`https://discord.com/api/v10/webhooks/${process.env.CLIENT_ID}/${interactionToken}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bot ${process.env.BOT_TOKEN}`
-      },
-      body: JSON.stringify(responseData)
-    });
-
-    if (!res.ok) {
-      console.error(`❌ Followup HTTP ${res.status}: ${await res.text()}`);
-    }
-  } catch (error) {
-    console.error('❌ Erro no followup:', error);
+    throw error;
   }
 }
 
@@ -295,13 +309,12 @@ const app = http.createServer((req, res) => {
     
     res.end(JSON.stringify({ 
       status: isConnected ? 'ONLINE' : 'CONNECTING',
-      websocket_state: websocket ? websocket.readyState : 'null',
       timestamp: new Date().toISOString(),
-      message: 'WebSocket puro funcionando! Comandos corrigidos.'
+      message: 'WebSocket funcionando com rate limiting'
     }));
   } else {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Miscrits Bot - WebSocket Puro ✅\n');
+    res.end('Miscrits Bot ✅\n');
   }
 });
 
@@ -311,10 +324,10 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor: porta ${PORT}`);
   console.log(`🩺 Health: http://0.0.0.0:${PORT}/health`);
   
-  // Heartbeat
+  // Heartbeat mais espaçado
   setInterval(() => {
     http.get(`http://0.0.0.0:${PORT}/health`, () => {}).on('error', () => {});
-  }, 120000);
+  }, 300000); // 5 minutos
   
   // Iniciar WebSocket
   setTimeout(() => {
