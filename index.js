@@ -1,16 +1,113 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits, Collection } = require("discord.js");
+const { REST, Routes, Collection } = require("discord.js");
+const WebSocket = require('ws');
 const fs = require("fs");
 const http = require('http');
+const crypto = require('crypto');
 
-console.log('🔧 INICIANDO BOT MISCRITS - RENDER FREE COMPATIBLE');
+console.log('🔧 MISCRITS BOT - WEBSOCKET CUSTOM PARA RENDER');
 
-// 🔧 CONFIGURAÇÃO SIMPLIFICADA
-const client = new Client({ 
-  intents: [GatewayIntentBits.Guilds],
-  ws: {
-    compress: false
+class CustomDiscordWS {
+  constructor() {
+    this.ws = null;
+    this.sequence = null;
+    this.sessionId = null;
+    this.heartbeatInterval = null;
+    this.isConnected = false;
   }
+
+  connect() {
+    console.log('🔗 Conectando via WebSocket custom...');
+    
+    this.ws = new WebSocket('wss://gateway.discord.gg/?v=10&encoding=json');
+    
+    this.ws.on('open', () => {
+      console.log('🎉 WebSocket conectado - enviando identify...');
+      this.sendIdentify();
+    });
+    
+    this.ws.on('message', (data) => {
+      this.handleMessage(JSON.parse(data));
+    });
+    
+    this.ws.on('close', (code, reason) => {
+      console.log(`🔌 WebSocket fechado: ${code} - ${reason}`);
+      this.isConnected = false;
+      this.clearIntervals();
+      
+      // Reconectar após 10 segundos
+      setTimeout(() => this.connect(), 10000);
+    });
+    
+    this.ws.on('error', (error) => {
+      console.error('❌ WebSocket error:', error.message);
+    });
+  }
+  
+  sendIdentify() {
+    const identify = {
+      op: 2,
+      d: {
+        token: process.env.BOT_TOKEN,
+        properties: {
+          $os: 'linux',
+          $browser: 'custom_ws',
+          $device: 'custom_ws'
+        },
+        intents: 1 << 0 // GUILDS intent
+      }
+    };
+    this.ws.send(JSON.stringify(identify));
+  }
+  
+  handleMessage(message) {
+    const { op, d, s, t } = message;
+    
+    if (s) this.sequence = s;
+    
+    switch (op) {
+      case 10: // HELLO
+        console.log('🔧 HELLO recebido - iniciando heartbeat');
+        const interval = d.heartbeat_interval;
+        this.startHeartbeat(interval);
+        break;
+        
+      case 11: // HEARTBEAT ACK
+        console.log('💓 Heartbeat ACK');
+        break;
+        
+      case 0: // DISPATCH
+        if (t === 'READY') {
+          console.log('🎉 BOT PRONTO via WebSocket custom!');
+          console.log(`🤖 Logado como: ${d.user.username}`);
+          this.isConnected = true;
+          this.sessionId = d.session_id;
+        }
+        break;
+    }
+  }
+  
+  startHeartbeat(interval) {
+    this.heartbeatInterval = setInterval(() => {
+      if (this.ws.readyState === WebSocket.OPEN) {
+        const heartbeat = { op: 1, d: this.sequence };
+        this.ws.send(JSON.stringify(heartbeat));
+        console.log('💓 Heartbeat enviado');
+      }
+    }, interval);
+  }
+  
+  clearIntervals() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
+  }
+}
+
+// ✅ BOT PRINCIPAL COM DISCORD.JS (para comandos)
+const client = new (require("discord.js").Client)({ 
+  intents: [require("discord.js").GatewayIntentBits.Guilds] 
 });
 
 client.commands = new Collection();
@@ -34,7 +131,7 @@ try {
   }
   console.log(`📋 ${client.commands.size} comandos carregados`);
 } catch (error) {
-  console.error('❌ Erro ao carregar comandos:', error.message);
+  console.error('❌ Erro comandos:', error.message);
 }
 
 // ✅ HEALTH CHECK
@@ -42,23 +139,13 @@ const app = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ 
     status: 'ONLINE',
-    bot_connected: client.isReady(),
     timestamp: new Date().toISOString(),
-    message: 'Miscrits Bot - Commands should work via REST'
+    mode: 'Custom WebSocket + Discord.js REST',
+    message: 'Bot funcionando em modo híbrido'
   }));
 });
 
-// ✅ EVENTOS
-client.once("ready", () => {
-  console.log(`🎉 BOT CONECTADO: ${client.user.tag}`);
-  console.log(`📊 Servidores: ${client.guilds.cache.size}`);
-});
-
-client.on("error", (error) => {
-  console.error(`❌ Discord Error: ${error.message}`);
-});
-
-// ✅ INTERAÇÕES
+// ✅ INTERAÇÕES COM DISCORD.JS
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
@@ -79,7 +166,7 @@ client.on("interactionCreate", async interaction => {
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.error('❌ Erro no comando:', error.message);
+    console.error('❌ Erro comando:', error.message);
     try {
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({ content: "❌ Erro no comando!", ephemeral: true });
@@ -88,51 +175,40 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-// ✅ CONEXÃO SIMPLES
-function connectBot() {
-  console.log('🔑 Conectando ao Discord...');
-  
-  client.login(process.env.BOT_TOKEN).catch(error => {
-    console.error('❌ Falha na conexão:', error.message);
-    console.log('💡 Comandos podem funcionar via REST API');
-    console.log('🔄 Tentando novamente em 30 segundos...');
-    
-    setTimeout(connectBot, 30000);
-  });
-}
-
-// ✅ INICIAR SERVIDOR
+// ✅ INICIAR TUDO
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Servidor HTTP na porta ${PORT}`);
+  console.log(`✅ Servidor HTTP: porta ${PORT}`);
   console.log(`🩺 Health: http://0.0.0.0:${PORT}/health`);
   
-  // ✅ HEARTBEAT PARA MANTENER ATIVO
+  // ✅ HEARTBEAT HTTP
   setInterval(() => {
     http.get(`http://0.0.0.0:${PORT}`, () => {
-      console.log('💓 Heartbeat -', new Date().toLocaleTimeString());
+      console.log('💓 HTTP Heartbeat -', new Date().toLocaleTimeString());
     }).on('error', () => {});
   }, 120000);
   
-  // ✅ INICIAR CONEXÃO DISCORD
-  setTimeout(connectBot, 2000);
+  // ✅ TENTAR CONEXÃO DISCORD.JS PRIMEIRO
+  setTimeout(() => {
+    console.log('🔑 Tentando Discord.js...');
+    client.login(process.env.BOT_TOKEN).catch(error => {
+      console.error('❌ Discord.js falhou:', error.message);
+      console.log('🔄 Iniciando WebSocket custom...');
+      
+      // ✅ SE DISCORD.JS FALHAR, TENTAR WEBSOCKET CUSTOM
+      const customWS = new CustomDiscordWS();
+      customWS.connect();
+    });
+  }, 2000);
 });
 
-// ✅ SHUTDOWN APENAS QUANDO NECESSÁRIO
-process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM recebido - Encerrando graciosamente...');
-  if (client.isReady()) {
-    client.destroy();
-  }
-  setTimeout(() => process.exit(0), 1000);
+// ✅ EVENTO READY DO DISCORD.JS (se funcionar)
+client.once("ready", () => {
+  console.log(`🎉 DISCORD.JS CONECTADO: ${client.user.tag}`);
 });
 
-process.on('SIGINT', () => {
-  console.log('🛑 SIGINT recebido - Encerrando graciosamente...');
-  if (client.isReady()) {
-    client.destroy();
-  }
-  setTimeout(() => process.exit(0), 1000);
+client.on("error", (error) => {
+  console.error('❌ Discord.js error:', error.message);
 });
 
-console.log('🚀 Bot Miscrits iniciado - Aguardando conexão Discord...');
+console.log('🚀 Bot iniciado - Modo híbrido WebSocket + REST');
