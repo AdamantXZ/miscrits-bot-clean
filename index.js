@@ -6,7 +6,7 @@ const https = require('https');
 
 // 🚨 DEBUG INICIAL
 console.log('🔧 Node.js version:', process.version);
-console.log('🔧 Starting Discord bot with alternative WebSocket config...');
+console.log('🔧 Starting Discord bot with Render-compatible port 443...');
 
 // 🚀 CONFIGURAÇÃO ALTERNATIVA DE WEBSOCKET PARA RENDER
 const wsOptions = {
@@ -276,10 +276,12 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-const PORT = process.env.PORT || 10000;
+// ✅ PORTA CORRIGIDA PARA RENDER FREE PLAN
+const PORT = process.env.PORT || 443; // ✅ Porta 443 (HTTPS) - Render-compatible
+
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🩺 Health check available at: http://0.0.0.0:${PORT}/health`);
+  console.log(`✅ Server running on Render-compatible port ${PORT} (HTTPS)`);
+  console.log(`🩺 Health check available via Render's load balancer`);
   
   // 🔄 SELF-PING MELHORADO
   setInterval(() => {
@@ -301,29 +303,26 @@ app.listen(PORT, '0.0.0.0', () => {
 
 // 🚀 FORCED CONNECTION WITH ALTERNATIVE WS CONFIG
 function connectBot() {
-  console.log('🔑 Starting Discord connection with alternative WebSocket config...');
+  console.log('🔑 Starting Discord connection on Render-compatible port...');
   
   const loginPromise = client.login(process.env.BOT_TOKEN);
 
   // Timeout de 20 segundos para WebSocket alternativo
   const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('ALTERNATIVE_WS_TIMEOUT: Alternative WebSocket config also failed')), 20000);
+    setTimeout(() => reject(new Error('RENDER_PORT_ISSUE: Port 443 WebSocket also failed')), 20000);
   });
 
   Promise.race([loginPromise, timeoutPromise])
     .then(() => {
-      console.log('🎉 ALTERNATIVE WS CONNECTION SUCCESS!');
-      console.log('💡 WebSocket workaround worked!');
+      console.log('🎉 RENDER PORT 443 CONNECTION SUCCESS!');
+      console.log('💡 Port configuration was the issue!');
     })
     .catch(error => {
-      console.error('❌ ALTERNATIVE WS FAILED:', error.message);
+      console.error('❌ PORT 443 WS FAILED:', error.message);
       
-      if (error.message.includes('ALTERNATIVE_WS_TIMEOUT')) {
-        console.log('🚨 FINAL CONCLUSION: Render Free Plan blocks Discord WebSocket entirely');
-        console.log('💡 Solutions:');
-        console.log('   1. Upgrade to Render Starter Plan ($7/month)');
-        console.log('   2. Migrate to Railway.app (free, WebSocket works)');
-        console.log('   3. Migrate to Fly.io (free, WebSocket works)');
+      if (error.message.includes('RENDER_PORT_ISSUE')) {
+        console.log('🚨 FINAL DIAGNOSIS: WebSocket blocked regardless of port');
+        console.log('💡 This confirms Render Free Plan blocks Discord WebSocket entirely');
       }
       
       console.log('🔄 Retrying in 30 seconds...');
