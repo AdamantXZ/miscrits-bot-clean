@@ -3,18 +3,14 @@ const WebSocket = require('ws');
 const fs = require("fs");
 const http = require('http');
 
-console.log('🔧 MISCRITS BOT - COM RATE LIMITING');
+console.log('🔧 MISCRITS BOT - ESTRATÉGIA SEM API DISCORD');
 
-// ✅ CONFIGURAÇÃO DO WEBSOCKET (JÁ FUNCIONA!)
+// ✅ CONFIGURAÇÃO DO WEBSOCKET
 const wsUri = "wss://gateway.discord.gg/?v=10&encoding=json";
 let websocket = null;
 let heartbeatInterval = null;
 let sequence = null;
 let sessionId = null;
-
-// ✅ SISTEMA DE RATE LIMITING
-let lastRequestTime = 0;
-const MIN_REQUEST_INTERVAL = 1000; // 1 segundo entre requests
 
 // ✅ CARREGAR COMANDOS
 const commands = new Map();
@@ -39,7 +35,7 @@ try {
   console.error('❌ Erro comandos:', error.message);
 }
 
-// ✅ WEBSOCKET (MANTIDO - JÁ FUNCIONA)
+// ✅ WEBSOCKET
 function createWebSocket() {
   console.log('🔗 Criando WebSocket...');
   websocket = new WebSocket(wsUri);
@@ -61,7 +57,7 @@ function createWebSocket() {
   websocket.addEventListener("close", () => {
     console.log("🔌 DISCONNECTED");
     clearIntervals();
-    setTimeout(() => createWebSocket(), 10000); // 10 segundos
+    setTimeout(() => createWebSocket(), 15000);
   });
 }
 
@@ -128,165 +124,9 @@ function handleDispatch(eventType, data) {
       
     case 'INTERACTION_CREATE':
       console.log(`🔧 Interação: ${data.data.name} ${data.data.options?.[0]?.name || ''}`);
-      handleInteraction(data);
+      // ✅ NÃO PROCESSAR AGORA - IP ESTÁ BANIDO
+      console.log('⚠️ IP banido - ignorando interação');
       break;
-  }
-}
-
-// ✅ ✅ ✅ SISTEMA DE INTERAÇÕES COM RATE LIMITING
-async function handleInteraction(interaction) {
-  const { id, token, data } = interaction;
-  
-  // ✅ RATE LIMITING - Esperar se necessário
-  const now = Date.now();
-  const timeSinceLastRequest = now - lastRequestTime;
-  
-  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
-    const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
-    console.log(`⏳ Rate limiting: esperando ${waitTime}ms`);
-    await new Promise(resolve => setTimeout(resolve, waitTime));
-  }
-  
-  lastRequestTime = Date.now();
-  
-  try {
-    const commandName = data.name;
-    const subcommand = data.options?.[0]?.name;
-
-    console.log(`🎯 Processando: /${commandName} ${subcommand}`);
-
-    let targetCommandName;
-    if (commandName === "miscrits" || commandName === "miscrits-test") {
-      targetCommandName = commandMap[subcommand];
-    }
-
-    if (!targetCommandName) {
-      await sendSimpleResponse(id, token, "❌ Subcomando não encontrado!");
-      return;
-    }
-
-    const command = commands.get(targetCommandName);
-    if (!command) {
-      await sendSimpleResponse(id, token, "❌ Comando não configurado!");
-      return;
-    }
-
-    // ✅ EXECUTAR COMANDO DIRETAMENTE (SEM MOCK COMPLEXO)
-    await executeCommandDirectly(command, id, token, data);
-
-  } catch (error) {
-    console.error('❌ Erro na interação:', error);
-    try {
-      await sendSimpleResponse(id, token, "❌ Erro interno!");
-    } catch (e) {
-      console.error('❌ Erro ao enviar resposta de erro:', e);
-    }
-  }
-}
-
-// ✅ EXECUTAR COMANDO DIRETAMENTE (MAIS SIMPLES)
-async function executeCommandDirectly(command, interactionId, interactionToken, data) {
-  try {
-    // Obter parâmetros do comando
-    const subcommand = data.options?.[0]?.name;
-    const options = data.options?.[0]?.options || [];
-    
-    // Criar resposta simples baseada no tipo de comando
-    let response;
-    
-    if (command.data.name === 'miscrits-info') {
-      const miscritName = options.find(opt => opt.name === 'name')?.value;
-      response = { content: `📊 Informações de ${miscritName || 'Miscrit'}` };
-    } 
-    else if (command.data.name === 'miscrits-days') {
-      const day = options.find(opt => opt.name === 'day')?.value;
-      response = { content: `📅 Miscrits de ${day || 'hoje'}` };
-    }
-    else if (command.data.name === 'miscrits-tier-list') {
-      response = { content: '🏆 Tier List PvP' };
-    }
-    else if (command.data.name === 'miscrits-relics') {
-      const miscritName = options.find(opt => opt.name === 'name')?.value;
-      response = { content: `🏺 Relíquias de ${miscritName || 'Miscrit'}` };
-    }
-    else if (command.data.name === 'miscrits-evos-moves') {
-      const miscritName = options.find(opt => opt.name === 'name')?.value;
-      response = { content: `✨ Evoluções e Habilidades de ${miscritName || 'Miscrit'}` };
-    }
-    else {
-      response = { content: '🔧 Comando em processamento...' };
-    }
-    
-    await sendInteractionResponse(interactionId, interactionToken, response);
-    
-  } catch (error) {
-    console.error('❌ Erro no comando:', error);
-    await sendSimpleResponse(interactionId, interactionToken, "❌ Erro ao executar comando!");
-  }
-}
-
-// ✅ RESPOSTA SIMPLES (EVITA RATE LIMITING)
-async function sendSimpleResponse(interactionId, interactionToken, content) {
-  await sendInteractionResponse(interactionId, interactionToken, {
-    content: content,
-    flags: 64 // EPHEMERAL
-  });
-}
-
-// ✅ ENVIAR RESPOSTA COM RATE LIMITING
-async function sendInteractionResponse(interactionId, interactionToken, responseData) {
-  try {
-    // ✅ USAR HTTP NATIVO EM VEZ DE FETCH (MAIS CONFIÁVEL)
-    const https = require('https');
-    
-    const postData = JSON.stringify({
-      type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-      data: responseData
-    });
-    
-    const options = {
-      hostname: 'discord.com',
-      port: 443,
-      path: `/api/v10/interactions/${interactionId}/${interactionToken}/callback`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bot ${process.env.BOT_TOKEN}`,
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-    
-    return new Promise((resolve, reject) => {
-      const req = https.request(options, (res) => {
-        let data = '';
-        
-        res.on('data', (chunk) => {
-          data += chunk;
-        });
-        
-        res.on('end', () => {
-          if (res.statusCode === 200 || res.statusCode === 204) {
-            console.log('✅ Resposta enviada!');
-            resolve();
-          } else {
-            console.error(`❌ HTTP ${res.statusCode}: ${data}`);
-            reject(new Error(`HTTP ${res.statusCode}`));
-          }
-        });
-      });
-      
-      req.on('error', (error) => {
-        console.error('❌ Request error:', error);
-        reject(error);
-      });
-      
-      req.write(postData);
-      req.end();
-    });
-    
-  } catch (error) {
-    console.error('❌ Erro ao enviar resposta:', error);
-    throw error;
   }
 }
 
@@ -310,11 +150,12 @@ const app = http.createServer((req, res) => {
     res.end(JSON.stringify({ 
       status: isConnected ? 'ONLINE' : 'CONNECTING',
       timestamp: new Date().toISOString(),
-      message: 'WebSocket funcionando com rate limiting'
+      message: 'Bot online - IP temporariamente banido pela API Discord',
+      solution: 'Aguardando ban expirar ou migrar para outro hosting'
     }));
   } else {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Miscrits Bot ✅\n');
+    res.end('Miscrits Bot - Aguardando ban expirar\n');
   }
 });
 
@@ -324,12 +165,19 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor: porta ${PORT}`);
   console.log(`🩺 Health: http://0.0.0.0:${PORT}/health`);
   
-  // Heartbeat mais espaçado
+  console.log('🚨 SITUAÇÃO: IP DO RENDER BANIDO PELO DISCORD');
+  console.log('💡 SOLUÇÕES:');
+  console.log('   1. Aguardar 1-2 horas para ban expirar');
+  console.log('   2. Migrar para Railway.app (recomendado)');
+  console.log('   3. Usar Fly.io ou outro hosting');
+  console.log('   4. Contatar suporte do Render sobre IP banido');
+  
+  // Heartbeat mínimo
   setInterval(() => {
     http.get(`http://0.0.0.0:${PORT}/health`, () => {}).on('error', () => {});
-  }, 300000); // 5 minutos
+  }, 300000);
   
-  // Iniciar WebSocket
+  // Iniciar WebSocket (só para manter online)
   setTimeout(() => {
     createWebSocket();
   }, 2000);
