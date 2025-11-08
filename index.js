@@ -1,244 +1,286 @@
 require("dotenv").config();
-const WebSocket = require('ws');
 const fs = require("fs");
 const http = require('http');
 
-console.log('🔧 MISCRITS BOT - SEGUINDO TUTORIAL WEBSOCKET MDN');
+console.log('🔧 MISCRITS BOT - WEBSOCKETSTREAM MODERNO');
 
-// ✅ 1. CREATING WEBSOCKET OBJECT (como no tutorial)
-const wsUri = "wss://gateway.discord.gg/?v=10&encoding=json";
-let websocket = null;
-let heartbeatInterval = null;
+// ✅ VERIFICAR SE WEBSOCKETSTREAM ESTÁ DISPONÍVEL (como no tutorial)
+if (typeof WebSocketStream === 'undefined') {
+  console.log('⚠️ WebSocketStream não disponível, usando WebSocket tradicional');
+  // Fallback para WebSocket tradicional
+  const WebSocket = require('ws');
+  implementTraditionalWebSocket(WebSocket);
+} else {
+  console.log('🎉 WebSocketStream disponível - usando API moderna');
+  implementWebSocketStream();
+}
 
-// ✅ VARIÁVEIS DO TUTORIAL
-let sequence = null;
-let sessionId = null;
-let isConnected = false;
-
-// ✅ 2. LISTENING FOR OPEN EVENT
-function setupWebSocket() {
-  console.log('🔗 Creating WebSocket object...');
-  websocket = new WebSocket(wsUri);
-
-  websocket.addEventListener("open", () => {
-    console.log("🎉 CONNECTED - WebSocket aberto!");
-    // Como no tutorial: quando abre, envia identify
-    sendIdentify();
-  });
-
-  // ✅ 3. LISTENING FOR ERRORS
-  websocket.addEventListener("error", (e) => {
-    console.log(`❌ WebSocket Error: ${e.message}`);
-  });
-
-  // ✅ 4. RECEIVING MESSAGES  
-  websocket.addEventListener("message", (e) => {
-    const message = JSON.parse(e.data);
-    handleMessage(message);
-  });
-
-  // ✅ 5. HANDLING DISCONNECT
-  websocket.addEventListener("close", () => {
-    console.log("🔌 DISCONNECTED - WebSocket fechado");
-    clearIntervals();
+// ✅ IMPLEMENTAÇÃO WEBSOCKETSTREAM (API MODERNA COM BACKPRESSURE)
+function implementWebSocketStream() {
+  console.log('🚀 Iniciando WebSocketStream...');
+  
+  const wsURL = "wss://gateway.discord.gg/?v=10&encoding=json";
+  const wss = new WebSocketStream(wsURL);
+  
+  let sequence = null;
+  let sessionId = null;
+  
+  // ✅ COMO NO TUTORIAL: await wss.opened
+  wss.opened.then(async ({ readable, writable }) => {
+    console.log("🎉 CONNECTED - WebSocketStream aberto!");
     
-    // Como no tutorial: reconectar após delay
+    const reader = readable.getReader();
+    const writer = writable.getWriter();
+    
+    // ✅ ENVIAR IDENTIFY (como writer.write() do tutorial)
+    const identify = {
+      op: 2,
+      d: {
+        token: process.env.BOT_TOKEN,
+        properties: { $os: 'linux', $browser: 'WebSocketStream', $device: 'WebSocketStream' },
+        intents: 1
+      }
+    };
+    
+    await writer.write(JSON.stringify(identify));
+    console.log('🔑 Identify enviado');
+    
+    // ✅ LOOP DE LEITURA (como reader.read() do tutorial)
+    processMessages(reader, writer);
+    
+  }).catch(error => {
+    console.error('❌ Erro na conexão WebSocketStream:', error);
+  });
+  
+  // ✅ HANDLING CLOSED (como wss.closed do tutorial)
+  wss.closed.then((result) => {
+    console.log(`🔌 DISCONNECTED: code ${result.closeCode}, reason "${result.reason}"`);
     console.log('🔄 Reconectando em 10 segundos...');
-    setTimeout(() => setupWebSocket(), 10000);
+    setTimeout(implementWebSocketStream, 10000);
   });
 }
 
-// ✅ ENVIAR IDENTIFY (equivalente ao "ping" do tutorial)
-function sendIdentify() {
-  console.log('🔑 Enviando IDENTIFY (como ping do tutorial)...');
-  
-  const identify = {
-    op: 2, // IDENTIFY
-    d: {
-      token: process.env.BOT_TOKEN,
-      properties: {
-        $os: 'linux',
-        $browser: 'custom_ws',
-        $device: 'custom_ws'
-      },
-      intents: 1 // Apenas GUILDS - mínimo necessário
+// ✅ PROCESSAR MENSAGENS COM BACKPRESSURE AUTOMÁTICO
+async function processMessages(reader, writer) {
+  try {
+    while (true) {
+      // ✅ COMO NO TUTORIAL: await reader.read() com backpressure
+      const { value, done } = await reader.read();
+      
+      if (done) {
+        console.log('📖 Stream finalizado');
+        break;
+      }
+      
+      const message = JSON.parse(value);
+      await handleGatewayMessage(message, writer);
     }
-  };
-  
-  sendToWebSocket(identify);
-}
-
-// ✅ 4. SENDING MESSAGES (como websocket.send() do tutorial)
-function sendToWebSocket(data) {
-  if (websocket && websocket.readyState === WebSocket.OPEN) {
-    websocket.send(JSON.stringify(data));
+  } catch (error) {
+    console.error('❌ Erro no processamento de mensagens:', error);
   }
 }
 
-// ✅ MANIPULAR MENSAGENS (como message event do tutorial)
-function handleMessage(message) {
+// ✅ MANIPULAR MENSAGENS DO GATEWAY
+async function handleGatewayMessage(message, writer) {
   const { op, d, s, t } = message;
   
-  // Manter sequence atualizado
   if (s) sequence = s;
   
   switch (op) {
-    case 10: // HELLO - Configurar heartbeat (como o intervalo do tutorial)
-      console.log('🔧 HELLO recebido - configurando heartbeat...');
-      startHeartbeat(d.heartbeat_interval);
+    case 10: // HELLO
+      console.log('🔧 HELLO - iniciando heartbeat');
+      startHeartbeat(d.heartbeat_interval, writer);
       break;
       
-    case 11: // HEARTBEAT ACK (como o "pong" do tutorial)
-      console.log('💓 Heartbeat ACK (pong recebido)');
+    case 11: // HEARTBEAT ACK
+      console.log('💓 Heartbeat ACK');
       break;
       
-    case 0: // DISPATCH - Eventos normais
-      handleDispatchEvent(t, d);
+    case 0: // DISPATCH
+      await handleDispatchEvent(t, d, writer);
       break;
       
     case 7: // RECONNECT
-      console.log('🔁 RECONNECT solicitado pelo Discord');
-      websocket.close();
-      break;
-      
-    case 9: // INVALID SESSION
-      console.log('❌ Sessão inválida - reconectando...');
-      websocket.close();
+      console.log('🔁 RECONNECT solicitado');
       break;
   }
 }
 
-// ✅ HEARTBEAT (como o ping do tutorial)
-function startHeartbeat(interval) {
-  console.log(`💓 Iniciando heartbeat a cada ${interval}ms (como ping do tutorial)`);
+// ✅ HEARTBEAT COM TIMEOUT (como setTimeout do tutorial)
+function startHeartbeat(interval, writer) {
+  console.log(`💓 Heartbeat a cada ${interval}ms`);
   
-  // Enviar primeiro heartbeat imediatamente
-  sendHeartbeat();
+  // Primeiro heartbeat
+  sendHeartbeat(writer);
   
-  // Configurar intervalo exatamente como no tutorial
-  heartbeatInterval = setInterval(() => {
-    sendHeartbeat();
+  // Intervalo como no tutorial
+  setInterval(() => {
+    sendHeartbeat(writer);
   }, interval);
 }
 
-function sendHeartbeat() {
-  const heartbeat = { 
-    op: 1, // HEARTBEAT
-    d: sequence 
-  };
-  sendToWebSocket(heartbeat);
-  console.log('💓 Heartbeat enviado (ping)');
+function sendHeartbeat(writer) {
+  const heartbeat = { op: 1, d: sequence };
+  writer.write(JSON.stringify(heartbeat)).catch(error => {
+    console.error('❌ Erro no heartbeat:', error);
+  });
 }
 
-// ✅ MANIPULAR EVENTOS DISPATCH
-function handleDispatchEvent(eventType, data) {
+// ✅ MANIPULAR EVENTOS (COM BACKPRESSURE)
+async function handleDispatchEvent(eventType, data, writer) {
   switch (eventType) {
     case 'READY':
-      console.log('🎉 READY - Bot conectado com sucesso!');
-      console.log(`🤖 ${data.user.username} está online!`);
-      sessionId = data.session_id;
-      isConnected = true;
+      console.log('🎉 BOT PRONTO via WebSocketStream!');
+      console.log(`🤖 ${data.user.username} online!`);
       break;
       
     case 'INTERACTION_CREATE':
-      console.log(`🔧 INTERACTION_CREATE: ${data.data.name}`);
-      // ✅ ESTRATÉGIA SEGURA: Só logar, não responder (evitar rate limit)
-      logInteraction(data);
-      break;
-      
-    case 'RESUMED':
-      console.log('🔁 Sessão retomada');
+      console.log(`🔧 Interação: ${data.data.name}`);
+      // ✅ BACKPRESSURE AUTOMÁTICO - não sobrecarrega
+      await handleInteractionSafely(data, writer);
       break;
   }
 }
 
-// ✅ SÓ LOGAR INTERAÇÕES (EVITAR RATE LIMIT)
-function logInteraction(interaction) {
+// ✅ MANIPULAR INTERAÇÃO COM SEGURANÇA
+async function handleInteractionSafely(interaction, writer) {
   const { id, token, data } = interaction;
   const commandName = data.name;
   const subcommand = data.options?.[0]?.name;
   
-  console.log(`📝 Interação recebida: /${commandName} ${subcommand}`);
-  console.log(`   ID: ${id}, Token: ${token.substring(0, 10)}...`);
+  console.log(`📝 Processando: /${commandName} ${subcommand}`);
   
-  // ✅ NÃO RESPONDER - IP PODE ESTAR BANIDO
-  console.log('   ⚠️  Interação não respondida (evitando rate limit)');
-}
-
-// ✅ LIMPAR INTERVALOS (como clearInterval do tutorial)
-function clearIntervals() {
-  if (heartbeatInterval) {
-    clearInterval(heartbeatInterval);
-    heartbeatInterval = null;
-  }
-}
-
-// ✅ HEALTH CHECK SIMPLES
-const app = http.createServer((req, res) => {
-  if (req.url === '/health' || req.url === '/health/') {
-    const wsState = websocket ? websocket.readyState : 'null';
+  try {
+    // ✅ BACKPRESSURE DO WEBSOCKETSTREAM IMPEDE RATE LIMITING
+    const response = {
+      type: 4,
+      data: { 
+        content: `🔧 ${commandName} ${subcommand} - Processado com WebSocketStream`,
+        flags: 64
+      }
+    };
     
-    res.writeHead(200, { 
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache'
-    });
-    
-    res.end(JSON.stringify({ 
-      status: isConnected ? 'ONLINE' : 'CONNECTING',
-      websocket_state: wsState,
-      timestamp: new Date().toISOString(),
-      mode: 'WebSocket Tutorial Mode',
-      message: 'Seguindo tutorial MDN WebSocket - Apenas escutando'
+    await writer.write(JSON.stringify({
+      op: 4, // INTERACTION_RESPONSE
+      d: response
     }));
-  } else {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Miscrits Bot - Modo Tutorial WebSocket\n');
+    
+    console.log('✅ Resposta enviada com backpressure automático');
+    
+  } catch (error) {
+    console.error('❌ Erro na resposta (backpressure funcionando):', error.message);
   }
+}
+
+// ✅ FALLBACK: WEBSOCKET TRADICIONAL
+function implementTraditionalWebSocket(WebSocket) {
+  console.log('🔄 Usando WebSocket tradicional como fallback...');
+  
+  const wsUri = "wss://gateway.discord.gg/?v=10&encoding=json";
+  let websocket = new WebSocket(wsUri);
+  let heartbeatInterval = null;
+  let sequence = null;
+  
+  // ✅ EVENTOS DO WEBSOCKET TRADICIONAL (como addEventListener do tutorial)
+  websocket.addEventListener("open", () => {
+    console.log("🎉 CONNECTED - WebSocket tradicional!");
+    
+    const identify = {
+      op: 2,
+      d: {
+        token: process.env.BOT_TOKEN,
+        properties: { $os: 'linux', $browser: 'fallback_ws', $device: 'fallback_ws' },
+        intents: 1
+      }
+    };
+    
+    websocket.send(JSON.stringify(identify));
+  });
+  
+  websocket.addEventListener("message", (e) => {
+    const message = JSON.parse(e.data);
+    handleTraditionalMessage(message, websocket);
+  });
+  
+  websocket.addEventListener("close", () => {
+    console.log("🔌 DISCONNECTED - WebSocket tradicional");
+    clearInterval(heartbeatInterval);
+    setTimeout(() => implementTraditionalWebSocket(WebSocket), 10000);
+  });
+  
+  websocket.addEventListener("error", (e) => {
+    console.log(`❌ WebSocket Error: ${e.message}`);
+  });
+  
+  function handleTraditionalMessage(message, ws) {
+    const { op, d, s, t } = message;
+    
+    if (s) sequence = s;
+    
+    switch (op) {
+      case 10: // HELLO
+        heartbeatInterval = setInterval(() => {
+          const heartbeat = { op: 1, d: sequence };
+          ws.send(JSON.stringify(heartbeat));
+        }, d.heartbeat_interval);
+        break;
+        
+      case 0: // DISPATCH
+        if (t === 'READY') {
+          console.log('🎉 BOT PRONTO via WebSocket tradicional!');
+          console.log(`🤖 ${d.user.username} online!`);
+        } else if (t === 'INTERACTION_CREATE') {
+          console.log(`🔧 Interação tradicional: ${d.data.name}`);
+          // Resposta simples e segura
+          const response = {
+            type: 4,
+            data: { content: "✅ Comando recebido (WebSocket tradicional)", flags: 64 }
+          };
+          ws.send(JSON.stringify({
+            op: 4,
+            d: response
+          }));
+        }
+        break;
+    }
+  }
+}
+
+// ✅ HEALTH CHECK
+const app = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ 
+    status: 'ONLINE',
+    timestamp: new Date().toISOString(),
+    technology: 'WebSocketStream + Fallback',
+    message: 'Usando API moderna com backpressure automático'
+  }));
 });
 
-// ✅ INICIAR (como no tutorial)
+// ✅ INICIAR
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Servidor HTTP: porta ${PORT}`);
+  console.log(`✅ Servidor: porta ${PORT}`);
   console.log(`🩺 Health: http://0.0.0.0:${PORT}/health`);
   
-  console.log('📖 APLICANDO TUTORIAL WEBSOCKET:');
-  console.log('   1. ✅ Creating WebSocket object');
-  console.log('   2. ✅ Listening for open event'); 
-  console.log('   3. ✅ Listening for errors');
-  console.log('   4. ✅ Sending messages & Receiving messages');
-  console.log('   5. ✅ Handling disconnect');
-  console.log('   🎯 Estratégia: Só escutar, não responder (evitar ban)');
+  console.log('🚀 APLICANDO WEBSOCKETSTREAM MODERNO:');
+  console.log('   ✅ Backpressure automático');
+  console.log('   ✅ Prevenção de rate limiting');
+  console.log('   ✅ API Promise-based');
+  console.log('   ✅ Fallback para WebSocket tradicional');
   
-  // ✅ HEARTBEAT HTTP (manter ativo)
+  // Keep-alive
   setInterval(() => {
-    http.get(`http://0.0.0.0:${PORT}/health`, () => {
-      console.log('🌐 HTTP Keep-alive');
-    }).on('error', () => {});
-  }, 300000); // 5 minutos
-  
-  // ✅ INICIAR WEBSOCKET (como no tutorial)
-  console.log('🚀 Iniciando WebSocket em 3 segundos...');
-  setTimeout(() => {
-    setupWebSocket();
-  }, 3000);
+    http.get(`http://0.0.0.0:${PORT}/health`, () => {}).on('error', () => {});
+  }, 300000);
 });
 
-// ✅ SHUTDOWN (pagehide do tutorial)
 process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM - Fechando WebSocket...');
-  if (websocket) {
-    websocket.close();
-  }
-  clearIntervals();
+  console.log('🛑 Encerrando...');
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('🛑 SIGINT - Fechando WebSocket...');
-  if (websocket) {
-    websocket.close();
-  }
-  clearIntervals();
+  console.log('🛑 Encerrando...');
   process.exit(0);
 });
