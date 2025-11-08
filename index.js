@@ -1,5 +1,5 @@
-// index.js — Miscrits Bot (Render WebSocket compatível universal)
-// ---------------------------------------------------------------
+// index.js — Miscrits Bot (Render WebSocket via Proxy)
+// ----------------------------------------------------
 require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
@@ -15,10 +15,16 @@ if (!TOKEN) {
   process.exit(1);
 }
 
-// ✅ CLIENTE DISCORD.JS (CONFIG RENDER-FRIENDLY)
+// ✅ CLIENT DISCORD.JS COM WEBSOCKET VIA PROXY
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
-  ws: { compress: false, large_threshold: 50 },
+  ws: {
+    version: 10,
+    buildIdentifyShard: (id) => id,
+    properties: { $os: "linux", $browser: "discord.js", $device: "discord.js" },
+    // ⚙️ Gateway Proxy confiável para Render
+    buildUrl: () => "wss://discord-proxy.fly.dev/?v=10&encoding=json"
+  },
   rest: { timeout: 30000, retries: 3 },
   presence: {
     status: "online",
@@ -28,25 +34,20 @@ const client = new Client({
 
 // ✅ CARREGAR COMANDOS
 client.commands = new Collection();
-
 try {
   const commandsPath = path.join(__dirname, "commands");
-  const commandFiles = fs.readdirSync(commandsPath).filter((f) => f.endsWith(".js"));
-
-  for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-    if (command?.data?.name) {
-      client.commands.set(command.data.name, command);
-      console.log(`✅ Comando carregado: ${command.data.name}`);
-    }
+  const files = fs.readdirSync(commandsPath).filter(f => f.endsWith(".js"));
+  for (const file of files) {
+    const cmd = require(path.join(commandsPath, file));
+    if (cmd?.data?.name) client.commands.set(cmd.data.name, cmd);
+    console.log(`✅ Comando carregado: ${cmd.data.name}`);
   }
-  console.log(`📋 Total de comandos carregados: ${client.commands.size}`);
-} catch (err) {
-  console.error("❌ Erro ao carregar comandos:", err);
+  console.log(`📋 Total de comandos: ${client.commands.size}`);
+} catch (e) {
+  console.error("❌ Erro ao carregar comandos:", e);
 }
 
-// ✅ EVENTO READY
+// ✅ EVENTOS
 client.once("ready", () => {
   console.log("=".repeat(50));
   console.log(`🎉 BOT ONLINE: ${client.user.tag}`);
@@ -54,8 +55,7 @@ client.once("ready", () => {
   console.log("=".repeat(50));
 });
 
-// ✅ EVENTO DE INTERAÇÃO
-client.on("interactionCreate", async (interaction) => {
+client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
   const command = client.commands.get(interaction.commandName);
   if (!command) return;
@@ -65,64 +65,50 @@ client.on("interactionCreate", async (interaction) => {
   } catch (err) {
     console.error(`❌ Erro em /${interaction.commandName}:`, err);
     try {
-      if (interaction.deferred || interaction.replied) {
-        await interaction.followUp({
-          content: "❌ Erro ao executar comando!",
-          ephemeral: true,
-        });
-      } else {
-        await interaction.reply({
-          content: "❌ Erro ao executar comando!",
-          ephemeral: true,
-        });
-      }
+      if (interaction.replied || interaction.deferred)
+        await interaction.followUp({ content: "❌ Erro ao executar comando!", ephemeral: true });
+      else
+        await interaction.reply({ content: "❌ Erro ao executar comando!", ephemeral: true });
     } catch {}
   }
 });
 
-// ✅ EVENTOS DE CONEXÃO / WEBSOCKET
-client.on("error", (err) => console.error("🚨 Erro Discord:", err.message));
-client.on("warn", (info) => console.warn("⚠️ Aviso Discord:", info));
+// ✅ EVENTOS DE CONEXÃO
+client.on("error", err => console.error("🚨 Discord.js error:", err.message));
+client.on("warn", info => console.warn("⚠️ Discord warning:", info));
+client.on("disconnect", () => console.log("🔌 Desconectado — tentando reconectar..."));
 client.on("reconnecting", () => console.log("🔁 Reconectando..."));
-client.on("disconnect", (e) => console.log(`🔌 Desconectado: ${e?.code || "?"}`));
 
-// ✅ SERVIDOR HTTP PARA HEALTH CHECK
+// ✅ HEALTH CHECK HTTP
 const server = http.createServer((req, res) => {
-  if (req.url === "/health" || req.url === "/") {
+  if (req.url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        status: client.isReady() ? "ONLINE" : "CONNECTING",
-        bot: client.user?.tag || "Desconectado",
-        guilds: client.guilds?.cache.size || 0,
-        uptime: Math.floor(process.uptime()),
-        memoryMB: (process.memoryUsage().rss / 1024 / 1024).toFixed(1),
-        timestamp: new Date().toISOString(),
-      })
-    );
+    res.end(JSON.stringify({
+      status: client.isReady() ? "ONLINE" : "CONNECTING",
+      bot: client.user?.tag || "Desconectado",
+      guilds: client.guilds?.cache.size || 0,
+      uptime: Math.floor(process.uptime()),
+      memory: (process.memoryUsage().rss / 1024 / 1024).toFixed(1) + "MB",
+      timestamp: new Date().toISOString()
+    }));
   } else {
     res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Miscrits Bot – Online\n");
+    res.end("Miscrits Bot - Online\n");
   }
 });
-
 const PORT = process.env.PORT || 10000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🌐 HTTP ativo na porta ${PORT}`);
-});
+server.listen(PORT, "0.0.0.0", () => console.log(`🌐 HTTP ativo na porta ${PORT}`));
 
-// ✅ LOGIN AUTOMÁTICO COM RECONEXÃO
-async function connect() {
+// ✅ LOGIN DISCORD
+(async () => {
   try {
-    console.log("🚀 Conectando ao Discord...");
+    console.log("🚀 Conectando ao Discord (via proxy)...");
     await client.login(TOKEN);
   } catch (err) {
-    console.error("❌ Falha no login:", err.message);
-    console.log("⏳ Tentando novamente em 30s...");
-    setTimeout(connect, 30000);
+    console.error("❌ Falha no login:", err);
+    setTimeout(() => process.exit(1), 10000);
   }
-}
-connect();
+})();
 
 // ✅ ENCERRAMENTO GRACIOSO
 process.on("SIGTERM", () => {
@@ -130,7 +116,6 @@ process.on("SIGTERM", () => {
   client.destroy();
   server.close(() => process.exit(0));
 });
-
 process.on("SIGINT", () => {
   console.log("🛑 Encerrando...");
   client.destroy();
