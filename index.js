@@ -4,28 +4,11 @@ const fs = require("fs");
 const http = require('http');
 const https = require('https');
 
-// 🚨 DEBUG INICIAL
-console.log('🔧 Node.js version:', process.version);
-console.log('🔧 Starting Discord bot with Render-compatible port 443...');
+console.log('🔧 Starting Discord bot with Render port binding...');
 
-// 🚀 CONFIGURAÇÃO ALTERNATIVA DE WEBSOCKET PARA RENDER
-const wsOptions = {
-  intents: [GatewayIntentBits.Guilds],
-  rest: {
-    timeout: 30000,
-  },
-  ws: {
-    large_threshold: 250,
-    compress: false,
-    properties: {
-      os: 'linux',
-      browser: 'discord.js',
-      device: 'discord.js'
-    }
-  }
-};
-
-const client = new Client(wsOptions);
+const client = new Client({ 
+  intents: [GatewayIntentBits.Guilds]
+});
 
 // 🛡️ SISTEMA DE AUTO-RECOVERY MELHORADO
 let restartCount = 0;
@@ -86,7 +69,6 @@ const commandMap = {
   'tierlist': 'miscrits-tier-list'
 };
 
-// ✅ SIMPLIFICADO: Agora usa o mesmo objeto, evitando inconsistência
 const testCommandMap = commandMap;
 
 // ✅ CARREGAMENTO SEGURO DOS COMANDOS
@@ -100,8 +82,6 @@ try {
       if (command.data && command.data.name) {
         client.commands.set(command.data.name, command);
         console.log(`✅ Command loaded: ${command.data.name}`);
-      } else {
-        console.error(`❌ Invalid command: ${file} - missing 'data' or 'data.name' property`);
       }
     } catch (error) {
       console.error(`❌ Error loading command ${file}:`, error.message);
@@ -118,7 +98,7 @@ client.once("clientReady", () => {
   console.log(`🛡️ Auto-recovery system activated`);
 });
 
-// 🛡️ AUTO-RECONNECTION (ENGLISH)
+// 🛡️ AUTO-RECONNECTION
 client.on("disconnect", () => {
   console.log('⚠️ Bot disconnected from Discord - reconnecting in 5 seconds...');
   setTimeout(() => {
@@ -140,7 +120,7 @@ client.on("error", (error) => {
   console.error('❌ Discord connection error:', error);
 });
 
-// Keep-alive para prevenir "cold start"
+// Keep-alive
 setInterval(() => {
   if (client.isReady()) {
     console.log('💓 Bot heartbeat -', new Date().toISOString());
@@ -150,12 +130,10 @@ setInterval(() => {
 // ✅ FUNÇÃO AUXILIAR PARA AUTOOCOMPLETE SEGURO
 async function handleAutocompleteSafely(interaction, command) {
   try {
-    // Verifica múltiplas condições antes de responder
     if (!interaction.responded && !interaction.replied && command.autocomplete) {
       await command.autocomplete(interaction);
     }
   } catch (error) {
-    // Ignora silenciosamente erros de interação já processada
     if (error.code === 10062 || error.code === 40060) return;
     console.error("❌ Autocomplete error:", error.message);
   }
@@ -166,7 +144,6 @@ async function executeCommandSafely(interaction, command) {
   try {
     await command.execute(interaction);
   } catch (error) {
-    // Ignora erro "Unknown interaction" (interação expirou)
     if (error.code === 10062) {
       console.log('⚠️ Expired interaction - ignoring error');
       return;
@@ -175,20 +152,17 @@ async function executeCommandSafely(interaction, command) {
     console.error('❌ Command error:', error.message);
     
     try {
-      // ✅ Compatível com ambas as versões do Discord.js
       const reply = {
         content: "❌ An error occurred while executing this command!",
         ...(interaction.ephemeral !== undefined ? { ephemeral: true } : { flags: 64 })
       };
       
-      // Verifica se ainda podemos responder
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply(reply);
       } else if (interaction.deferred) {
         await interaction.followUp(reply);
       }
     } catch (replyError) {
-      // Ignora erros de interação expirada
       if (replyError.code !== 10062) {
         console.error('❌ Error sending error message:', replyError.message);
       }
@@ -201,7 +175,6 @@ client.on("interactionCreate", async interaction => {
     const commandName = interaction.commandName;
     const subcommand = interaction.options.getSubcommand();
     
-    // ✅ SUPORTE PARA AMBOS OS COMANDOS: miscrits E miscrits-test
     if (commandName === "miscrits" || commandName === "miscrits-test") {
       if (subcommand === "info" || subcommand === "moves-and-evos" || subcommand === "relics") {
         
@@ -227,7 +200,6 @@ client.on("interactionCreate", async interaction => {
     const commandName = interaction.commandName;
     const subcommand = interaction.options.getSubcommand();
     
-    // ✅ DETERMINAR QUAL MAPA USAR BASEADO NO COMANDO PRINCIPAL
     let targetCommandName;
     
     if (commandName === "miscrits") {
@@ -238,8 +210,6 @@ client.on("interactionCreate", async interaction => {
       console.log(`🧪 Test command: /miscrits-test ${subcommand} -> ${targetCommandName}`);
     } else {
       console.log(`❓ Unknown command: ${commandName}`);
-      
-      // ✅ USA MESMA LÓGICA DE COMPATIBILIDADE
       const reply = {
         content: "❌ Command not recognized!",
         ...(interaction.ephemeral !== undefined ? { ephemeral: true } : { flags: 64 })
@@ -276,12 +246,12 @@ client.on("interactionCreate", async interaction => {
   }
 });
 
-// ✅ PORTA CORRIGIDA PARA RENDER FREE PLAN
-const PORT = process.env.PORT || 443; // ✅ Porta 443 (HTTPS) - Render-compatible
+// ✅ PORTA ORIGINAL DO RENDER
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on Render-compatible port ${PORT} (HTTPS)`);
-  console.log(`🩺 Health check available via Render's load balancer`);
+  console.log(`✅ Server running on Render default port ${PORT}`);
+  console.log(`🩺 Health check available at: http://0.0.0.0:${PORT}/health`);
   
   // 🔄 SELF-PING MELHORADO
   setInterval(() => {
@@ -292,8 +262,6 @@ app.listen(PORT, '0.0.0.0', () => {
       res.on('data', () => {});
     }).on('error', (err) => {
       console.warn(`⚠️ Self-ping failed: ${err.message}`);
-    }).setTimeout(10000, () => {
-      console.warn('⚠️ Self-ping timeout');
     });
     
   }, 4 * 60 * 1000);
@@ -301,39 +269,24 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log("🔁 Self-ping system activated");
 });
 
-// 🚀 FORCED CONNECTION WITH ALTERNATIVE WS CONFIG
+// 🚀 CONEXÃO SIMPLES
 function connectBot() {
-  console.log('🔑 Starting Discord connection on Render-compatible port...');
+  console.log('🔑 Attempting to connect to Discord...');
   
-  const loginPromise = client.login(process.env.BOT_TOKEN);
-
-  // Timeout de 20 segundos para WebSocket alternativo
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('RENDER_PORT_ISSUE: Port 443 WebSocket also failed')), 20000);
-  });
-
-  Promise.race([loginPromise, timeoutPromise])
+  client.login(process.env.BOT_TOKEN)
     .then(() => {
-      console.log('🎉 RENDER PORT 443 CONNECTION SUCCESS!');
-      console.log('💡 Port configuration was the issue!');
+      console.log('🎉 CONNECTED TO DISCORD!');
     })
     .catch(error => {
-      console.error('❌ PORT 443 WS FAILED:', error.message);
-      
-      if (error.message.includes('RENDER_PORT_ISSUE')) {
-        console.log('🚨 FINAL DIAGNOSIS: WebSocket blocked regardless of port');
-        console.log('💡 This confirms Render Free Plan blocks Discord WebSocket entirely');
-      }
-      
+      console.error('❌ Connection failed:', error.message);
       console.log('🔄 Retrying in 30 seconds...');
       setTimeout(connectBot, 30000);
     });
 }
 
-// Conexão inicial + verificação periódica
 connectBot();
 
-// Verifica a cada minuto se ainda está conectado
+// Verificação de conexão
 setInterval(() => {
   if (!client.isReady()) {
     console.log('⚠️ Bot disconnected - reconnecting...');
