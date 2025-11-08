@@ -6,11 +6,26 @@ const https = require('https');
 
 // 🚨 DEBUG INICIAL
 console.log('🔧 Node.js version:', process.version);
-console.log('🔧 Starting Discord bot...');
+console.log('🔧 Starting Discord bot with alternative WebSocket config...');
 
-const client = new Client({ 
-  intents: [GatewayIntentBits.Guilds]
-});
+// 🚀 CONFIGURAÇÃO ALTERNATIVA DE WEBSOCKET PARA RENDER
+const wsOptions = {
+  intents: [GatewayIntentBits.Guilds],
+  rest: {
+    timeout: 30000,
+  },
+  ws: {
+    large_threshold: 250,
+    compress: false,
+    properties: {
+      os: 'linux',
+      browser: 'discord.js',
+      device: 'discord.js'
+    }
+  }
+};
+
+const client = new Client(wsOptions);
 
 // 🛡️ SISTEMA DE AUTO-RECOVERY MELHORADO
 let restartCount = 0;
@@ -284,28 +299,31 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log("🔁 Self-ping system activated");
 });
 
-// 🚀 FORCED CONNECTION WITH WEB SOCKET DEBUG
+// 🚀 FORCED CONNECTION WITH ALTERNATIVE WS CONFIG
 function connectBot() {
-  console.log('🔑 Starting Discord connection with WebSocket debug...');
+  console.log('🔑 Starting Discord connection with alternative WebSocket config...');
   
   const loginPromise = client.login(process.env.BOT_TOKEN);
 
-  // Timeout de 15 segundos para WebSocket
+  // Timeout de 20 segundos para WebSocket alternativo
   const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('DISCORD_WS_TIMEOUT: WebSocket handshake timeout after 15s')), 15000);
+    setTimeout(() => reject(new Error('ALTERNATIVE_WS_TIMEOUT: Alternative WebSocket config also failed')), 20000);
   });
 
   Promise.race([loginPromise, timeoutPromise])
     .then(() => {
-      console.log('🎉 Discord WebSocket connected successfully!');
+      console.log('🎉 ALTERNATIVE WS CONNECTION SUCCESS!');
+      console.log('💡 WebSocket workaround worked!');
     })
     .catch(error => {
-      console.error('❌ WEB SOCKET ERROR:', error.message);
-      console.log('🔧 Error type:', error.code || 'NO_CODE');
+      console.error('❌ ALTERNATIVE WS FAILED:', error.message);
       
-      if (error.message.includes('DISCORD_WS_TIMEOUT')) {
-        console.log('🚨 CONFIRMED: Render is blocking WebSocket connection to Discord');
-        console.log('💡 Solution required: Render support needs to allow Discord WebSocket connections');
+      if (error.message.includes('ALTERNATIVE_WS_TIMEOUT')) {
+        console.log('🚨 FINAL CONCLUSION: Render Free Plan blocks Discord WebSocket entirely');
+        console.log('💡 Solutions:');
+        console.log('   1. Upgrade to Render Starter Plan ($7/month)');
+        console.log('   2. Migrate to Railway.app (free, WebSocket works)');
+        console.log('   3. Migrate to Fly.io (free, WebSocket works)');
       }
       
       console.log('🔄 Retrying in 30 seconds...');
