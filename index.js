@@ -1,25 +1,27 @@
-require("dotenv").config();
-const { Client, GatewayIntentBits } = require("discord.js");
+// Adicione isto ANTES do client.login():
+console.log('🌐 Testando conectividade...');
 
-console.log('🔑 Token do Render:', process.env.BOT_TOKEN ? 'PRESENTE' : 'AUSENTE');
-
-if (!process.env.BOT_TOKEN) {
-  console.error('❌ BOT_TOKEN não encontrado nas variáveis de ambiente!');
-  process.exit(1);
-}
-
-const client = new Client({ 
-  intents: [GatewayIntentBits.Guilds] 
+// Teste de conectividade básica
+const https = require('https');
+https.get('https://discord.com/api/v10/gateway', (res) => {
+  console.log(`📡 Conectividade Discord: ${res.statusCode}`);
+}).on('error', (err) => {
+  console.error('❌ Sem conectividade com Discord:', err.message);
 });
 
-client.once('ready', () => {
-  console.log('🎉 BOT CONECTOU AO DISCORD!');
-});
+// Timeout específico para login
+console.log('🔑 Iniciando login...');
+const loginTimeout = setTimeout(() => {
+  console.log('⏰ TIMEOUT - Login travado após 30s');
+}, 30000);
 
-client.login(process.env.BOT_TOKEN).catch(err => {
-  console.error('❌ ERRO NO LOGIN:', err.message);
-});
-
-require('http').createServer((req, res) => {
-  res.end('OK');
-}).listen(process.env.PORT || 10000);
+client.login(process.env.BOT_TOKEN)
+  .then(() => {
+    clearTimeout(loginTimeout);
+    console.log('✅ Login bem-sucedido!');
+  })
+  .catch(err => {
+    clearTimeout(loginTimeout);
+    console.error('❌ ERRO NO LOGIN:', err.message);
+    console.error('Código do erro:', err.code);
+  });
