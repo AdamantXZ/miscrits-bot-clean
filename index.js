@@ -4,14 +4,26 @@ const fs = require("fs");
 const http = require('http');
 const WebSocket = require('ws');
 
-// ✅ CONFIGURAÇÃO DO CLIENTE DISCORD COM WEBSOCKET CUSTOM
+// 🛡️ SISTEMA DE FALLBACK PARA VARIÁVEIS DE AMBIENTE
+function getEnvVar(key, defaultValue = null) {
+  // Tenta todas as fontes possíveis
+  const value = process.env[key] || defaultValue;
+  
+  if (!value && key === 'BOT_TOKEN') {
+    console.error('🚨 CRÍTICO: BOT_TOKEN não encontrado em nenhuma fonte!');
+    console.log('💡 Verifique as variáveis de ambiente no painel do Render');
+  }
+  
+  return value;
+}
+
+// ✅ CONFIGURAÇÃO DO CLIENTE DISCORD
 const client = new Client({ 
   intents: [GatewayIntentBits.Guilds],
-  // ✅ USA WEBSOCKET PERSONALIZADO
-  ws: {
-    properties: {
-      $browser: "Discord iOS"
-    }
+  // ✅ CONFIGURAÇÕES OTIMIZADAS PARA RENDER
+  rest: {
+    timeout: 30000,
+    retries: 3
   }
 });
 
@@ -35,14 +47,23 @@ process.on('uncaughtException', (error) => {
   }
 });
 
-// ✅ WEBSOCKET SERVER PARA PROXY
+// ✅ WEBSOCKET SERVER PARA PROXY E MONITORAMENTO
 const server = http.createServer((req, res) => {
   if (req.url === '/health' || req.url === '/health/') {
     const botStatus = client.isReady() ? 'connected' : 'disconnected';
     
+    // ✅ DIAGNÓSTICO DETALHADO DAS VARIÁVEIS
+    const envDiagnosis = {
+      BOT_TOKEN: getEnvVar('BOT_TOKEN') ? '✅ PRESENTE' : '❌ AUSENTE',
+      PORT: getEnvVar('PORT', '10000'),
+      RENDER_EXTERNAL_URL: getEnvVar('RENDER_EXTERNAL_URL', 'Não definida'),
+      NODE_ENV: getEnvVar('NODE_ENV', 'Não definida')
+    };
+    
     res.writeHead(200, { 
       'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache'
+      'Cache-Control': 'no-cache',
+      'Access-Control-Allow-Origin': '*'
     });
     
     res.end(JSON.stringify({ 
@@ -51,7 +72,9 @@ const server = http.createServer((req, res) => {
       uptime: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),
       websocket: 'ACTIVE',
-      commands: client.commands?.size || 0
+      commands: client.commands?.size || 0,
+      environment_diagnosis: envDiagnosis,
+      render_service: getEnvVar('RENDER_SERVICE_NAME', 'Não detectado')
     }));
   } else {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -59,7 +82,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-// ✅ CRIANDO WEBSOCKET SERVER (ISSO É PERMITIDO NO RENDER)
+// ✅ CRIANDO WEBSOCKET SERVER
 const wss = new WebSocket.Server({ 
   server: server,
   path: '/websocket'
@@ -130,15 +153,17 @@ try {
 
 // ✅ EVENTOS DO CLIENTE DISCORD
 client.once("ready", () => {
-  console.log(`✅ Bot online como ${client.user.tag}`);
-  console.log(`📋 Comandos carregados: ${client.commands.size}`);
-  console.log(`🔗 WebSocket Server ativo na porta ${process.env.PORT || 10000}`);
+  console.log(`🎉 BOT CONECTADO COM SUCESSO!`);
+  console.log(`🤖 Nome: ${client.user.tag}`);
+  console.log(`📋 Comandos: ${client.commands.size}`);
+  console.log(`🔗 WebSocket Server: porta ${getEnvVar('PORT', '10000')}`);
   
   // ✅ BROADCAST VIA WEBSOCKET
   broadcastToWebSockets({
     type: 'BOT_READY',
     botName: client.user.tag,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    status: 'CONNECTED'
   });
 });
 
@@ -151,7 +176,7 @@ client.on("disconnect", () => {
   
   setTimeout(() => {
     client.destroy().then(() => {
-      client.login(process.env.BOT_TOKEN).catch(console.error);
+      connectBot();
     });
   }, 10000);
 });
@@ -286,38 +311,70 @@ client.on("interactionCreate", async interaction => {
 });
 
 // ✅ INICIAR SERVIDOR
-const PORT = process.env.PORT || 10000;
+const PORT = getEnvVar('PORT', '10000');
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor HTTP/WebSocket rodando na porta ${PORT}`);
   console.log(`🩺 Health check: http://0.0.0.0:${PORT}/health`);
   console.log(`🔗 WebSocket: ws://0.0.0.0:${PORT}/websocket`);
-  console.log(`🔑 Iniciando conexão com Discord...`);
+  
+  // ✅ DIAGNÓSTICO INICIAL
+  console.log('🔍 Diagnóstico de Variáveis de Ambiente:');
+  console.log(`   - BOT_TOKEN: ${getEnvVar('BOT_TOKEN') ? '✅ PRESENTE' : '❌ AUSENTE'}`);
+  console.log(`   - PORT: ${getEnvVar('PORT', '10000 (fallback)')}`);
+  console.log(`   - RENDER_EXTERNAL_URL: ${getEnvVar('RENDER_EXTERNAL_URL', 'Não definida')}`);
+  
+  console.log(`🔑 Iniciando conexão com Discord em 3 segundos...`);
   
   // ✅ CONEXÃO COM DISCORD
   setTimeout(() => {
     connectBot();
-  }, 2000);
+  }, 3000);
 });
 
 // 🛡️ CONEXÃO SEGURA COM DISCORD
 function connectBot() {
-  console.log('🔑 Tentando conexão WebSocket com Discord...');
+  const botToken = getEnvVar('BOT_TOKEN');
   
-  client.login(process.env.BOT_TOKEN)
+  if (!botToken) {
+    console.error('🚨 CRÍTICO: BOT_TOKEN não encontrado!');
+    console.log('💡 AÇÃO: Verifique as variáveis de ambiente no painel do Render');
+    console.log('🔄 Tentando novamente em 60 segundos...');
+    setTimeout(connectBot, 60000);
+    return;
+  }
+  
+  console.log('🔑 Tentando conexão WebSocket com Discord...');
+  console.log('⏱️ Timeout: 30 segundos');
+  
+  // ✅ TIMEOUT PARA DETECTAR BLOQUEIO
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('WEBSOCKET_TIMEOUT: Handshake excedeu 30s - Render bloqueando')), 30000);
+  });
+  
+  const loginPromise = client.login(botToken);
+  
+  Promise.race([loginPromise, timeoutPromise])
     .then(() => {
-      console.log('✅ Conexão WebSocket estabelecida com Discord!');
+      console.log('🎉 CONEXÃO WEBSOCKET ESTABELECIDA COM SUCESSO!');
+      broadcastToWebSockets({
+        type: 'WEBSOCKET_SUCCESS',
+        message: 'Conectado ao Discord',
+        timestamp: new Date().toISOString()
+      });
     })
     .catch(error => {
-      console.error('❌ ERRO NA CONEXÃO:', error.message);
+      console.error('❌ ERRO NA CONEXÃO WEBSOCKET:', error.message);
       
-      if (error.message.includes('WebSocket') || error.message.includes('timeout')) {
-        console.log('🚨 WebSocket bloqueado - usando fallback...');
-        // ✅ TENTATIVA COM CONFIGURAÇÃO ALTERNATIVA
-        setTimeout(connectBot, 30000);
-      } else {
-        console.log('🔄 Reconectando em 30 segundos...');
-        setTimeout(connectBot, 30000);
+      if (error.message.includes('WEBSOCKET_TIMEOUT')) {
+        console.log('🚨 CONFIRMADO: Render está BLOQUEANDO WebSocket para Discord');
+        console.log('💡 SOLUÇÃO: Necessário migrar para Railway/Heroku ou usar abordagem alternativa');
+      } else if (error.message.includes('token') || error.message.includes('TOKEN_INVALID')) {
+        console.log('🔐 ERRO: Token inválido ou formato incorreto');
+        console.log('💡 VERIFIQUE: BOT_TOKEN no painel do Render');
       }
+      
+      console.log('🔄 Tentando reconectar em 45 segundos...');
+      setTimeout(connectBot, 45000);
     });
 }
 
