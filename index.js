@@ -1,4 +1,4 @@
-// index.js - Miscritbot com ephemeral CORRETO
+// index.js — Miscritbot com ephemeral 100% funcional e autocomplete
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -69,9 +69,7 @@ async function handleAutocomplete(interaction) {
 
   try {
     const fakeInteraction = {
-      options: {
-        getFocused: () => focusedOption?.value || ""
-      },
+      options: { getFocused: () => focusedOption?.value || "" },
       responded: null,
       respond: async (choices) => {
         fakeInteraction.responded = choices;
@@ -80,12 +78,7 @@ async function handleAutocomplete(interaction) {
 
     await handler.autocomplete(fakeInteraction);
 
-    if (fakeInteraction.responded) {
-      return { type: 8, data: { choices: fakeInteraction.responded } };
-    } else {
-      return { type: 8, data: { choices: [] } };
-    }
-
+    return { type: 8, data: { choices: fakeInteraction.responded || [] } };
   } catch (err) {
     console.error("❌ Erro no autocomplete:", err);
     return { type: 8, data: { choices: [] } };
@@ -93,74 +86,62 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - CORREÇÃO FINAL para ephemeral
+// ✅ Processar Comandos — com ephemeral e PATCH correto
 // ====================================================
 async function handleCommand(interaction) {
   try {
     const commandName = interaction.data.name;
     const subcommandName = interaction.data.options?.[0]?.name;
-    console.log(`🔧 Comando recebido: /${commandName} ${subcommandName || ''}`);
+    console.log(`🔧 Comando recebido: /${commandName} ${subcommandName || ""}`);
 
     const commandHandler = commands[commandName]?.[subcommandName];
     if (!commandHandler) {
       return {
         type: 4,
-        data: { content: "❌ Comando não encontrado ou não implementado.", flags: 64 }
+        data: { content: "❌ Comando não encontrado.", flags: 64 }
       };
     }
 
     let hasReplied = false;
+
     const interactionObj = {
       options: {
         getString: (name) =>
           interaction.data.options?.[0]?.options?.find(opt => opt.name === name)?.value || null,
         getFocused: () => ""
       },
+
+      // ✅ envia resposta principal
       reply: async (response) => {
         if (hasReplied) return interactionObj.followUp(response);
         hasReplied = true;
-        
-        // ✅ CORREÇÃO FINAL: Usar CREATE MESSAGE em vez de PATCH para ephemeral
+
         const webhookData = { ...response };
-        let isEphemeral = false;
-        
-        // Verificar se é ephemeral
-        if (webhookData.ephemeral === true || webhookData.flags === 64) {
-          isEphemeral = true;
+        if (webhookData.ephemeral === true) {
           webhookData.flags = 64;
           delete webhookData.ephemeral;
         }
-        
-        console.log(`📤 Enviando resposta ${isEphemeral ? 'EPHEMERAL' : 'PUBLIC'} via webhook`);
-        
-        // ✅ CORREÇÃO: Usar POST para criar mensagem em vez de PATCH
-        const url = `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`;
-        await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+
+        console.log(`📤 PATCH (resposta ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"})`);
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(webhookData)
         });
       },
+
+      // ✅ follow-up opcional
       followUp: async (response) => {
         const webhookData = { ...response };
-        let isEphemeral = false;
-        
-        if (webhookData.ephemeral === true || webhookData.flags === 64) {
-          isEphemeral = true;
+        if (webhookData.ephemeral === true) {
           webhookData.flags = 64;
           delete webhookData.ephemeral;
         }
-        
-        console.log(`📤 Enviando followUp ${isEphemeral ? 'EPHEMERAL' : 'PUBLIC'} via webhook`);
-        
-        const url = `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`;
-        await fetch(url, {
+
+        console.log(`📤 POST (followUp ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"})`);
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(webhookData)
         });
       }
@@ -172,12 +153,11 @@ async function handleCommand(interaction) {
     if (!hasReplied) {
       await interactionObj.reply({
         content: `✅ Comando **/${commandName} ${subcommandName}** executado!`,
-        flags: 64
+        ephemeral: true
       });
     }
 
     return { type: 5 };
-
   } catch (err) {
     console.error("❌ Erro ao executar comando:", err);
     return {
@@ -202,7 +182,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "POST" && req.url === "/interactions") {
     let body = "";
-    req.on("data", (chunk) => (body += chunk.toString()));
+    req.on("data", chunk => (body += chunk.toString()));
     req.on("end", async () => {
       if (!verifyDiscordRequest(req, body)) {
         res.writeHead(401, { "Content-Type": "application/json" });
@@ -214,18 +194,23 @@ const server = http.createServer(async (req, res) => {
 
         // PING
         if (interaction.type === 1) {
-          console.log("✅ Ping recebido - verificação do Discord.");
+          console.log("✅ Ping recebido - verificação do Discord");
           res.writeHead(200, { "Content-Type": "application/json" });
           return res.end(JSON.stringify({ type: 1 }));
         }
 
-        // Slash Command
+        // Slash command
         if (interaction.type === 2) {
           console.log(`🎯 Slash command recebido: ${interaction.data.name}`);
           res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ type: 5 }));
+          // ✅ Resposta inicial ephemeral
+          res.end(JSON.stringify({
+            type: 4,
+            data: { content: "⏳ Processando comando...", flags: 64 }
+          }));
 
-          setTimeout(() => handleCommand(interaction), 100);
+          // ✅ processa em background
+          setTimeout(() => handleCommand(interaction), 150);
           return;
         }
 
