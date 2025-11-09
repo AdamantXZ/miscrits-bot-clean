@@ -1,286 +1,237 @@
+// index.js — Miscritbot (WebSocketStream + Fallback + Interactions API)
 require("dotenv").config();
 const fs = require("fs");
-const http = require('http');
+const http = require("http");
+const crypto = require("crypto");
 
-console.log('🔧 MISCRITS BOT - WEBSOCKETSTREAM MODERNO');
+console.log("🔧 MISCRITS BOT - WEBSOCKETSTREAM + INTERACTIONS");
 
-// ✅ VERIFICAR SE WEBSOCKETSTREAM ESTÁ DISPONÍVEL (como no tutorial)
-if (typeof WebSocketStream === 'undefined') {
-  console.log('⚠️ WebSocketStream não disponível, usando WebSocket tradicional');
-  // Fallback para WebSocket tradicional
-  const WebSocket = require('ws');
+// ✅ Servidor HTTP com /health e /interactions
+const app = http.createServer((req, res) => {
+  if (req.method === "POST" && req.url === "/interactions") {
+    let data = "";
+    req.on("data", chunk => (data += chunk));
+    req.on("end", () => {
+      // Verificar assinatura do Discord
+      const signature = req.headers["x-signature-ed25519"];
+      const timestamp = req.headers["x-signature-timestamp"];
+      const publicKey = process.env.PUBLIC_KEY;
+
+      if (!signature || !timestamp || !publicKey) {
+        res.writeHead(401);
+        return res.end("Missing signature or public key");
+      }
+
+      try {
+        const isVerified = crypto.verify(
+          null,
+          Buffer.from(timestamp + data),
+          Buffer.from(publicKey, "hex"),
+          Buffer.from(signature, "hex")
+        );
+
+        if (!isVerified) {
+          res.writeHead(401);
+          return res.end("Invalid request signature");
+        }
+      } catch (err) {
+        res.writeHead(401);
+        return res.end("Signature verification failed");
+      }
+
+      // Parse body
+      let body = {};
+      try {
+        body = JSON.parse(data || "{}");
+      } catch {
+        res.writeHead(400);
+        return res.end("Invalid JSON");
+      }
+
+      // ✅ Resposta obrigatória para o Discord (PING verification)
+      if (body.type === 1) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        return res.end(JSON.stringify({ type: 1 }));
+      }
+
+      // ✅ Resposta básica a comandos
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({
+        type: 4,
+        data: { content: "✅ Miscritbot recebeu sua interação!", flags: 64 }
+      }));
+    });
+  } else if (req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({
+      status: "ONLINE",
+      timestamp: new Date().toISOString(),
+      technology: "WebSocketStream + Fallback",
+      message: "Miscritbot ativo e rodando no Render"
+    }));
+  } else {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Miscritbot - Online\nUse /health para status detalhado");
+  }
+});
+
+// ✅ Porta padrão Render
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🌐 Servidor HTTP ativo na porta ${PORT}`);
+  console.log(`🩺 Health check: http://0.0.0.0:${PORT}/health`);
+  console.log(`🤖 Endpoint de Interações: https://miscrit-bot.onrender.com/interactions`);
+});
+
+// ✅ Mantém ativo com heartbeat
+setInterval(() => {
+  http.get(`http://0.0.0.0:${PORT}/health`, () => {}).on("error", () => {});
+}, 5 * 60 * 1000);
+
+// ===========================================
+// 🔌 CONEXÃO COM DISCORD VIA WEBSOCKETSTREAM
+// ===========================================
+
+console.log("🚀 Iniciando WebSocketStream...");
+
+if (typeof WebSocketStream === "undefined") {
+  console.log("⚠️ WebSocketStream não disponível, usando WebSocket tradicional...");
+  const WebSocket = require("ws");
   implementTraditionalWebSocket(WebSocket);
 } else {
-  console.log('🎉 WebSocketStream disponível - usando API moderna');
+  console.log("🎉 WebSocketStream disponível - usando API moderna");
   implementWebSocketStream();
 }
 
-// ✅ IMPLEMENTAÇÃO WEBSOCKETSTREAM (API MODERNA COM BACKPRESSURE)
+// ✅ WEBSOCKETSTREAM MODERNO (Node >= 20)
 function implementWebSocketStream() {
-  console.log('🚀 Iniciando WebSocketStream...');
-  
   const wsURL = "wss://gateway.discord.gg/?v=10&encoding=json";
   const wss = new WebSocketStream(wsURL);
-  
+
   let sequence = null;
-  let sessionId = null;
-  
-  // ✅ COMO NO TUTORIAL: await wss.opened
-  wss.opened.then(async ({ readable, writable }) => {
-    console.log("🎉 CONNECTED - WebSocketStream aberto!");
-    
-    const reader = readable.getReader();
-    const writer = writable.getWriter();
-    
-    // ✅ ENVIAR IDENTIFY (como writer.write() do tutorial)
-    const identify = {
-      op: 2,
-      d: {
-        token: process.env.BOT_TOKEN,
-        properties: { $os: 'linux', $browser: 'WebSocketStream', $device: 'WebSocketStream' },
-        intents: 1
-      }
-    };
-    
-    await writer.write(JSON.stringify(identify));
-    console.log('🔑 Identify enviado');
-    
-    // ✅ LOOP DE LEITURA (como reader.read() do tutorial)
-    processMessages(reader, writer);
-    
-  }).catch(error => {
-    console.error('❌ Erro na conexão WebSocketStream:', error);
-  });
-  
-  // ✅ HANDLING CLOSED (como wss.closed do tutorial)
-  wss.closed.then((result) => {
-    console.log(`🔌 DISCONNECTED: code ${result.closeCode}, reason "${result.reason}"`);
-    console.log('🔄 Reconectando em 10 segundos...');
+
+  wss.opened
+    .then(async ({ readable, writable }) => {
+      console.log("🎉 CONNECTED - WebSocketStream aberto!");
+
+      const writer = writable.getWriter();
+      const identify = {
+        op: 2,
+        d: {
+          token: process.env.BOT_TOKEN,
+          properties: {
+            $os: "linux",
+            $browser: "WebSocketStream",
+            $device: "WebSocketStream"
+          },
+          intents: 1
+        }
+      };
+      await writer.write(JSON.stringify(identify));
+      console.log("🔑 Identify enviado");
+
+      const reader = readable.getReader();
+      processMessages(reader, writer);
+    })
+    .catch(err => {
+      console.error("❌ Erro no WebSocketStream:", err);
+      setTimeout(implementWebSocketStream, 10000);
+    });
+
+  wss.closed.then(() => {
+    console.log("🔌 DISCONNECTED (WebSocketStream) — reconectando em 10s...");
     setTimeout(implementWebSocketStream, 10000);
   });
-}
 
-// ✅ PROCESSAR MENSAGENS COM BACKPRESSURE AUTOMÁTICO
-async function processMessages(reader, writer) {
-  try {
+  async function processMessages(reader, writer) {
     while (true) {
-      // ✅ COMO NO TUTORIAL: await reader.read() com backpressure
       const { value, done } = await reader.read();
-      
-      if (done) {
-        console.log('📖 Stream finalizado');
-        break;
+      if (done) break;
+
+      const msg = JSON.parse(value);
+      const { op, d, s, t } = msg;
+      if (s) sequence = s;
+
+      switch (op) {
+        case 10: // Hello
+          startHeartbeat(d.heartbeat_interval, writer);
+          break;
+        case 11: // Heartbeat ACK
+          console.log("💓 Heartbeat ACK");
+          break;
+        case 0:
+          if (t === "READY") {
+            console.log("🎉 BOT PRONTO via WebSocketStream!");
+            console.log(`🤖 ${d.user.username} online!`);
+          }
+          break;
       }
-      
-      const message = JSON.parse(value);
-      await handleGatewayMessage(message, writer);
     }
-  } catch (error) {
-    console.error('❌ Erro no processamento de mensagens:', error);
+  }
+
+  function startHeartbeat(interval, writer) {
+    setInterval(() => {
+      writer.write(JSON.stringify({ op: 1, d: sequence }));
+    }, interval);
   }
 }
 
-// ✅ MANIPULAR MENSAGENS DO GATEWAY
-async function handleGatewayMessage(message, writer) {
-  const { op, d, s, t } = message;
-  
-  if (s) sequence = s;
-  
-  switch (op) {
-    case 10: // HELLO
-      console.log('🔧 HELLO - iniciando heartbeat');
-      startHeartbeat(d.heartbeat_interval, writer);
-      break;
-      
-    case 11: // HEARTBEAT ACK
-      console.log('💓 Heartbeat ACK');
-      break;
-      
-    case 0: // DISPATCH
-      await handleDispatchEvent(t, d, writer);
-      break;
-      
-    case 7: // RECONNECT
-      console.log('🔁 RECONNECT solicitado');
-      break;
-  }
-}
-
-// ✅ HEARTBEAT COM TIMEOUT (como setTimeout do tutorial)
-function startHeartbeat(interval, writer) {
-  console.log(`💓 Heartbeat a cada ${interval}ms`);
-  
-  // Primeiro heartbeat
-  sendHeartbeat(writer);
-  
-  // Intervalo como no tutorial
-  setInterval(() => {
-    sendHeartbeat(writer);
-  }, interval);
-}
-
-function sendHeartbeat(writer) {
-  const heartbeat = { op: 1, d: sequence };
-  writer.write(JSON.stringify(heartbeat)).catch(error => {
-    console.error('❌ Erro no heartbeat:', error);
-  });
-}
-
-// ✅ MANIPULAR EVENTOS (COM BACKPRESSURE)
-async function handleDispatchEvent(eventType, data, writer) {
-  switch (eventType) {
-    case 'READY':
-      console.log('🎉 BOT PRONTO via WebSocketStream!');
-      console.log(`🤖 ${data.user.username} online!`);
-      break;
-      
-    case 'INTERACTION_CREATE':
-      console.log(`🔧 Interação: ${data.data.name}`);
-      // ✅ BACKPRESSURE AUTOMÁTICO - não sobrecarrega
-      await handleInteractionSafely(data, writer);
-      break;
-  }
-}
-
-// ✅ MANIPULAR INTERAÇÃO COM SEGURANÇA
-async function handleInteractionSafely(interaction, writer) {
-  const { id, token, data } = interaction;
-  const commandName = data.name;
-  const subcommand = data.options?.[0]?.name;
-  
-  console.log(`📝 Processando: /${commandName} ${subcommand}`);
-  
-  try {
-    // ✅ BACKPRESSURE DO WEBSOCKETSTREAM IMPEDE RATE LIMITING
-    const response = {
-      type: 4,
-      data: { 
-        content: `🔧 ${commandName} ${subcommand} - Processado com WebSocketStream`,
-        flags: 64
-      }
-    };
-    
-    await writer.write(JSON.stringify({
-      op: 4, // INTERACTION_RESPONSE
-      d: response
-    }));
-    
-    console.log('✅ Resposta enviada com backpressure automático');
-    
-  } catch (error) {
-    console.error('❌ Erro na resposta (backpressure funcionando):', error.message);
-  }
-}
-
-// ✅ FALLBACK: WEBSOCKET TRADICIONAL
+// ✅ WEBSOCKET TRADICIONAL (Fallback)
 function implementTraditionalWebSocket(WebSocket) {
-  console.log('🔄 Usando WebSocket tradicional como fallback...');
-  
-  const wsUri = "wss://gateway.discord.gg/?v=10&encoding=json";
-  let websocket = new WebSocket(wsUri);
-  let heartbeatInterval = null;
+  const wsURL = "wss://gateway.discord.gg/?v=10&encoding=json";
+  let socket = new WebSocket(wsURL);
+  let heartbeatInterval;
   let sequence = null;
-  
-  // ✅ EVENTOS DO WEBSOCKET TRADICIONAL (como addEventListener do tutorial)
-  websocket.addEventListener("open", () => {
+
+  socket.on("open", () => {
     console.log("🎉 CONNECTED - WebSocket tradicional!");
-    
     const identify = {
       op: 2,
       d: {
         token: process.env.BOT_TOKEN,
-        properties: { $os: 'linux', $browser: 'fallback_ws', $device: 'fallback_ws' },
+        properties: { $os: "linux", $browser: "fallback_ws", $device: "fallback_ws" },
         intents: 1
       }
     };
-    
-    websocket.send(JSON.stringify(identify));
+    socket.send(JSON.stringify(identify));
   });
-  
-  websocket.addEventListener("message", (e) => {
-    const message = JSON.parse(e.data);
-    handleTraditionalMessage(message, websocket);
+
+  socket.on("message", msg => {
+    const message = JSON.parse(msg);
+    const { op, d, s, t } = message;
+    if (s) sequence = s;
+
+    switch (op) {
+      case 10: // Hello
+        heartbeatInterval = setInterval(() => {
+          socket.send(JSON.stringify({ op: 1, d: sequence }));
+        }, d.heartbeat_interval);
+        break;
+      case 0: // Dispatch
+        if (t === "READY") {
+          console.log("🎉 BOT PRONTO via WebSocket tradicional!");
+          console.log(`🤖 ${d.user.username} online!`);
+        }
+        break;
+    }
   });
-  
-  websocket.addEventListener("close", () => {
+
+  socket.on("close", () => {
     console.log("🔌 DISCONNECTED - WebSocket tradicional");
     clearInterval(heartbeatInterval);
     setTimeout(() => implementTraditionalWebSocket(WebSocket), 10000);
   });
-  
-  websocket.addEventListener("error", (e) => {
-    console.log(`❌ WebSocket Error: ${e.message}`);
-  });
-  
-  function handleTraditionalMessage(message, ws) {
-    const { op, d, s, t } = message;
-    
-    if (s) sequence = s;
-    
-    switch (op) {
-      case 10: // HELLO
-        heartbeatInterval = setInterval(() => {
-          const heartbeat = { op: 1, d: sequence };
-          ws.send(JSON.stringify(heartbeat));
-        }, d.heartbeat_interval);
-        break;
-        
-      case 0: // DISPATCH
-        if (t === 'READY') {
-          console.log('🎉 BOT PRONTO via WebSocket tradicional!');
-          console.log(`🤖 ${d.user.username} online!`);
-        } else if (t === 'INTERACTION_CREATE') {
-          console.log(`🔧 Interação tradicional: ${d.data.name}`);
-          // Resposta simples e segura
-          const response = {
-            type: 4,
-            data: { content: "✅ Comando recebido (WebSocket tradicional)", flags: 64 }
-          };
-          ws.send(JSON.stringify({
-            op: 4,
-            d: response
-          }));
-        }
-        break;
-    }
-  }
+
+  socket.on("error", e => console.error("❌ Erro WebSocket:", e.message));
 }
 
-// ✅ HEALTH CHECK
-const app = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ 
-    status: 'ONLINE',
-    timestamp: new Date().toISOString(),
-    technology: 'WebSocketStream + Fallback',
-    message: 'Usando API moderna com backpressure automático'
-  }));
-});
-
-// ✅ INICIAR
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Servidor: porta ${PORT}`);
-  console.log(`🩺 Health: http://0.0.0.0:${PORT}/health`);
-  
-  console.log('🚀 APLICANDO WEBSOCKETSTREAM MODERNO:');
-  console.log('   ✅ Backpressure automático');
-  console.log('   ✅ Prevenção de rate limiting');
-  console.log('   ✅ API Promise-based');
-  console.log('   ✅ Fallback para WebSocket tradicional');
-  
-  // Keep-alive
-  setInterval(() => {
-    http.get(`http://0.0.0.0:${PORT}/health`, () => {}).on('error', () => {});
-  }, 300000);
-});
-
-process.on('SIGTERM', () => {
-  console.log('🛑 Encerrando...');
+// ✅ Encerramento limpo
+process.on("SIGTERM", () => {
+  console.log("🛑 Encerrando Miscritbot...");
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
-  console.log('🛑 Encerrando...');
+process.on("SIGINT", () => {
+  console.log("🛑 Encerrando Miscritbot...");
   process.exit(0);
 });
