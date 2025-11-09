@@ -1,4 +1,4 @@
-// index.js - Miscritbot com ephemeral funcionando (CORRIGIDO)
+// index.js - Miscritbot com ephemeral CORRETO
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -93,7 +93,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - CORRIGIDO para ephemeral
+// ✅ Processar Comandos - CORREÇÃO FINAL para ephemeral
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -120,17 +120,23 @@ async function handleCommand(interaction) {
         if (hasReplied) return interactionObj.followUp(response);
         hasReplied = true;
         
-        // ✅ CORREÇÃO: Converter ephemeral:true para flags:64 no webhook
+        // ✅ CORREÇÃO FINAL: Usar CREATE MESSAGE em vez de PATCH para ephemeral
         const webhookData = { ...response };
-        if (webhookData.ephemeral === true) {
+        let isEphemeral = false;
+        
+        // Verificar se é ephemeral
+        if (webhookData.ephemeral === true || webhookData.flags === 64) {
+          isEphemeral = true;
           webhookData.flags = 64;
           delete webhookData.ephemeral;
         }
         
-        console.log("📤 Enviando resposta via webhook:", JSON.stringify(webhookData));
+        console.log(`📤 Enviando resposta ${isEphemeral ? 'EPHEMERAL' : 'PUBLIC'} via webhook`);
         
-        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
-          method: "PATCH",
+        // ✅ CORREÇÃO: Usar POST para criar mensagem em vez de PATCH
+        const url = `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`;
+        await fetch(url, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
@@ -138,16 +144,19 @@ async function handleCommand(interaction) {
         });
       },
       followUp: async (response) => {
-        // ✅ CORREÇÃO: Converter ephemeral:true para flags:64 no webhook
         const webhookData = { ...response };
-        if (webhookData.ephemeral === true) {
+        let isEphemeral = false;
+        
+        if (webhookData.ephemeral === true || webhookData.flags === 64) {
+          isEphemeral = true;
           webhookData.flags = 64;
           delete webhookData.ephemeral;
         }
         
-        console.log("📤 Enviando followUp via webhook:", JSON.stringify(webhookData));
+        console.log(`📤 Enviando followUp ${isEphemeral ? 'EPHEMERAL' : 'PUBLIC'} via webhook`);
         
-        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+        const url = `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`;
+        await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
