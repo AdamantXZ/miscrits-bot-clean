@@ -1,255 +1,146 @@
+// index.js - Miscritbot com Interactions API e verificação Ed25519
 require("dotenv").config();
 const http = require("http");
-const crypto = require("crypto");
-const WebSocket = require("ws");
+const nacl = require("tweetnacl");
 const fetch = require("node-fetch");
 
-// =============================================
-// 🔧 MISCRITS BOT - WebSocket + Interactions API
-// =============================================
-console.log("🔧 MISCRITS BOT - WebSocket + Interactions API");
-
-// =============================================
-// ✅ DISCORD CONFIGURAÇÕES
-// =============================================
-const GATEWAY_URL = "wss://gateway.discord.gg/?v=10&encoding=json";
+// Variáveis de ambiente
 const TOKEN = process.env.BOT_TOKEN;
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
-const APPLICATION_ID = process.env.APPLICATION_ID;
+const APP_ID = process.env.APPLICATION_ID;
+const PORT = process.env.PORT || 10000;
 
-if (!TOKEN || !PUBLIC_KEY || !APPLICATION_ID) {
-  console.error("❌ Variáveis ausentes: BOT_TOKEN, PUBLIC_KEY ou APPLICATION_ID");
-  process.exit(1);
-}
-
-let ws;
-let heartbeatInterval;
-let sequence = null;
+// Log inicial
+console.log("🔧 MISCRITS BOT - WebSocket + Interactions API");
+console.log(`🌐 HTTP ativo na porta ${PORT}`);
+console.log("🚀 Conectando ao Discord...");
 
 // =============================================
-// ✅ CONEXÃO AO DISCORD GATEWAY
-// =============================================
-function connectGateway() {
-  console.log("🚀 Conectando ao Discord...");
-  ws = new WebSocket(GATEWAY_URL);
-
-  ws.on("open", () => {
-    console.log("🎉 CONNECTED ao Discord Gateway");
-    identify();
-  });
-
-  ws.on("message", (data) => handleGatewayMessage(JSON.parse(data)));
-
-  ws.on("close", (code) => {
-    console.log(`🔌 Desconectado do Gateway (${code})`);
-    clearInterval(heartbeatInterval);
-    setTimeout(connectGateway, 10000);
-  });
-
-  ws.on("error", (err) => console.error("❌ WebSocket erro:", err.message));
-}
-
-// =============================================
-// ✅ IDENTIFY
-// =============================================
-function identify() {
-  const payload = {
-    op: 2,
-    d: {
-      token: TOKEN,
-      intents: 1,
-      properties: {
-        os: "linux",
-        browser: "miscritsbot",
-        device: "miscritsbot",
-      },
-    },
-  };
-  ws.send(JSON.stringify(payload));
-}
-
-// =============================================
-// ✅ HANDLER DE MENSAGENS
-// =============================================
-function handleGatewayMessage(msg) {
-  const { op, t, d, s } = msg;
-  if (s) sequence = s;
-
-  switch (op) {
-    case 10: // HELLO
-      heartbeat(d.heartbeat_interval);
-      break;
-    case 11: // ACK
-      break;
-    case 0: // DISPATCH
-      handleDispatch(t, d);
-      break;
-  }
-}
-
-// =============================================
-// ✅ HEARTBEAT
-// =============================================
-function heartbeat(interval) {
-  if (heartbeatInterval) clearInterval(heartbeatInterval);
-  heartbeatInterval = setInterval(() => {
-    ws.send(JSON.stringify({ op: 1, d: sequence }));
-  }, interval);
-}
-
-// =============================================
-// ✅ DISPATCH HANDLER
-// =============================================
-function handleDispatch(t, d) {
-  switch (t) {
-    case "READY":
-      console.log(`🤖 Bot conectado como ${d.user.username}`);
-      break;
-    case "INTERACTION_CREATE":
-      console.log(`🔧 Interação recebida: ${d.data?.name}`);
-      replyInteraction(d);
-      break;
-  }
-}
-
-// =============================================
-// ✅ RESPOSTA DE INTERAÇÃO VIA GATEWAY
-// =============================================
-function replyInteraction(interaction) {
-  const response = {
-    type: 4,
-    data: {
-      content: `✅ Recebido: /${interaction.data.name}`,
-      flags: 64,
-    },
-  };
-
-  fetch(`https://discord.com/api/v10/interactions/${interaction.id}/${interaction.token}/callback`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(response),
-  }).catch((err) => console.error("❌ Erro resposta:", err.message));
-}
-
-// =============================================
-// ✅ VERIFICAR ASSINATURA DO DISCORD (ED25519 CORRETO)
+// ✅ VERIFICAR ASSINATURA DO DISCORD (CORRETO)
 // =============================================
 function verifyDiscordRequest(req, body) {
   const signature = req.headers["x-signature-ed25519"];
   const timestamp = req.headers["x-signature-timestamp"];
+  if (!signature || !timestamp) return false;
 
-  if (!signature || !timestamp) {
-    console.error("❌ Faltando cabeçalhos de assinatura");
-    return false;
-  }
+  const isValid = nacl.sign.detached.verify(
+    Buffer.from(timestamp + body),
+    Buffer.from(signature, "hex"),
+    Buffer.from(PUBLIC_KEY, "hex")
+  );
 
-  try {
-    const isVerified = crypto.verify(
-      null,
-      Buffer.from(timestamp + body),
-      {
-        key: Buffer.from(PUBLIC_KEY, "hex"),
-        format: "der",
-        type: "spki",
-      },
-      Buffer.from(signature, "hex")
-    );
-    return isVerified;
-  } catch (err) {
-    console.error("❌ Erro ao verificar assinatura:", err.message);
-    return false;
-  }
+  if (!isValid) console.error("❌ Assinatura inválida recebida");
+  return isValid;
 }
 
 // =============================================
-// ✅ SERVIDOR HTTP (HEALTH + INTERACTIONS)
+// ✅ SERVIDOR HTTP (para /health e /interactions)
 // =============================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        status: ws?.readyState === WebSocket.OPEN ? "ONLINE" : "CONNECTING",
-        bot: ws?.readyState === WebSocket.OPEN ? "Connected" : "Idle",
-        timestamp: new Date().toISOString(),
-      })
-    );
+    return res.end(JSON.stringify({
+      status: "ONLINE",
+      timestamp: new Date().toISOString(),
+      message: "Miscritbot rodando normalmente!"
+    }));
   }
 
-  // Endpoint principal de interações do Discord
-  else if (req.method === "POST" && req.url === "/interactions") {
+  if (req.method === "POST" && req.url === "/interactions") {
     let body = "";
     req.on("data", (chunk) => (body += chunk.toString()));
     req.on("end", async () => {
+      // Verificar assinatura
       if (!verifyDiscordRequest(req, body)) {
-        console.error("❌ Assinatura inválida recebida");
         res.writeHead(401, { "Content-Type": "application/json" });
-        return res.end(JSON.stringify({ error: "Invalid signature" }));
+        return res.end(JSON.stringify({ error: "Invalid request signature" }));
       }
 
       try {
         const interaction = JSON.parse(body);
 
-        // ✅ PING do Discord (verificação inicial)
+        // PING (verificação inicial do Discord)
         if (interaction.type === 1) {
           console.log("✅ Ping recebido do Discord - Respondendo...");
           res.writeHead(200, { "Content-Type": "application/json" });
           return res.end(JSON.stringify({ type: 1 }));
         }
 
-        // ✅ Comando /miscrits
+        // Comando de interação
         if (interaction.type === 2) {
-          console.log(`🔧 Comando recebido: ${interaction.data?.name}`);
+          const name = interaction.data?.name;
+          console.log(`🔧 Comando recebido: /${name}`);
 
+          // Resposta inicial (defer)
           res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ type: 5 })); // ACK imediato
+          res.end(JSON.stringify({ type: 5 }));
 
-          // Resposta após defer
+          // Editar a resposta depois (simulando execução do comando)
           setTimeout(() => {
-            fetch(`https://discord.com/api/v10/webhooks/${APPLICATION_ID}/${interaction.token}/messages/@original`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                content: `✅ Comando \`/${interaction.data.name}\` recebido com sucesso!`,
-              }),
-            }).catch((err) => console.error("❌ Erro ao enviar resposta:", err));
+            fetch(
+              `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`,
+              {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  content: `✅ Comando **/${name}** recebido com sucesso!`
+                }),
+              }
+            ).catch(err => console.error("❌ Erro ao enviar resposta:", err.message));
           }, 1000);
+
           return;
         }
 
+        // Qualquer outro tipo
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ type: 4, data: { content: "✅ Interação processada!" } }));
+        res.end(JSON.stringify({ type: 4, data: { content: "✅ Interação recebida!" } }));
       } catch (err) {
-        console.error("❌ Erro no /interactions:", err.message);
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: "Internal error" }));
+        console.error("❌ Erro ao processar /interactions:", err.message);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Internal server error" }));
       }
     });
+    return;
   }
 
-  else {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Miscrits Bot - Active");
-  }
+  // Rota padrão
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Miscritbot está ativo!");
 });
+
+// =============================================
+// ✅ WEBSOCKET SIMPLES (somente para log online)
+// =============================================
+const WebSocket = require("ws");
+const ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
+
+ws.on("open", () => {
+  console.log("🎉 CONNECTED ao Discord Gateway");
+
+  const identify = {
+    op: 2,
+    d: {
+      token: TOKEN,
+      intents: 1,
+      properties: { $os: "linux", $browser: "miscritbot", $device: "miscritbot" }
+    }
+  };
+
+  ws.send(JSON.stringify(identify));
+});
+
+ws.on("message", (data) => {
+  const msg = JSON.parse(data);
+  if (msg.t === "READY") console.log(`🤖 Bot conectado como ${msg.d.user.username}`);
+});
+
+ws.on("close", () => console.log("🔌 Gateway fechado"));
+ws.on("error", (err) => console.error("🚨 WebSocket error:", err.message));
 
 // =============================================
 // ✅ INICIAR SERVIDOR
 // =============================================
-const PORT = process.env.PORT || 10000;
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🌐 HTTP ativo na porta ${PORT}`);
-  connectGateway();
-});
-
-// =============================================
-// ✅ SHUTDOWN GRACIOSO
-// =============================================
-process.on("SIGTERM", () => {
-  console.log("🛑 Encerrando Miscritbot...");
-  process.exit(0);
-});
-process.on("SIGINT", () => {
-  console.log("🛑 Encerrando Miscritbot...");
-  process.exit(0);
+  console.log(`✅ Servidor HTTP escutando na porta ${PORT}`);
 });
