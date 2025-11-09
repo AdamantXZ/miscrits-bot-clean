@@ -1,4 +1,4 @@
-// index.js - Miscritbot com Interactions API e comandos reais (CORRIGIDO)
+// index.js - Miscritbot com Interactions API e comandos reais (versão final)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -27,12 +27,12 @@ const commands = {
   }
 };
 
-console.log("🔧 MISCRITS BOT - WebSocket + Interactions API (CORRIGIDO)");
+console.log("🔧 MISCRITS BOT - WebSocket + Interactions API (final)");
 console.log(`🌐 HTTP ativo na porta ${PORT}`);
 console.log("🚀 Conectando ao Discord...");
 
 // ====================================================
-// ✅ VERIFICAÇÃO CORRIGIDA USANDO Ed25519 + BASE64 (CORREÇÃO 1)
+// ✅ VERIFICAÇÃO USANDO Ed25519 + BASE64
 // ====================================================
 function verifyDiscordRequest(req, rawBody) {
   const signature = req.headers["x-signature-ed25519"];
@@ -40,11 +40,10 @@ function verifyDiscordRequest(req, rawBody) {
   if (!signature || !timestamp) return false;
 
   try {
-    // ✅ CORREÇÃO: PUBLIC_KEY em base64 (não hex)
     const isVerified = nacl.sign.detached.verify(
       Buffer.from(timestamp + rawBody),
       Buffer.from(signature, "hex"),
-      Buffer.from(PUBLIC_KEY, "base64") // ✅ CORRIGIDO: base64 em vez de hex
+      Buffer.from(PUBLIC_KEY, "base64") // 🔧 base64 (correto)
     );
     if (!isVerified) console.error("❌ Assinatura inválida recebida");
     return isVerified;
@@ -61,12 +60,9 @@ async function handleCommand(interaction) {
   try {
     const commandName = interaction.data.name;
     const subcommandName = interaction.data.options?.[0]?.name;
-    
     console.log(`🔧 Comando recebido: /${commandName} ${subcommandName || ''}`);
 
-    // ✅ PROCURAR O COMANDO CORRETO
     let commandHandler;
-    
     if (commandName === "miscrits" && subcommandName) {
       commandHandler = commands.miscrits[subcommandName];
     }
@@ -82,32 +78,26 @@ async function handleCommand(interaction) {
       };
     }
 
-    // ✅ CRIAR OBJETO DE INTERAÇÃO SIMULADO PARA OS COMANDOS
     const interactionObj = {
       options: {
         getString: (optionName) => {
           const option = interaction.data.options?.[0]?.options?.find(opt => opt.name === optionName);
           return option?.value;
         },
-        getFocused: () => "" // Para autocomplete
+        getFocused: () => ""
       },
       replied: false,
-      
-      // ✅ MÉTODO REPLY CORRIGIDO (CORREÇÃO 2)
       reply: async (response) => {
         interactionObj.replied = true;
-        // ✅ CORREÇÃO: Usar /messages/@original para editar resposta deferida
         await fetch(
           `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`,
           {
-            method: "PATCH", // ✅ CORRIGIDO: PATCH em vez de POST
+            method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(response)
           }
         );
       },
-      
-      // ✅ MÉTODO FOLLOWUP CORRIGIDO
       followUp: async (response) => {
         await fetch(
           `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`,
@@ -120,11 +110,9 @@ async function handleCommand(interaction) {
       }
     };
 
-    // ✅ EXECUTAR O COMANDO
     console.log(`✅ Executando comando: ${subcommandName}`);
     await commandHandler.execute(interactionObj);
 
-    // ✅ SE O COMANDO NÃO RESPONDEU, ENVIAR RESPOSTA PADRÃO
     if (!interactionObj.replied) {
       await fetch(
         `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`,
@@ -139,13 +127,9 @@ async function handleCommand(interaction) {
       );
     }
 
-    // ✅ RETORNAR RESPOSTA DEFER (já respondemos via webhook)
-    return { type: 5 }; // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
-
+    return { type: 5 };
   } catch (error) {
     console.error("❌ Erro ao executar comando:", error);
-    
-    // ✅ TENTAR ENVIAR MENSAGEM DE ERRO
     try {
       await fetch(
         `https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`,
@@ -161,34 +145,28 @@ async function handleCommand(interaction) {
     } catch (fetchError) {
       console.error("❌ Erro ao enviar mensagem de erro:", fetchError);
     }
-    
     return { type: 5 };
   }
 }
 
 // ====================================================
-// ✅ SERVIDOR HTTP (para /health e /interactions)
+// ✅ SERVIDOR HTTP
 // ====================================================
 const server = http.createServer(async (req, res) => {
-  // ✅ HEALTH CHECK
   if (req.method === "GET" && req.url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
-    return res.end(
-      JSON.stringify({
-        status: "ONLINE",
-        timestamp: new Date().toISOString(),
-        message: "Miscritbot rodando normalmente!",
-        commands: Object.keys(commands.miscrits)
-      })
-    );
+    return res.end(JSON.stringify({
+      status: "ONLINE",
+      timestamp: new Date().toISOString(),
+      message: "Miscritbot rodando normalmente!",
+      commands: Object.keys(commands.miscrits)
+    }));
   }
 
-  // ✅ INTERACTIONS ENDPOINT
   if (req.method === "POST" && req.url === "/interactions") {
     let body = "";
     req.on("data", (chunk) => (body += chunk.toString()));
     req.on("end", async () => {
-      // ✅ VERIFICAR ASSINATURA
       if (!verifyDiscordRequest(req, body)) {
         res.writeHead(401, { "Content-Type": "application/json" });
         return res.end(JSON.stringify({ error: "Invalid request signature" }));
@@ -196,32 +174,22 @@ const server = http.createServer(async (req, res) => {
 
       try {
         const interaction = JSON.parse(body);
-
-        // ✅ PING (verificação inicial do Discord)
         if (interaction.type === 1) {
           console.log("✅ Ping recebido do Discord - Respondendo...");
           res.writeHead(200, { "Content-Type": "application/json" });
           return res.end(JSON.stringify({ type: 1 }));
         }
-
-        // ✅ COMANDO SLASH
         if (interaction.type === 2) {
           const response = await handleCommand(interaction);
           res.writeHead(200, { "Content-Type": "application/json" });
           return res.end(JSON.stringify(response));
         }
-
-        // ✅ AUTOCOMPLETE
         if (interaction.type === 4) {
-          // Para agora, apenas responder com sucesso
           res.writeHead(200, { "Content-Type": "application/json" });
           return res.end(JSON.stringify({ type: 1 }));
         }
-
-        // ✅ OUTROS TIPOS
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ type: 1 }));
-
       } catch (err) {
         console.error("❌ Erro ao processar /interactions:", err.message);
         res.writeHead(500, { "Content-Type": "application/json" });
@@ -231,13 +199,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // ✅ ROTA PADRÃO
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Miscritbot está ativo! Use /miscrits para ver os comandos.");
 });
 
 // ====================================================
-// ✅ WEBSOCKET COM RECONEXÃO AUTOMÁTICA (CORREÇÃO 3)
+// ✅ WEBSOCKET COM RECONEXÃO AUTOMÁTICA
 // ====================================================
 const WebSocket = require("ws");
 let ws;
@@ -261,8 +228,6 @@ function connectWebSocket() {
 
   ws.on("message", (data) => {
     const msg = JSON.parse(data);
-    
-    // ✅ HEARTBEAT
     if (msg.op === 10) {
       console.log("💓 Heartbeat configurado");
       heartbeatInterval = setInterval(() => {
@@ -271,8 +236,6 @@ function connectWebSocket() {
         }
       }, msg.d.heartbeat_interval);
     }
-    
-    // ✅ READY EVENT
     if (msg.t === "READY") {
       console.log(`🤖 Bot conectado como ${msg.d.user.username}`);
       console.log("✅ Comandos carregados:", Object.keys(commands.miscrits));
@@ -282,8 +245,6 @@ function connectWebSocket() {
   ws.on("close", (code, reason) => {
     console.log(`🔌 Gateway fechado (${code}) - ${reason || 'Sem motivo'}`);
     if (heartbeatInterval) clearInterval(heartbeatInterval);
-    
-    // ✅ CORREÇÃO: Reconexão automática após 10 segundos
     console.log("🔄 Tentando reconectar em 10 segundos...");
     setTimeout(connectWebSocket, 10000);
   });
@@ -294,7 +255,7 @@ function connectWebSocket() {
 }
 
 // ====================================================
-// ✅ INICIAR TUDO
+// ✅ INICIAR SERVIDOR E CONEXÃO
 // ====================================================
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Servidor HTTP escutando na porta ${PORT}`);
@@ -302,14 +263,11 @@ server.listen(PORT, "0.0.0.0", () => {
   Object.keys(commands.miscrits).forEach(cmd => {
     console.log(`   /miscrits ${cmd}`);
   });
-  
-  // ✅ INICIAR WEBSOCKET
   connectWebSocket();
 });
 
-// ✅ TRATAMENTO GRACIOSO DE SHUTDOWN
 process.on("SIGTERM", () => {
-  console.log("🛑 Recebido SIGTERM - Encerrando graciosamente...");
+  console.log("🛑 Encerrando...");
   if (ws) ws.close();
   if (heartbeatInterval) clearInterval(heartbeatInterval);
   process.exit(0);
