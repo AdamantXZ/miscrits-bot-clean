@@ -1,4 +1,4 @@
-// index.js - Miscritbot com Interactions API, WebSocket e Autocomplete (CORRIGIDO)
+// index.js - Miscritbot com ephemeral funcionando (CORRIGIDO)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -52,7 +52,7 @@ function verifyDiscordRequest(req, rawBody) {
 }
 
 // ====================================================
-// ✅ Função para Autocomplete (corrigido)
+// ✅ Função para Autocomplete
 // ====================================================
 async function handleAutocomplete(interaction) {
   const commandName = interaction.data.name;
@@ -93,7 +93,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - CORRIGIDO (sem Authorization header)
+// ✅ Processar Comandos - CORRIGIDO para ephemeral
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -120,25 +120,39 @@ async function handleCommand(interaction) {
         if (hasReplied) return interactionObj.followUp(response);
         hasReplied = true;
         
-        // ✅ CORREÇÃO: REMOVIDO Authorization header para ephemeral funcionar
+        // ✅ CORREÇÃO: Converter ephemeral:true para flags:64 no webhook
+        const webhookData = { ...response };
+        if (webhookData.ephemeral === true) {
+          webhookData.flags = 64;
+          delete webhookData.ephemeral;
+        }
+        
+        console.log("📤 Enviando resposta via webhook:", JSON.stringify(webhookData));
+        
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json"
-            // ❌ REMOVIDO: "Authorization": `Bot ${TOKEN}`
           },
-          body: JSON.stringify(response)
+          body: JSON.stringify(webhookData)
         });
       },
       followUp: async (response) => {
-        // ✅ CORREÇÃO: REMOVIDO Authorization header para ephemeral funcionar
+        // ✅ CORREÇÃO: Converter ephemeral:true para flags:64 no webhook
+        const webhookData = { ...response };
+        if (webhookData.ephemeral === true) {
+          webhookData.flags = 64;
+          delete webhookData.ephemeral;
+        }
+        
+        console.log("📤 Enviando followUp via webhook:", JSON.stringify(webhookData));
+        
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
-            // ❌ REMOVIDO: "Authorization": `Bot ${TOKEN}`
           },
-          body: JSON.stringify(response)
+          body: JSON.stringify(webhookData)
         });
       }
     };
