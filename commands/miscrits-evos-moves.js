@@ -1,4 +1,4 @@
-// commands/miscrits-evos-moves.js
+// commands/miscrits-evos-moves.js - CORRIGIDO
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const miscritsData = require("../data/miscrits.json");
 
@@ -50,10 +50,13 @@ module.exports = {
 
   async execute(interaction) {
     try {
+      console.log("✅ Executando comando moves-and-evos...");
+      
       const name = interaction.options.getString("name").toLowerCase();
       const miscrit = miscrits.find((m) => m.name?.toLowerCase() === name);
 
       if (!miscrit) {
+        // ✅ CORREÇÃO: Chamar reply() mesmo para erros
         return await interaction.reply({ content: "❌ Miscrit not found!", flags: 64 });
       }
 
@@ -75,10 +78,13 @@ module.exports = {
         .setDescription(description)
         .setColor(0x2b6cb0);
 
+      // ✅ CORREÇÃO: Chamar interaction.reply() para enviar a resposta
       await interaction.reply({ 
         embeds: [embed1, embed2], 
         flags: 64 
       });
+      console.log("✅ Resposta moves-and-evos enviada com sucesso!");
+      
     } catch (err) {
       // ✅ IGNORA ERROS DE INTERAÇÃO EXPIRADA
       if (err.code === 10062) return;

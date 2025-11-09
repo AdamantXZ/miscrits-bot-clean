@@ -1,4 +1,4 @@
-// commands/miscrits-days.js
+// commands/miscrits-days.js - CORRIGIDO
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const miscritsData = require("../data/miscrits.json");
 
@@ -11,6 +11,8 @@ module.exports = {
 
   async execute(interaction) {
     try {
+      console.log("✅ Executando comando spawn-days...");
+      
       const day = interaction.options.getString("day");
       const filtered = miscrits.filter((m) => {
         const days = (m.days || "").toLowerCase();
@@ -25,6 +27,7 @@ module.exports = {
       });
 
       if (filtered.length === 0) {
+        // ✅ CORREÇÃO: Chamar reply() mesmo para erros
         return await interaction.reply({ content: `❌ No Miscrits found for **${day}**.`, flags: 64 });
       }
 
@@ -74,17 +77,19 @@ module.exports = {
         embedChunks.push(embed);
       }
 
-      // ✅ ENVIA MÚLTIPLOS EMBEDS JUNTOS (ATÉ 10 POR MENSAGEM)
+      // ✅ CORREÇÃO: Chamar interaction.reply() para o primeiro batch
       const maxEmbedsPerMessage = 10;
-      for (let i = 0; i < embedChunks.length; i += maxEmbedsPerMessage) {
-        const embedsBatch = embedChunks.slice(i, i + maxEmbedsPerMessage);
-        
-        if (i === 0) {
-          await interaction.reply({ embeds: embedsBatch, flags: 64 });
-        } else {
-          await interaction.followUp({ embeds: embedsBatch, flags: 64 });
-        }
+      const firstBatch = embedChunks.slice(0, maxEmbedsPerMessage);
+      
+      await interaction.reply({ embeds: firstBatch, flags: 64 });
+      console.log("✅ Resposta spawn-days enviada com sucesso!");
+
+      // ✅ Enviar batches restantes como followUp
+      for (let i = maxEmbedsPerMessage; i < embedChunks.length; i += maxEmbedsPerMessage) {
+        const nextBatch = embedChunks.slice(i, i + maxEmbedsPerMessage);
+        await interaction.followUp({ embeds: nextBatch, flags: 64 });
       }
+      
     } catch (err) {
       // ✅ IGNORA ERROS DE INTERAÇÃO EXPIRADA
       if (err.code === 10062) return;

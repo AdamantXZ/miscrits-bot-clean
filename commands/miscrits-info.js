@@ -1,4 +1,4 @@
-// commands/miscrits-info.js
+// commands/miscrits-info.js - CORRIGIDO
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const miscritsData = require("../data/miscrits.json");
 
@@ -51,10 +51,13 @@ module.exports = {
 
   async execute(interaction) {
     try {
+      console.log("✅ Executando comando info...");
+      
       const name = interaction.options.getString("name").toLowerCase();
       const miscrit = miscrits.find((m) => m.name?.toLowerCase() === name);
 
       if (!miscrit) {
+        // ✅ CORREÇÃO: Chamar reply() mesmo para erros
         return await interaction.reply({ content: "❌ Miscrit not found!", flags: 64 });
       }
 
@@ -116,7 +119,10 @@ module.exports = {
       const embed2 = new EmbedBuilder().setDescription(description).setColor(embedColor);
       if (miscrit.location_url) embed2.setImage(miscrit.location_url);
 
+      // ✅ CORREÇÃO: Chamar interaction.reply() para enviar a resposta
       await interaction.reply({ embeds: [embed1, embed2], flags: 64 });
+      console.log("✅ Resposta info enviada com sucesso!");
+      
     } catch (err) {
       if (err.code === 10062) return;
       console.error("Command execution error:", err);
