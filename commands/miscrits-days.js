@@ -27,8 +27,11 @@ module.exports = {
       });
 
       if (filtered.length === 0) {
-        // ✅ CORREÇÃO: Chamar reply() mesmo para erros
-        return await interaction.reply({ content: `❌ No Miscrits found for **${day}**.`, flags: 64 });
+        // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
+        return await interaction.reply({ 
+          content: `❌ No Miscrits found for **${day}**.`, 
+          ephemeral: true 
+        });
       }
 
       const chunkSize = 30;
@@ -37,7 +40,6 @@ module.exports = {
         chunks.push(filtered.slice(i, i + chunkSize));
       }
 
-      // ✅ ENVIA ATÉ 10 EMBEDS POR MENSAGEM (DISCORD LIMIT)
       const embedChunks = [];
       for (let i = 0; i < chunks.length; i++) {
         const lines = chunks[i].map((m) => {
@@ -49,7 +51,6 @@ module.exports = {
             case "legendary": emoji = "🟠"; break;
           }
           
-          // ✅ ADICIONA PVP STATUS
           let pvpStatus = "";
           if (m.pvp_desired_status) {
             pvpStatus = ` — ${m.pvp_desired_status}`;
@@ -58,18 +59,15 @@ module.exports = {
           return `${emoji} **${m.name}** — ${m.region || "Unknown Region"}${pvpStatus}`;
         });
 
-        // ✅ APENAS NO ÚLTIMO EMBED ADICIONA A NOTA
         const note =
           i === chunks.length - 1
             ? `\n\n*Only* **🔵 Rare** and **🟢 Epic** are shown.\n*⚪ Common, 🟣 Exotic, 🟠 Legendary and 🛒 Shop Miscrits are available every day.*`
             : "";
 
-        // ✅ PRIMEIRO EMBED TEM TÍTULO, OS DEMAIS NÃO
         const embed = new EmbedBuilder()
           .setDescription(lines.join("\n") + note)
           .setColor(0x2b6cb0);
 
-        // ✅ APENAS O PRIMEIRO EMBED TEM TÍTULO COM EMOJI NOVO
         if (i === 0) {
           embed.setTitle(`🗓️ Miscrits Spawn on ${day}`);
         }
@@ -77,25 +75,32 @@ module.exports = {
         embedChunks.push(embed);
       }
 
-      // ✅ CORREÇÃO: Chamar interaction.reply() para o primeiro batch
       const maxEmbedsPerMessage = 10;
       const firstBatch = embedChunks.slice(0, maxEmbedsPerMessage);
       
-      await interaction.reply({ embeds: firstBatch, flags: 64 });
+      // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
+      await interaction.reply({ 
+        embeds: firstBatch, 
+        ephemeral: true 
+      });
       console.log("✅ Resposta spawn-days enviada com sucesso!");
 
-      // ✅ Enviar batches restantes como followUp
       for (let i = maxEmbedsPerMessage; i < embedChunks.length; i += maxEmbedsPerMessage) {
         const nextBatch = embedChunks.slice(i, i + maxEmbedsPerMessage);
-        await interaction.followUp({ embeds: nextBatch, flags: 64 });
+        await interaction.followUp({ 
+          embeds: nextBatch, 
+          ephemeral: true 
+        });
       }
       
     } catch (err) {
-      // ✅ IGNORA ERROS DE INTERAÇÃO EXPIRADA
       if (err.code === 10062) return;
       console.error("Command execution error:", err);
       try {
-        await interaction.reply({ content: "❌ Error executing command!", flags: 64 });
+        await interaction.reply({ 
+          content: "❌ Error executing command!", 
+          ephemeral: true 
+        });
       } catch (replyErr) {
         if (replyErr.code !== 10062) {
           console.error('Error sending error message:', replyErr.message);

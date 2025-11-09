@@ -57,8 +57,11 @@ module.exports = {
       const miscrit = miscrits.find((m) => m.name?.toLowerCase() === name);
 
       if (!miscrit) {
-        // ✅ CORREÇÃO: Chamar reply() mesmo para erros
-        return await interaction.reply({ content: "❌ Miscrit not found!", flags: 64 });
+        // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
+        return await interaction.reply({ 
+          content: "❌ Miscrit not found!", 
+          ephemeral: true 
+        });
       }
 
       let rarityDot = "⚪";
@@ -94,11 +97,9 @@ module.exports = {
 
       let description = "";
 
-      // ✅ CORRIGIDO: Aspas adicionadas
       if (miscrit.pvp_desired_status)
         description += `⚔️ **PVP Desired Status:** ${miscrit.pvp_desired_status}\n`;
 
-      // ✅ NOVA LINHA ADICIONADA
       if (miscrit.useless_pvp_status)
         description += `💤 **Useless PVP Status:** ${miscrit.useless_pvp_status}\n`;
 
@@ -119,15 +120,21 @@ module.exports = {
       const embed2 = new EmbedBuilder().setDescription(description).setColor(embedColor);
       if (miscrit.location_url) embed2.setImage(miscrit.location_url);
 
-      // ✅ CORREÇÃO: Chamar interaction.reply() para enviar a resposta
-      await interaction.reply({ embeds: [embed1, embed2], flags: 64 });
+      // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
+      await interaction.reply({ 
+        embeds: [embed1, embed2], 
+        ephemeral: true 
+      });
       console.log("✅ Resposta info enviada com sucesso!");
       
     } catch (err) {
       if (err.code === 10062) return;
       console.error("Command execution error:", err);
       try {
-        await interaction.reply({ content: "❌ Error executing command!", flags: 64 });
+        await interaction.reply({ 
+          content: "❌ Error executing command!", 
+          ephemeral: true 
+        });
       } catch (replyErr) {
         if (replyErr.code !== 10062) {
           console.error('Error sending error message:', replyErr.message);
