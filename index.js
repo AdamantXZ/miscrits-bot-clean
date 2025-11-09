@@ -1,4 +1,4 @@
-// index.js - Miscritbot com Interactions API, WebSocket e Autocomplete
+// index.js - Miscritbot com Interactions API, WebSocket e Autocomplete (CORRIGIDO)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -93,7 +93,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos
+// ✅ Processar Comandos - CORRIGIDO (sem Authorization header)
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -119,21 +119,24 @@ async function handleCommand(interaction) {
       reply: async (response) => {
         if (hasReplied) return interactionObj.followUp(response);
         hasReplied = true;
+        
+        // ✅ CORREÇÃO: REMOVIDO Authorization header para ephemeral funcionar
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
           method: "PATCH",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bot ${TOKEN}`
+            "Content-Type": "application/json"
+            // ❌ REMOVIDO: "Authorization": `Bot ${TOKEN}`
           },
           body: JSON.stringify(response)
         });
       },
       followUp: async (response) => {
+        // ✅ CORREÇÃO: REMOVIDO Authorization header para ephemeral funcionar
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bot ${TOKEN}`
+            "Content-Type": "application/json"
+            // ❌ REMOVIDO: "Authorization": `Bot ${TOKEN}`
           },
           body: JSON.stringify(response)
         });
