@@ -1,10 +1,9 @@
-// index.js - Miscritbot com Interactions API e verificação Ed25519 (CORRIGIDO)
+// index.js - Miscritbot com Interactions API e verificação Ed25519 (FINAL)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
 const fetch = require("node-fetch");
 
-// Variáveis de ambiente
 const TOKEN = process.env.BOT_TOKEN;
 const PUBLIC_KEY = process.env.PUBLIC_KEY;
 const APP_ID = process.env.APPLICATION_ID;
@@ -15,7 +14,7 @@ console.log(`🌐 HTTP ativo na porta ${PORT}`);
 console.log("🚀 Conectando ao Discord...");
 
 // ====================================================
-// ✅ VERIFICAÇÃO CORRETA USANDO Ed25519 + Base64
+// ✅ VERIFICAÇÃO CORRETA USANDO Ed25519 + HEX
 // ====================================================
 function verifyDiscordRequest(req, rawBody) {
   const signature = req.headers["x-signature-ed25519"];
@@ -23,11 +22,11 @@ function verifyDiscordRequest(req, rawBody) {
   if (!signature || !timestamp) return false;
 
   try {
-    // A Public Key do Discord é Base64, NÃO hexadecimal
+    // A chave pública fornecida pelo Discord é HEX
     const isVerified = nacl.sign.detached.verify(
       Buffer.from(timestamp + rawBody),
       Buffer.from(signature, "hex"),
-      Buffer.from(PUBLIC_KEY, "base64")
+      Buffer.from(PUBLIC_KEY, "hex")
     );
     if (!isVerified) console.error("❌ Assinatura inválida recebida");
     return isVerified;
@@ -122,7 +121,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 // ====================================================
-// ✅ WEBSOCKET APENAS PARA MOSTRAR ONLINE
+// ✅ WEBSOCKET (somente para status de conexão)
 // ====================================================
 const WebSocket = require("ws");
 const ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
