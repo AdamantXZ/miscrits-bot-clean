@@ -1,9 +1,10 @@
-// ✅ deploy-commands.js — versão avançada (com subcomandos)
+// ✅ deploy-commands.js — versão corrigida
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
 const token = process.env.BOT_TOKEN;
-const clientId = process.env.APPLICATION_ID; // <- usa o mesmo ID do app
+const clientId = process.env.APPLICATION_ID;
+
 if (!token || !clientId) {
   console.error("❌ Faltando BOT_TOKEN ou APPLICATION_ID no .env");
   process.exit(1);
@@ -32,6 +33,7 @@ if (!token || !clientId) {
             .setName("name")
             .setDescription("Nome do Miscrit")
             .setRequired(true)
+            .setAutocomplete(true) // ✅ CORRIGIDO: autocomplete adicionado
         )
     );
 
@@ -45,6 +47,7 @@ if (!token || !clientId) {
             .setName("name")
             .setDescription("Nome do Miscrit")
             .setRequired(true)
+            .setAutocomplete(true) // ✅ CORRIGIDO: autocomplete adicionado
         )
     );
 
@@ -58,6 +61,7 @@ if (!token || !clientId) {
             .setName("name")
             .setDescription("Nome do Miscrit")
             .setRequired(true)
+            .setAutocomplete(true) // ✅ CORRIGIDO: autocomplete adicionado
         )
     );
 
@@ -99,10 +103,10 @@ if (!token || !clientId) {
 
     console.log("✅ Comandos registrados com sucesso!");
     console.log("📋 Disponíveis globalmente:");
-    console.log("   /miscrits info");
-    console.log("   /miscrits moves-and-evos");
-    console.log("   /miscrits relics");
-    console.log("   /miscrits spawn-days");
+    console.log("   /miscrits info [nome]");
+    console.log("   /miscrits moves-and-evos [nome]");
+    console.log("   /miscrits relics [nome]");
+    console.log("   /miscrits spawn-days [dia]");
     console.log("   /miscrits tierlist");
   } catch (err) {
     console.error("❌ Erro ao registrar comandos:", err);
