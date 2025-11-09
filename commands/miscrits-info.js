@@ -91,9 +91,11 @@ module.exports = {
 
       let description = "";
 
+      // ✅ CORRIGIDO: Aspas adicionadas
       if (miscrit.pvp_desired_status)
         description += `⚔️ **PVP Desired Status:** ${miscrit.pvp_desired_status}\n`;
 
+      // ✅ NOVA LINHA ADICIONADA
       if (miscrit.useless_pvp_status)
         description += `💤 **Useless PVP Status:** ${miscrit.useless_pvp_status}\n`;
 

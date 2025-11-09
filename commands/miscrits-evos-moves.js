@@ -18,6 +18,7 @@ module.exports = {
 
   async autocomplete(interaction) {
     try {
+      // ✅ VERIFICA SE A INTERAÇÃO JÁ FOI PROCESSADA
       if (interaction.responded) return;
       
       const focused = (interaction.options.getFocused() || "").trim().toLowerCase();
@@ -36,10 +37,12 @@ module.exports = {
           .map((m) => ({ name: m.name, value: m.name }));
       }
 
+      // ✅ VERIFICA NOVAMENTE ANTES DE RESPONDER
       if (!interaction.responded) {
         await interaction.respond(results);
       }
     } catch (err) {
+      // ✅ IGNORA ERROS DE INTERAÇÃO JÁ PROCESSADA
       if (err.code === 10062 || err.code === 40060) return;
       console.error("Autocomplete error:", err);
     }
@@ -54,10 +57,12 @@ module.exports = {
         return await interaction.reply({ content: "❌ Miscrit not found!", flags: 64 });
       }
 
+      // ✅ EMBED 1: IMAGEM FIXA
       const embed1 = new EmbedBuilder()
         .setImage("https://i.imgur.com/dMyh4pu.png")
         .setColor(0x2b6cb0);
 
+      // ✅ EMBED 2: INFORMAÇÕES DO WIKI COM NOME DO MISCRIT
       let description = "";
       
       if (miscrit.wiki_page) {
@@ -75,6 +80,7 @@ module.exports = {
         flags: 64 
       });
     } catch (err) {
+      // ✅ IGNORA ERROS DE INTERAÇÃO EXPIRADA
       if (err.code === 10062) return;
       console.error("Command execution error:", err);
       try {

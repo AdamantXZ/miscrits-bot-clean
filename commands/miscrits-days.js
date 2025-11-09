@@ -7,22 +7,7 @@ const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-days")
-    .setDescription("Show Miscrits spawn for a specific day")
-    .addStringOption((option) =>
-      option
-        .setName("day")
-        .setDescription("Day of the week")
-        .setRequired(true)
-        .addChoices(
-          { name: "Monday", value: "Monday" },
-          { name: "Tuesday", value: "Tuesday" },
-          { name: "Wednesday", value: "Wednesday" },
-          { name: "Thursday", value: "Thursday" },
-          { name: "Friday", value: "Friday" },
-          { name: "Saturday", value: "Saturday" },
-          { name: "Sunday", value: "Sunday" }
-        )
-    ),
+    .setDescription("Show Miscrits spawn for a specific day"),
 
   async execute(interaction) {
     try {
@@ -49,6 +34,7 @@ module.exports = {
         chunks.push(filtered.slice(i, i + chunkSize));
       }
 
+      // ✅ ENVIA ATÉ 10 EMBEDS POR MENSAGEM (DISCORD LIMIT)
       const embedChunks = [];
       for (let i = 0; i < chunks.length; i++) {
         const lines = chunks[i].map((m) => {
@@ -60,6 +46,7 @@ module.exports = {
             case "legendary": emoji = "🟠"; break;
           }
           
+          // ✅ ADICIONA PVP STATUS
           let pvpStatus = "";
           if (m.pvp_desired_status) {
             pvpStatus = ` — ${m.pvp_desired_status}`;
@@ -68,14 +55,18 @@ module.exports = {
           return `${emoji} **${m.name}** — ${m.region || "Unknown Region"}${pvpStatus}`;
         });
 
-        const note = i === chunks.length - 1
-          ? `\n\n*Only* **🔵 Rare** and **🟢 Epic** are shown.\n*⚪ Common, 🟣 Exotic, 🟠 Legendary and 🛒 Shop Miscrits are available every day.*`
-          : "";
+        // ✅ APENAS NO ÚLTIMO EMBED ADICIONA A NOTA
+        const note =
+          i === chunks.length - 1
+            ? `\n\n*Only* **🔵 Rare** and **🟢 Epic** are shown.\n*⚪ Common, 🟣 Exotic, 🟠 Legendary and 🛒 Shop Miscrits are available every day.*`
+            : "";
 
+        // ✅ PRIMEIRO EMBED TEM TÍTULO, OS DEMAIS NÃO
         const embed = new EmbedBuilder()
           .setDescription(lines.join("\n") + note)
           .setColor(0x2b6cb0);
 
+        // ✅ APENAS O PRIMEIRO EMBED TEM TÍTULO COM EMOJI NOVO
         if (i === 0) {
           embed.setTitle(`🗓️ Miscrits Spawn on ${day}`);
         }
@@ -83,6 +74,7 @@ module.exports = {
         embedChunks.push(embed);
       }
 
+      // ✅ ENVIA MÚLTIPLOS EMBEDS JUNTOS (ATÉ 10 POR MENSAGEM)
       const maxEmbedsPerMessage = 10;
       for (let i = 0; i < embedChunks.length; i += maxEmbedsPerMessage) {
         const embedsBatch = embedChunks.slice(i, i + maxEmbedsPerMessage);
@@ -94,6 +86,7 @@ module.exports = {
         }
       }
     } catch (err) {
+      // ✅ IGNORA ERROS DE INTERAÇÃO EXPIRADA
       if (err.code === 10062) return;
       console.error("Command execution error:", err);
       try {

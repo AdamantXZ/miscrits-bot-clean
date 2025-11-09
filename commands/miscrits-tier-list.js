@@ -15,6 +15,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed], flags: 64 });
     } catch (err) {
+      // ✅ IGNORA ERROS DE INTERAÇÃO EXPIRADA
       if (err.code === 10062) return;
       console.error("Command execution error:", err);
       try {
