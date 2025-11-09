@@ -43,7 +43,7 @@ function verifyDiscordRequest(req, rawBody) {
     const isVerified = nacl.sign.detached.verify(
       Buffer.from(timestamp + rawBody),
       Buffer.from(signature, "hex"),
-      Buffer.from(PUBLIC_KEY, "base64") // 🔧 base64 (correto)
+      Buffer.from(PUBLIC_KEY, "hex") // ✅ volta para HEX
     );
     if (!isVerified) console.error("❌ Assinatura inválida recebida");
     return isVerified;
