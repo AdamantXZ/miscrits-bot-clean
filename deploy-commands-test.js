@@ -1,4 +1,4 @@
-// deploy-commands-test.js - IDÊNTICO ao deploy-commands.js mas para servidor específico
+// deploy-commands-test.js - Comandos de TESTE com /test
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
@@ -13,19 +13,19 @@ if (!token || !clientId || !guildId) {
 
 (async () => {
   try {
-    console.log("🚀 Registrando comandos GLOBAIS de TESTE...");
+    console.log("🚀 Registrando comandos de TESTE com /test...");
 
     const rest = new REST({ version: "10" }).setToken(token);
 
     // ===========================================
-    // 🎯 Comando principal: /miscrits
+    // 🎯 Comando principal: /test
     // ===========================================
-    const miscritsCommand = new SlashCommandBuilder()
-      .setName("miscrits")
-      .setDescription("Comandos relacionados aos Miscrits");
+    const testCommand = new SlashCommandBuilder()
+      .setName("test")
+      .setDescription("Comandos de teste do MiscritBot");
 
-    // 📘 Subcomando: /miscrits info
-    miscritsCommand.addSubcommand(sub =>
+    // 📘 Subcomando: /test info
+    testCommand.addSubcommand(sub =>
       sub
         .setName("info")
         .setDescription("Mostra informações sobre um Miscrit específico")
@@ -38,8 +38,8 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 📗 Subcomando: /miscrits moves-and-evos
-    miscritsCommand.addSubcommand(sub =>
+    // 📗 Subcomando: /test moves-and-evos
+    testCommand.addSubcommand(sub =>
       sub
         .setName("moves-and-evos")
         .setDescription("Mostra os golpes e evoluções do Miscrit")
@@ -52,8 +52,8 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 📙 Subcomando: /miscrits relics
-    miscritsCommand.addSubcommand(sub =>
+    // 📙 Subcomando: /test relics
+    testCommand.addSubcommand(sub =>
       sub
         .setName("relics")
         .setDescription("Mostra o conjunto de relíquias recomendado para o Miscrit")
@@ -66,8 +66,8 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 📒 Subcomando: /miscrits spawn-days
-    miscritsCommand.addSubcommand(sub =>
+    // 📒 Subcomando: /test spawn-days
+    testCommand.addSubcommand(sub =>
       sub
         .setName("spawn-days")
         .setDescription("Mostra os Miscrits que aparecem em um dia da semana")
@@ -88,8 +88,8 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 📕 Subcomando: /miscrits tierlist
-    miscritsCommand.addSubcommand(sub =>
+    // 📕 Subcomando: /test tierlist
+    testCommand.addSubcommand(sub =>
       sub
         .setName("tierlist")
         .setDescription("Exibe a Tier List PvP dos Miscrits")
@@ -99,16 +99,16 @@ if (!token || !clientId || !guildId) {
     // 🚀 Registrar comando no servidor específico
     // ===========================================
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-      body: [miscritsCommand.toJSON()],
+      body: [testCommand.toJSON()],
     });
 
     console.log("✅ Comandos de TESTE registrados com sucesso!");
     console.log("📋 Disponíveis no servidor específico:");
-    console.log("   /miscrits info [nome]");
-    console.log("   /miscrits moves-and-evos [nome]");
-    console.log("   /miscrits relics [nome]");
-    console.log("   /miscrits spawn-days [dia]");
-    console.log("   /miscrits tierlist");
+    console.log("   /test info [nome]");
+    console.log("   /test moves-and-evos [nome]");
+    console.log("   /test relics [nome]");
+    console.log("   /test spawn-days [dia]");
+    console.log("   /test tierlist");
     console.log("");
     console.log("📍 Comandos disponíveis APENAS no servidor:", guildId);
   } catch (err) {
