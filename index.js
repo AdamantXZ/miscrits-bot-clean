@@ -1,4 +1,4 @@
-// index.js - Miscritbot sem mensagem de processamento
+// index.js - Miscritbot SEM mensagem de processamento (CORRIGIDO)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -28,6 +28,10 @@ const commands = {
     "moves-and-evos": miscritsEvosMoves
   }
 };
+
+console.log("🔧 MISCRITS BOT - WebSocket + Interactions API");
+console.log(`🌐 HTTP ativo na porta ${PORT}`);
+console.log("🚀 Conectando ao Discord...");
 
 // ====================================================
 // ✅ Verificação da assinatura do Discord (Ed25519)
@@ -86,7 +90,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - SEM mensagem de processamento
+// ✅ Processar Comandos - CORREÇÃO FINAL
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -96,10 +100,16 @@ async function handleCommand(interaction) {
 
     const commandHandler = commands[commandName]?.[subcommandName];
     if (!commandHandler) {
-      return {
-        type: 4,
-        data: { content: "❌ Comando não encontrado.", flags: 64 }
-      };
+      // Enviar resposta de erro diretamente
+      await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: "❌ Comando não encontrado.",
+          flags: 64
+        })
+      });
+      return;
     }
 
     let hasReplied = false;
@@ -122,9 +132,11 @@ async function handleCommand(interaction) {
           delete webhookData.ephemeral;
         }
 
-        console.log(`📤 PATCH (resposta ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"})`);
-        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
-          method: "PATCH",
+        console.log(`📤 Enviando resposta ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"}`);
+        
+        // ✅ CORREÇÃO: Usar POST para criar mensagem em vez de PATCH
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(webhookData)
         });
@@ -138,7 +150,8 @@ async function handleCommand(interaction) {
           delete webhookData.ephemeral;
         }
 
-        console.log(`📤 POST (followUp ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"})`);
+        console.log(`📤 Enviando followUp ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"}`);
+        
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -153,22 +166,29 @@ async function handleCommand(interaction) {
     if (!hasReplied) {
       await interactionObj.reply({
         content: `✅ Comando **/${commandName} ${subcommandName}** executado!`,
-        ephemeral: true
+        flags: 64
       });
     }
 
-    return { type: 5 };
   } catch (err) {
     console.error("❌ Erro ao executar comando:", err);
-    return {
-      type: 4,
-      data: { content: "❌ Erro interno ao executar o comando.", flags: 64 }
-    };
+    try {
+      await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: "❌ Erro interno ao executar o comando.",
+          flags: 64
+        })
+      });
+    } catch (fetchError) {
+      console.error("❌ Erro ao enviar mensagem de erro:", fetchError);
+    }
   }
 }
 
 // ====================================================
-// ✅ Servidor HTTP - CORRIGIDO sem mensagem de processamento
+// ✅ Servidor HTTP - CORREÇÃO FINAL
 // ====================================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -199,15 +219,19 @@ const server = http.createServer(async (req, res) => {
           return res.end(JSON.stringify({ type: 1 }));
         }
 
-        // Slash command - CORREÇÃO: defer silencioso
+        // Slash command - CORREÇÃO: defer sem mensagem visível
         if (interaction.type === 2) {
           console.log(`🎯 Slash command recebido: ${interaction.data.name}`);
+          
+          // ✅ CORREÇÃO: defer IMEDIATO sem mensagem
           res.writeHead(200, { "Content-Type": "application/json" });
-          // ✅ CORREÇÃO: defer silencioso sem mensagem
           res.end(JSON.stringify({ type: 5 })); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
 
-          // ✅ processa em background com pequeno delay
-          setTimeout(() => handleCommand(interaction), 100);
+          // Processar o comando em background
+          handleCommand(interaction).catch(err => {
+            console.error("❌ Erro não tratado em handleCommand:", err);
+          });
+          
           return;
         }
 
@@ -261,13 +285,15 @@ function connectWebSocket() {
           ws.send(JSON.stringify({ op: 1, d: null }));
       }, msg.d.heartbeat_interval);
     }
-    if (msg.t === "READY")
+    if (msg.t === "READY") {
       console.log(`🤖 Bot conectado como ${msg.d.user.username}`);
+      console.log("✅ Comandos carregados:", Object.keys(commands.miscrits));
+    }
   });
 
   ws.on("close", () => {
     console.log("🔌 Conexão encerrada. Tentando reconectar...");
-    clearInterval(heartbeat);
+    if (heartbeat) clearInterval(heartbeat);
     setTimeout(connectWebSocket, 10000);
   });
 
@@ -280,7 +306,9 @@ function connectWebSocket() {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Servidor HTTP escutando na porta ${PORT}`);
   console.log("📋 Comandos disponíveis:");
-  Object.keys(commands.miscrits).forEach(cmd => console.log(`   /miscrits ${cmd}`));
+  Object.keys(commands.miscrits).forEach(cmd => {
+    console.log(`   /miscrits ${cmd}`);
+  });
   connectWebSocket();
 });
 
