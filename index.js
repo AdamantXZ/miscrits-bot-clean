@@ -1,4 +1,4 @@
-// index.js - Miscritbot (sem mensagem "⏳ Processando...", respostas apenas finais e privadas)
+// index.js - Miscritbot (sem mensagem "⏳ Processando...", respostas apenas finais e PRIVADAS)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -73,7 +73,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - resposta única e privada
+// ✅ Processar Comandos - resposta única e PRIVADA
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -84,7 +84,7 @@ async function handleCommand(interaction) {
     if (!handler) {
       await sendWebhook(interaction, {
         content: "❌ Comando não encontrado.",
-        flags: 64
+        flags: 64 // ✅ SEMPRE PRIVADO
       });
       return;
     }
@@ -97,16 +97,18 @@ async function handleCommand(interaction) {
       },
       reply: async (response) => {
         const body = { ...response };
+        // ✅ FORÇAR todas as respostas a serem ephemeral
+        body.flags = 64;
         if (body.ephemeral) {
-          body.flags = 64;
           delete body.ephemeral;
         }
         await sendWebhook(interaction, body);
       },
       followUp: async (response) => {
         const body = { ...response };
+        // ✅ FORÇAR todas as followUps a serem ephemeral
+        body.flags = 64;
         if (body.ephemeral) {
-          body.flags = 64;
           delete body.ephemeral;
         }
         await sendWebhook(interaction, body);
@@ -120,13 +122,13 @@ async function handleCommand(interaction) {
     console.error("❌ Erro no comando:", err);
     await sendWebhook(interaction, {
       content: "❌ Erro interno ao executar o comando.",
-      flags: 64
+      flags: 64 // ✅ SEMPRE PRIVADO
     });
   }
 }
 
 // ====================================================
-// ✅ Envia resposta via webhook (mensagem final)
+// ✅ Envia resposta via webhook (mensagem final PRIVADA)
 // ====================================================
 async function sendWebhook(interaction, body) {
   try {
