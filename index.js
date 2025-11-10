@@ -1,4 +1,4 @@
-// index.js - Miscritbot (SOLUÇÃO DEFINITIVA - respostas 100% privadas)
+// index.js - Miscritbot (SOLUÇÃO SIMPLES - type:4 direto com flags:64)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -73,28 +73,24 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ SOLUÇÃO DEFINITIVA - Respostas 100% PRIVADAS
+// ✅ Processar Comandos - SOLUÇÃO SIMPLES
 // ====================================================
-async function handleCommand(interaction) {
+async function handleCommand(interaction, res) {
   try {
     const commandName = interaction.data.name;
     const subcommandName = interaction.data.options?.[0]?.name;
     const handler = commands[commandName]?.[subcommandName];
 
     if (!handler) {
-      // ✅ Método 1: Resposta imediata ephemeral
-      await fetch(`https://discord.com/api/v10/interactions/${interaction.id}/${interaction.token}/callback`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: 4,
-          data: {
-            content: "❌ Comando não encontrado.",
-            flags: 64
-          }
-        })
-      });
-      return;
+      // ✅ Resposta direta com type:4 e flags:64
+      res.writeHead(200, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({
+        type: 4,
+        data: {
+          content: "❌ Comando não encontrado.",
+          flags: 64
+        }
+      }));
     }
 
     const interactionObj = {
@@ -104,7 +100,7 @@ async function handleCommand(interaction) {
         getFocused: () => ""
       },
       
-      // ✅ Método 2: Resposta via webhook com flags:64 FORÇADAS
+      // ✅ Resposta direta via callback (type:4)
       reply: async (response) => {
         const body = { ...response };
         
@@ -112,14 +108,14 @@ async function handleCommand(interaction) {
         body.flags = 64;
         if (body.ephemeral) delete body.ephemeral;
         
-        console.log(`📤 Enviando resposta EPHEMERAL via webhook`);
+        console.log(`📤 Enviando resposta EPHEMERAL via type:4`);
         
-        // Usar o endpoint de webhook diretamente
-        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
+        // Enviar resposta direta via callback
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({
+          type: 4,
+          data: body
+        }));
       },
 
       followUp: async (response) => {
@@ -127,8 +123,9 @@ async function handleCommand(interaction) {
         body.flags = 64;
         if (body.ephemeral) delete body.ephemeral;
         
-        console.log(`📤 Enviando followUp EPHEMERAL`);
+        console.log(`📤 Enviando followUp EPHEMERAL via webhook`);
         
+        // Follow-up via webhook normal
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -143,20 +140,20 @@ async function handleCommand(interaction) {
   } catch (err) {
     console.error("❌ Erro no comando:", err);
     
-    // ✅ Método 3: Resposta de erro também ephemeral
-    await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    // ✅ Resposta de erro também com type:4 e flags:64
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({
+      type: 4,
+      data: {
         content: "❌ Erro interno ao executar o comando.",
         flags: 64
-      })
-    });
+      }
+    }));
   }
 }
 
 // ====================================================
-// ✅ Servidor HTTP - NÃO usar defer, responder diretamente
+// ✅ Servidor HTTP - Resposta direta type:4
 // ====================================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -192,16 +189,12 @@ const server = http.createServer(async (req, res) => {
         return res.end(JSON.stringify(response));
       }
 
-      // ✅ SLASH COMMAND - Processar diretamente SEM DEFER
+      // ✅ SLASH COMMAND - Processar DIRETAMENTE com type:4
       if (interaction.type === 2) {
         console.log(`🎯 Comando recebido: /${interaction.data.name} ${interaction.data.options?.[0]?.name || ''}`);
         
-        // ✅ Responder ACK vazio e processar em background
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ type: 5 })); // Defer sem mensagem
-        
-        // Processar o comando
-        setTimeout(() => handleCommand(interaction), 100);
+        // Processar o comando e responder com type:4
+        await handleCommand(interaction, res);
         return;
       }
 
@@ -256,6 +249,6 @@ function connectWebSocket() {
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Servidor HTTP ouvindo na porta ${PORT}`);
-  console.log("🚀 Bot pronto - Todas as respostas serão EPHEMERAL");
+  console.log("🚀 Bot pronto - TODAS as respostas serão EPHEMERAL (apenas para você)");
   connectWebSocket();
 });
