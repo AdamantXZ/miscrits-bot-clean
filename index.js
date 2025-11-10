@@ -1,4 +1,4 @@
-// index.js — Miscritbot com ephemeral 100% funcional e autocomplete
+// index.js - Miscritbot sem mensagem de processamento
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -86,7 +86,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos — com ephemeral e PATCH correto
+// ✅ Processar Comandos - SEM mensagem de processamento
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -168,7 +168,7 @@ async function handleCommand(interaction) {
 }
 
 // ====================================================
-// ✅ Servidor HTTP
+// ✅ Servidor HTTP - CORRIGIDO sem mensagem de processamento
 // ====================================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -199,18 +199,15 @@ const server = http.createServer(async (req, res) => {
           return res.end(JSON.stringify({ type: 1 }));
         }
 
-        // Slash command
+        // Slash command - CORREÇÃO: defer silencioso
         if (interaction.type === 2) {
           console.log(`🎯 Slash command recebido: ${interaction.data.name}`);
           res.writeHead(200, { "Content-Type": "application/json" });
-          // ✅ Resposta inicial ephemeral
-          res.end(JSON.stringify({
-            type: 4,
-            data: { content: "⏳ Processando comando...", flags: 64 }
-          }));
+          // ✅ CORREÇÃO: defer silencioso sem mensagem
+          res.end(JSON.stringify({ type: 5 })); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
 
-          // ✅ processa em background
-          setTimeout(() => handleCommand(interaction), 150);
+          // ✅ processa em background com pequeno delay
+          setTimeout(() => handleCommand(interaction), 100);
           return;
         }
 
