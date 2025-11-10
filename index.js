@@ -1,4 +1,4 @@
-// index.js - Miscritbot com suporte a miscrits-test
+// index.js - Miscritbot SEM mensagem de processamento (SOLUÇÃO FINAL)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -18,7 +18,7 @@ const miscritsTierList = require("./commands/miscrits-tier-list.js");
 const miscritsRelics = require("./commands/miscrits-relics.js");
 const miscritsEvosMoves = require("./commands/miscrits-evos-moves.js");
 
-// 🔗 Mapa de comandos - ATUALIZADO com miscrits-test
+// 🔗 Mapa de comandos
 const commands = {
   "miscrits": {
     "info": miscritsInfo,
@@ -27,7 +27,7 @@ const commands = {
     "relics": miscritsRelics,
     "moves-and-evos": miscritsEvosMoves
   },
-  "miscrits-test": { // ✅ ADICIONADO suporte para miscrits-test
+  "miscrits-test": {
     "info": miscritsInfo,
     "spawn-days": miscritsDays,
     "tierlist": miscritsTierList,
@@ -97,7 +97,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - CORRIGIDO
+// ✅ Processar Comandos - SOLUÇÃO FINAL
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -107,7 +107,6 @@ async function handleCommand(interaction) {
 
     const commandHandler = commands[commandName]?.[subcommandName];
     if (!commandHandler) {
-      // Enviar resposta de erro diretamente
       await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -141,7 +140,6 @@ async function handleCommand(interaction) {
 
         console.log(`📤 Enviando resposta ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"}`);
         
-        // ✅ CORREÇÃO: Usar POST para criar mensagem em vez de PATCH
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -195,7 +193,7 @@ async function handleCommand(interaction) {
 }
 
 // ====================================================
-// ✅ Servidor HTTP - CORREÇÃO FINAL
+// ✅ Servidor HTTP - SOLUÇÃO FINAL (SEM DEFER)
 // ====================================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -226,18 +224,26 @@ const server = http.createServer(async (req, res) => {
           return res.end(JSON.stringify({ type: 1 }));
         }
 
-        // Slash command - CORREÇÃO: defer sem mensagem visível
+        // Slash command - SOLUÇÃO: responder com type 4 mas SEM conteúdo
         if (interaction.type === 2) {
           console.log(`🎯 Slash command recebido: ${interaction.data.name}`);
           
-          // ✅ CORREÇÃO: defer IMEDIATO sem mensagem
+          // ✅ SOLUÇÃO FINAL: Responder com type 4 mas SEM conteúdo (vazio)
           res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ type: 5 })); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+          res.end(JSON.stringify({ 
+            type: 4, 
+            data: {
+              content: "", // ✅ CONTEÚDO VAZIO - não mostra nada
+              flags: 64    // ✅ Ephemeral para esconder completamente
+            }
+          }));
 
-          // Processar o comando em background
-          handleCommand(interaction).catch(err => {
-            console.error("❌ Erro não tratado em handleCommand:", err);
-          });
+          // Processar o comando em background (agora vai mostrar a resposta real)
+          setTimeout(() => {
+            handleCommand(interaction).catch(err => {
+              console.error("❌ Erro não tratado em handleCommand:", err);
+            });
+          }, 100);
           
           return;
         }
