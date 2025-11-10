@@ -1,10 +1,10 @@
-// deploy-commands-test.js - Com nome /miscrits-test para testes
+// deploy-commands-test.js - Registro de comandos /miscrits-test (servidor de teste)
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
 const token = process.env.BOT_TOKEN;
 const clientId = process.env.APPLICATION_ID;
-const guildId = process.env.GUILD_ID; // ✅ Servidor específico para testes
+const guildId = process.env.GUILD_ID;
 
 if (!token || !clientId || !guildId) {
   console.error("❌ Faltando BOT_TOKEN, APPLICATION_ID ou GUILD_ID no .env");
@@ -13,105 +13,70 @@ if (!token || !clientId || !guildId) {
 
 (async () => {
   try {
-    console.log("🚀 Registrando comandos de TESTE no servidor específico...");
+    console.log("🚀 Registrando comandos de TESTE (/miscrits-test)...");
 
     const rest = new REST({ version: "10" }).setToken(token);
 
-    // ===========================================
-    // 🎯 Comando principal: /miscrits-test
-    // ===========================================
+    // Comando principal
     const miscritsCommand = new SlashCommandBuilder()
-      .setName("miscrits-test") // ✅ NOME CORRETO PARA TESTES
-      .setDescription("Comandos de TESTE relacionados aos Miscrits");
+      .setName("miscrits-test")
+      .setDescription("Comandos de teste dos Miscrits");
 
-    // 📘 Subcomando: /miscrits-test info
     miscritsCommand.addSubcommand(sub =>
-      sub
-        .setName("info")
-        .setDescription("TESTE - Mostra informações sobre um Miscrit específico")
+      sub.setName("info")
+        .setDescription("Mostra informações de um Miscrit")
         .addStringOption(opt =>
-          opt
-            .setName("name")
-            .setDescription("Nome do Miscrit")
-            .setRequired(true)
-            .setAutocomplete(true)
+          opt.setName("name").setDescription("Nome do Miscrit").setRequired(true).setAutocomplete(true)
         )
     );
 
-    // 📗 Subcomando: /miscrits-test moves-and-evos
     miscritsCommand.addSubcommand(sub =>
-      sub
-        .setName("moves-and-evos")
-        .setDescription("TESTE - Mostra os golpes e evoluções do Miscrit")
+      sub.setName("moves-and-evos")
+        .setDescription("Mostra golpes e evoluções")
         .addStringOption(opt =>
-          opt
-            .setName("name")
-            .setDescription("Nome do Miscrit")
-            .setRequired(true)
-            .setAutocomplete(true)
+          opt.setName("name").setDescription("Nome do Miscrit").setRequired(true).setAutocomplete(true)
         )
     );
 
-    // 📙 Subcomando: /miscrits-test relics
     miscritsCommand.addSubcommand(sub =>
-      sub
-        .setName("relics")
-        .setDescription("TESTE - Mostra o conjunto de relíquias recomendado para o Miscrit")
+      sub.setName("relics")
+        .setDescription("Mostra o conjunto de relíquias")
         .addStringOption(opt =>
-          opt
-            .setName("name")
-            .setDescription("Nome do Miscrit")
-            .setRequired(true)
-            .setAutocomplete(true)
+          opt.setName("name").setDescription("Nome do Miscrit").setRequired(true).setAutocomplete(true)
         )
     );
 
-    // 📒 Subcomando: /miscrits-test spawn-days
     miscritsCommand.addSubcommand(sub =>
-      sub
-        .setName("spawn-days")
-        .setDescription("TESTE - Mostra os Miscrits que aparecem em um dia da semana")
+      sub.setName("spawn-days")
+        .setDescription("Mostra Miscrits por dia da semana")
         .addStringOption(opt =>
-          opt
-            .setName("day")
-            .setDescription("Dia da semana")
-            .setRequired(true)
-            .addChoices(
-              { name: "Monday", value: "Monday" },
-              { name: "Tuesday", value: "Tuesday" },
-              { name: "Wednesday", value: "Wednesday" },
-              { name: "Thursday", value: "Thursday" },
-              { name: "Friday", value: "Friday" },
-              { name: "Saturday", value: "Saturday" },
-              { name: "Sunday", value: "Sunday" }
-            )
+          opt.setName("day").setDescription("Dia da semana").setRequired(true).addChoices(
+            { name: "Monday", value: "Monday" },
+            { name: "Tuesday", value: "Tuesday" },
+            { name: "Wednesday", value: "Wednesday" },
+            { name: "Thursday", value: "Thursday" },
+            { name: "Friday", value: "Friday" },
+            { name: "Saturday", value: "Saturday" },
+            { name: "Sunday", value: "Sunday" }
+          )
         )
     );
 
-    // 📕 Subcomando: /miscrits-test tierlist
     miscritsCommand.addSubcommand(sub =>
-      sub
-        .setName("tierlist")
-        .setDescription("TESTE - Exibe a Tier List PvP dos Miscrits")
+      sub.setName("tierlist").setDescription("Mostra a Tier List PvP")
     );
 
-    // ===========================================
-    // 🚀 Registrar comando no servidor específico
-    // ===========================================
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: [miscritsCommand.toJSON()],
     });
 
-    console.log("✅ Comandos de TESTE registrados com sucesso!");
-    console.log("📋 Disponíveis APENAS no seu servidor de testes:");
-    console.log("   /miscrits-test info [nome]");
-    console.log("   /miscrits-test moves-and-evos [nome]");
-    console.log("   /miscrits-test relics [nome]");
-    console.log("   /miscrits-test spawn-days [dia]");
+    console.log("✅ /miscrits-test registrado com sucesso!");
+    console.log("📋 Subcomandos:");
+    console.log("   /miscrits-test info [name]");
+    console.log("   /miscrits-test moves-and-evos [name]");
+    console.log("   /miscrits-test relics [name]");
+    console.log("   /miscrits-test spawn-days [day]");
     console.log("   /miscrits-test tierlist");
-    console.log("");
-    console.log("🔧 Use para testar mudanças antes do deploy global");
-    console.log("📍 Servidor ID:", guildId);
   } catch (err) {
     console.error("❌ Erro ao registrar comandos de teste:", err);
   }
