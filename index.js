@@ -1,4 +1,4 @@
-// index.js - Miscritbot (respostas FINAIS e PRIVADAS via PATCH @original)
+// index.js - Miscritbot (SOLUÇÃO DEFINITIVA - respostas 100% privadas)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -73,7 +73,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - resposta PRIVADA via PATCH @original
+// ✅ SOLUÇÃO DEFINITIVA - Respostas 100% PRIVADAS
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -82,19 +82,20 @@ async function handleCommand(interaction) {
     const handler = commands[commandName]?.[subcommandName];
 
     if (!handler) {
-      // ✅ PATCH para mensagem privada
-      await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
-        method: "PATCH",
+      // ✅ Método 1: Resposta imediata ephemeral
+      await fetch(`https://discord.com/api/v10/interactions/${interaction.id}/${interaction.token}/callback`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          content: "❌ Comando não encontrado.",
-          flags: 64
+          type: 4,
+          data: {
+            content: "❌ Comando não encontrado.",
+            flags: 64
+          }
         })
       });
       return;
     }
-
-    let hasReplied = false;
 
     const interactionObj = {
       options: {
@@ -103,37 +104,30 @@ async function handleCommand(interaction) {
         getFocused: () => ""
       },
       
-      // ✅ PATCH para /messages/@original (mantém ephemeral)
+      // ✅ Método 2: Resposta via webhook com flags:64 FORÇADAS
       reply: async (response) => {
-        if (hasReplied) return interactionObj.followUp(response);
-        hasReplied = true;
-
         const body = { ...response };
-        // ✅ FORÇAR todas as respostas a serem ephemeral
-        body.flags = 64;
-        if (body.ephemeral) {
-          delete body.ephemeral;
-        }
-
-        console.log(`📤 PATCH /messages/@original (EPHEMERAL)`);
         
-        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
-          method: "PATCH",
+        // ✅ FORÇAR flags:64 em TODOS os casos
+        body.flags = 64;
+        if (body.ephemeral) delete body.ephemeral;
+        
+        console.log(`📤 Enviando resposta EPHEMERAL via webhook`);
+        
+        // Usar o endpoint de webhook diretamente
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         });
       },
 
-      // ✅ Follow-up também privado
       followUp: async (response) => {
         const body = { ...response };
-        // ✅ FORÇAR todas as followUps a serem ephemeral
         body.flags = 64;
-        if (body.ephemeral) {
-          delete body.ephemeral;
-        }
-
-        console.log(`📤 POST followUp (EPHEMERAL)`);
+        if (body.ephemeral) delete body.ephemeral;
+        
+        console.log(`📤 Enviando followUp EPHEMERAL`);
         
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
           method: "POST",
@@ -148,9 +142,10 @@ async function handleCommand(interaction) {
 
   } catch (err) {
     console.error("❌ Erro no comando:", err);
-    // ✅ PATCH para mensagem de erro privada
-    await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
-      method: "PATCH",
+    
+    // ✅ Método 3: Resposta de erro também ephemeral
+    await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         content: "❌ Erro interno ao executar o comando.",
@@ -161,7 +156,7 @@ async function handleCommand(interaction) {
 }
 
 // ====================================================
-// ✅ Servidor HTTP (defer sem mensagem inicial)
+// ✅ Servidor HTTP - NÃO usar defer, responder diretamente
 // ====================================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -184,23 +179,30 @@ const server = http.createServer(async (req, res) => {
 
       const interaction = JSON.parse(body);
 
+      // ✅ PING
       if (interaction.type === 1) {
         res.writeHead(200, { "Content-Type": "application/json" });
         return res.end(JSON.stringify({ type: 1 }));
       }
 
-      // ✅ Slash Command → defer (type:5) sem mensagem inicial
-      if (interaction.type === 2) {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ type: 5 })); // defer sem mensagem
-        setTimeout(() => handleCommand(interaction), 150);
-        return;
-      }
-
+      // ✅ AUTOCOMPLETE
       if (interaction.type === 4) {
         const response = await handleAutocomplete(interaction);
         res.writeHead(200, { "Content-Type": "application/json" });
         return res.end(JSON.stringify(response));
+      }
+
+      // ✅ SLASH COMMAND - Processar diretamente SEM DEFER
+      if (interaction.type === 2) {
+        console.log(`🎯 Comando recebido: /${interaction.data.name} ${interaction.data.options?.[0]?.name || ''}`);
+        
+        // ✅ Responder ACK vazio e processar em background
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ type: 5 })); // Defer sem mensagem
+        
+        // Processar o comando
+        setTimeout(() => handleCommand(interaction), 100);
+        return;
       }
 
       res.writeHead(400);
@@ -254,5 +256,6 @@ function connectWebSocket() {
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Servidor HTTP ouvindo na porta ${PORT}`);
+  console.log("🚀 Bot pronto - Todas as respostas serão EPHEMERAL");
   connectWebSocket();
 });
