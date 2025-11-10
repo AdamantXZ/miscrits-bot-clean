@@ -1,4 +1,4 @@
-// index.js - Miscritbot (sem mensagem "⏳ Processando...", respostas apenas finais e PRIVADAS)
+// index.js - Miscritbot (respostas FINAIS e PRIVADAS via PATCH @original)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -73,7 +73,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - resposta única e PRIVADA
+// ✅ Processar Comandos - resposta PRIVADA via PATCH @original
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -82,12 +82,19 @@ async function handleCommand(interaction) {
     const handler = commands[commandName]?.[subcommandName];
 
     if (!handler) {
-      await sendWebhook(interaction, {
-        content: "❌ Comando não encontrado.",
-        flags: 64 // ✅ SEMPRE PRIVADO
+      // ✅ PATCH para mensagem privada
+      await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: "❌ Comando não encontrado.",
+          flags: 64
+        })
       });
       return;
     }
+
+    let hasReplied = false;
 
     const interactionObj = {
       options: {
@@ -95,15 +102,29 @@ async function handleCommand(interaction) {
           interaction.data.options?.[0]?.options?.find(o => o.name === name)?.value || null,
         getFocused: () => ""
       },
+      
+      // ✅ PATCH para /messages/@original (mantém ephemeral)
       reply: async (response) => {
+        if (hasReplied) return interactionObj.followUp(response);
+        hasReplied = true;
+
         const body = { ...response };
         // ✅ FORÇAR todas as respostas a serem ephemeral
         body.flags = 64;
         if (body.ephemeral) {
           delete body.ephemeral;
         }
-        await sendWebhook(interaction, body);
+
+        console.log(`📤 PATCH /messages/@original (EPHEMERAL)`);
+        
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
       },
+
+      // ✅ Follow-up também privado
       followUp: async (response) => {
         const body = { ...response };
         // ✅ FORÇAR todas as followUps a serem ephemeral
@@ -111,7 +132,14 @@ async function handleCommand(interaction) {
         if (body.ephemeral) {
           delete body.ephemeral;
         }
-        await sendWebhook(interaction, body);
+
+        console.log(`📤 POST followUp (EPHEMERAL)`);
+        
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
       }
     };
 
@@ -120,30 +148,20 @@ async function handleCommand(interaction) {
 
   } catch (err) {
     console.error("❌ Erro no comando:", err);
-    await sendWebhook(interaction, {
-      content: "❌ Erro interno ao executar o comando.",
-      flags: 64 // ✅ SEMPRE PRIVADO
-    });
-  }
-}
-
-// ====================================================
-// ✅ Envia resposta via webhook (mensagem final PRIVADA)
-// ====================================================
-async function sendWebhook(interaction, body) {
-  try {
-    await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
-      method: "POST",
+    // ✅ PATCH para mensagem de erro privada
+    await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}/messages/@original`, {
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      body: JSON.stringify({
+        content: "❌ Erro interno ao executar o comando.",
+        flags: 64
+      })
     });
-  } catch (err) {
-    console.error("❌ Erro ao enviar webhook:", err.message);
   }
 }
 
 // ====================================================
-// ✅ Servidor HTTP (sem mensagem inicial)
+// ✅ Servidor HTTP (defer sem mensagem inicial)
 // ====================================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -171,7 +189,7 @@ const server = http.createServer(async (req, res) => {
         return res.end(JSON.stringify({ type: 1 }));
       }
 
-      // Slash Command → apenas ACK (sem mensagem inicial)
+      // ✅ Slash Command → defer (type:5) sem mensagem inicial
       if (interaction.type === 2) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ type: 5 })); // defer sem mensagem
