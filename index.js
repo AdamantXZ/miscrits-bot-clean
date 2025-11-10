@@ -1,4 +1,4 @@
-// index.js - Miscritbot (SOLUÇÃO SIMPLES - type:4 direto com flags:64)
+// index.js - Miscritbot (com suporte para /test e /miscrits)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -17,9 +17,16 @@ const miscritsTierList = require("./commands/miscrits-tier-list.js");
 const miscritsRelics = require("./commands/miscrits-relics.js");
 const miscritsEvosMoves = require("./commands/miscrits-evos-moves.js");
 
-// 🔗 Mapa de comandos
+// 🔗 Mapa de comandos - AGORA com suporte para /test e /miscrits
 const commands = {
   "miscrits": {
+    "info": miscritsInfo,
+    "spawn-days": miscritsDays,
+    "tierlist": miscritsTierList,
+    "relics": miscritsRelics,
+    "moves-and-evos": miscritsEvosMoves
+  },
+  "test": {
     "info": miscritsInfo,
     "spawn-days": miscritsDays,
     "tierlist": miscritsTierList,
@@ -30,6 +37,7 @@ const commands = {
 
 console.log("🔧 MISCRITS BOT - WebSocket + Interactions API");
 console.log(`🌐 HTTP ativo na porta ${PORT}`);
+console.log("✅ Comandos disponíveis: /miscrits e /test");
 
 // ====================================================
 // ✅ Verificação da assinatura do Discord
@@ -87,7 +95,7 @@ async function handleCommand(interaction, res) {
       return res.end(JSON.stringify({
         type: 4,
         data: {
-          content: "❌ Comando não encontrado.",
+          content: `❌ Comando não encontrado: /${commandName} ${subcommandName}`,
           flags: 64
         }
       }));
@@ -108,7 +116,7 @@ async function handleCommand(interaction, res) {
         body.flags = 64;
         if (body.ephemeral) delete body.ephemeral;
         
-        console.log(`📤 Enviando resposta EPHEMERAL via type:4`);
+        console.log(`📤 Enviando resposta EPHEMERAL via type:4 para /${commandName}`);
         
         // Enviar resposta direta via callback
         res.writeHead(200, { "Content-Type": "application/json" });
@@ -123,7 +131,7 @@ async function handleCommand(interaction, res) {
         body.flags = 64;
         if (body.ephemeral) delete body.ephemeral;
         
-        console.log(`📤 Enviando followUp EPHEMERAL via webhook`);
+        console.log(`📤 Enviando followUp EPHEMERAL via webhook para /${commandName}`);
         
         // Follow-up via webhook normal
         await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
@@ -161,7 +169,7 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify({
       status: "ONLINE",
       timestamp: new Date().toISOString(),
-      commands: Object.keys(commands.miscrits)
+      commands: ["/miscrits", "/test"]
     }));
   }
 
@@ -250,5 +258,16 @@ function connectWebSocket() {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Servidor HTTP ouvindo na porta ${PORT}`);
   console.log("🚀 Bot pronto - TODAS as respostas serão EPHEMERAL (apenas para você)");
+  console.log("📋 Comandos disponíveis:");
+  console.log("   /miscrits info [nome]");
+  console.log("   /miscrits moves-and-evos [nome]");
+  console.log("   /miscrits relics [nome]");
+  console.log("   /miscrits spawn-days [dia]");
+  console.log("   /miscrits tierlist");
+  console.log("   /test info [nome]");
+  console.log("   /test moves-and-evos [nome]");
+  console.log("   /test relics [nome]");
+  console.log("   /test spawn-days [dia]");
+  console.log("   /test tierlist");
   connectWebSocket();
 });
