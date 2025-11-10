@@ -1,4 +1,4 @@
-// index.js - Miscritbot (versão final, sem “processando comando...”)
+// index.js - Miscritbot SEM mensagem de processamento (CORRIGIDO)
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -18,16 +18,9 @@ const miscritsTierList = require("./commands/miscrits-tier-list.js");
 const miscritsRelics = require("./commands/miscrits-relics.js");
 const miscritsEvosMoves = require("./commands/miscrits-evos-moves.js");
 
-// 🔗 Mapa de comandos (produção + teste)
+// 🔗 Mapa de comandos
 const commands = {
   "miscrits": {
-    "info": miscritsInfo,
-    "spawn-days": miscritsDays,
-    "tierlist": miscritsTierList,
-    "relics": miscritsRelics,
-    "moves-and-evos": miscritsEvosMoves
-  },
-  "miscrits-test": {
     "info": miscritsInfo,
     "spawn-days": miscritsDays,
     "tierlist": miscritsTierList,
@@ -41,7 +34,7 @@ console.log(`🌐 HTTP ativo na porta ${PORT}`);
 console.log("🚀 Conectando ao Discord...");
 
 // ====================================================
-// ✅ Verificação da assinatura (Ed25519)
+// ✅ Verificação da assinatura do Discord (Ed25519)
 // ====================================================
 function verifyDiscordRequest(req, rawBody) {
   const signature = req.headers["x-signature-ed25519"];
@@ -49,11 +42,13 @@ function verifyDiscordRequest(req, rawBody) {
   if (!signature || !timestamp) return false;
 
   try {
-    return nacl.sign.detached.verify(
+    const isVerified = nacl.sign.detached.verify(
       Buffer.from(timestamp + rawBody),
       Buffer.from(signature, "hex"),
       Buffer.from(PUBLIC_KEY, "hex")
     );
+    if (!isVerified) console.error("❌ Assinatura inválida recebida");
+    return isVerified;
   } catch (err) {
     console.error("❌ Erro ao verificar assinatura:", err.message);
     return false;
@@ -61,95 +56,139 @@ function verifyDiscordRequest(req, rawBody) {
 }
 
 // ====================================================
-// ✅ Função de autocomplete
+// ✅ Função para Autocomplete
 // ====================================================
 async function handleAutocomplete(interaction) {
   const commandName = interaction.data.name;
   const subcommandName = interaction.data.options?.[0]?.name;
   const focusedOption = interaction.data.options?.[0]?.options?.find(opt => opt.focused);
 
+  console.log(`🔍 Autocomplete: /${commandName} ${subcommandName} - ${focusedOption?.name}`);
+
   const handler = commands[commandName]?.[subcommandName];
-  if (!handler?.autocomplete) return { type: 8, data: { choices: [] } };
+  if (!handler || !handler.autocomplete) {
+    console.log("❌ Nenhum handler de autocomplete encontrado");
+    return { type: 8, data: { choices: [] } };
+  }
 
   try {
     const fakeInteraction = {
       options: { getFocused: () => focusedOption?.value || "" },
       responded: null,
-      respond: async (choices) => (fakeInteraction.responded = choices)
+      respond: async (choices) => {
+        fakeInteraction.responded = choices;
+      }
     };
 
     await handler.autocomplete(fakeInteraction);
+
     return { type: 8, data: { choices: fakeInteraction.responded || [] } };
-  } catch {
+  } catch (err) {
+    console.error("❌ Erro no autocomplete:", err);
     return { type: 8, data: { choices: [] } };
   }
 }
 
 // ====================================================
-// ✅ Processamento dos comandos
+// ✅ Processar Comandos - CORREÇÃO FINAL
 // ====================================================
 async function handleCommand(interaction) {
-  const commandName = interaction.data.name;
-  const subcommandName = interaction.data.options?.[0]?.name;
-  const handler = commands[commandName]?.[subcommandName];
+  try {
+    const commandName = interaction.data.name;
+    const subcommandName = interaction.data.options?.[0]?.name;
+    console.log(`🔧 Comando recebido: /${commandName} ${subcommandName || ""}`);
 
-  console.log(`🔧 Comando recebido: /${commandName} ${subcommandName}`);
-
-  if (!handler) {
-    await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: "❌ Comando não encontrado.", flags: 64 })
-    });
-    return;
-  }
-
-  const interactionObj = {
-    options: {
-      getString: (name) =>
-        interaction.data.options?.[0]?.options?.find(opt => opt.name === name)?.value || null,
-      getFocused: () => ""
-    },
-    reply: async (response) => {
-      const body = { ...response };
-      if (body.ephemeral === true) {
-        body.flags = 64;
-        delete body.ephemeral;
-      }
+    const commandHandler = commands[commandName]?.[subcommandName];
+    if (!commandHandler) {
+      // Enviar resposta de erro diretamente
       await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          content: "❌ Comando não encontrado.",
+          flags: 64
+        })
       });
-    },
-    followUp: async (response) => {
-      const body = { ...response };
-      if (body.ephemeral === true) {
-        body.flags = 64;
-        delete body.ephemeral;
+      return;
+    }
+
+    let hasReplied = false;
+
+    const interactionObj = {
+      options: {
+        getString: (name) =>
+          interaction.data.options?.[0]?.options?.find(opt => opt.name === name)?.value || null,
+        getFocused: () => ""
+      },
+
+      // ✅ envia resposta principal
+      reply: async (response) => {
+        if (hasReplied) return interactionObj.followUp(response);
+        hasReplied = true;
+
+        const webhookData = { ...response };
+        if (webhookData.ephemeral === true) {
+          webhookData.flags = 64;
+          delete webhookData.ephemeral;
+        }
+
+        console.log(`📤 Enviando resposta ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"}`);
+        
+        // ✅ CORREÇÃO: Usar POST para criar mensagem em vez de PATCH
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(webhookData)
+        });
+      },
+
+      // ✅ follow-up opcional
+      followUp: async (response) => {
+        const webhookData = { ...response };
+        if (webhookData.ephemeral === true) {
+          webhookData.flags = 64;
+          delete webhookData.ephemeral;
+        }
+
+        console.log(`📤 Enviando followUp ${webhookData.flags === 64 ? "EPHEMERAL" : "PUBLIC"}`);
+        
+        await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(webhookData)
+        });
       }
-      await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+    };
+
+    console.log(`✅ Executando comando: ${subcommandName}`);
+    await commandHandler.execute(interactionObj);
+
+    if (!hasReplied) {
+      await interactionObj.reply({
+        content: `✅ Comando **/${commandName} ${subcommandName}** executado!`,
+        flags: 64
       });
     }
-  };
 
-  try {
-    await handler.execute(interactionObj);
   } catch (err) {
     console.error("❌ Erro ao executar comando:", err);
-    await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: "❌ Erro interno ao executar o comando.", flags: 64 })
-    });
+    try {
+      await fetch(`https://discord.com/api/v10/webhooks/${APP_ID}/${interaction.token}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: "❌ Erro interno ao executar o comando.",
+          flags: 64
+        })
+      });
+    } catch (fetchError) {
+      console.error("❌ Erro ao enviar mensagem de erro:", fetchError);
+    }
   }
 }
 
 // ====================================================
-// ✅ Servidor HTTP (sem “processando comando...”)
+// ✅ Servidor HTTP - CORREÇÃO FINAL
 // ====================================================
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -170,35 +209,44 @@ const server = http.createServer(async (req, res) => {
         return res.end(JSON.stringify({ error: "Invalid signature" }));
       }
 
-      const interaction = JSON.parse(body);
+      try {
+        const interaction = JSON.parse(body);
 
-      // PING
-      if (interaction.type === 1) {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        return res.end(JSON.stringify({ type: 1 }));
+        // PING
+        if (interaction.type === 1) {
+          console.log("✅ Ping recebido - verificação do Discord");
+          res.writeHead(200, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify({ type: 1 }));
+        }
+
+        // Slash command - CORREÇÃO: defer sem mensagem visível
+        if (interaction.type === 2) {
+          console.log(`🎯 Slash command recebido: ${interaction.data.name}`);
+          
+          // ✅ CORREÇÃO: defer IMEDIATO sem mensagem
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ type: 5 })); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+
+          // Processar o comando em background
+          handleCommand(interaction).catch(err => {
+            console.error("❌ Erro não tratado em handleCommand:", err);
+          });
+          
+          return;
+        }
+
+        // Autocomplete
+        if (interaction.type === 4) {
+          const response = await handleAutocomplete(interaction);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          return res.end(JSON.stringify(response));
+        }
+
+      } catch (err) {
+        console.error("❌ Erro no processamento:", err.message);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Internal server error" }));
       }
-
-      // ✅ Slash command - silencioso
-      if (interaction.type === 2) {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ type: 5 })); // deferReply silencioso
-
-        setTimeout(() => {
-          handleCommand(interaction).catch(err => console.error("❌ Erro em handleCommand:", err));
-        }, 150);
-
-        return;
-      }
-
-      // Autocomplete
-      if (interaction.type === 4) {
-        const response = await handleAutocomplete(interaction);
-        res.writeHead(200, { "Content-Type": "application/json" });
-        return res.end(JSON.stringify(response));
-      }
-
-      res.writeHead(200);
-      res.end();
     });
     return;
   }
@@ -239,12 +287,13 @@ function connectWebSocket() {
     }
     if (msg.t === "READY") {
       console.log(`🤖 Bot conectado como ${msg.d.user.username}`);
+      console.log("✅ Comandos carregados:", Object.keys(commands.miscrits));
     }
   });
 
   ws.on("close", () => {
     console.log("🔌 Conexão encerrada. Tentando reconectar...");
-    clearInterval(heartbeat);
+    if (heartbeat) clearInterval(heartbeat);
     setTimeout(connectWebSocket, 10000);
   });
 
@@ -256,5 +305,16 @@ function connectWebSocket() {
 // ====================================================
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Servidor HTTP escutando na porta ${PORT}`);
+  console.log("📋 Comandos disponíveis:");
+  Object.keys(commands.miscrits).forEach(cmd => {
+    console.log(`   /miscrits ${cmd}`);
+  });
   connectWebSocket();
+});
+
+process.on("SIGTERM", () => {
+  console.log("🛑 Encerrando...");
+  if (ws) ws.close();
+  if (heartbeat) clearInterval(heartbeat);
+  process.exit(0);
 });
