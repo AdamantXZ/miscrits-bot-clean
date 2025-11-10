@@ -1,4 +1,4 @@
-// index.js - Miscritbot SEM mensagem de processamento (CORRIGIDO)
+// index.js - Miscritbot com suporte a miscrits-test
 require("dotenv").config();
 const http = require("http");
 const nacl = require("tweetnacl");
@@ -18,9 +18,16 @@ const miscritsTierList = require("./commands/miscrits-tier-list.js");
 const miscritsRelics = require("./commands/miscrits-relics.js");
 const miscritsEvosMoves = require("./commands/miscrits-evos-moves.js");
 
-// 🔗 Mapa de comandos
+// 🔗 Mapa de comandos - ATUALIZADO com miscrits-test
 const commands = {
   "miscrits": {
+    "info": miscritsInfo,
+    "spawn-days": miscritsDays,
+    "tierlist": miscritsTierList,
+    "relics": miscritsRelics,
+    "moves-and-evos": miscritsEvosMoves
+  },
+  "miscrits-test": { // ✅ ADICIONADO suporte para miscrits-test
     "info": miscritsInfo,
     "spawn-days": miscritsDays,
     "tierlist": miscritsTierList,
@@ -90,7 +97,7 @@ async function handleAutocomplete(interaction) {
 }
 
 // ====================================================
-// ✅ Processar Comandos - CORREÇÃO FINAL
+// ✅ Processar Comandos - CORRIGIDO
 // ====================================================
 async function handleCommand(interaction) {
   try {
@@ -287,7 +294,9 @@ function connectWebSocket() {
     }
     if (msg.t === "READY") {
       console.log(`🤖 Bot conectado como ${msg.d.user.username}`);
-      console.log("✅ Comandos carregados:", Object.keys(commands.miscrits));
+      console.log("✅ Comandos carregados:");
+      console.log("   Produção: /miscrits", Object.keys(commands.miscrits));
+      console.log("   Teste: /miscrits-test", Object.keys(commands["miscrits-test"]));
     }
   });
 
@@ -306,9 +315,8 @@ function connectWebSocket() {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Servidor HTTP escutando na porta ${PORT}`);
   console.log("📋 Comandos disponíveis:");
-  Object.keys(commands.miscrits).forEach(cmd => {
-    console.log(`   /miscrits ${cmd}`);
-  });
+  console.log("   Produção: /miscrits", Object.keys(commands.miscrits));
+  console.log("   Teste: /miscrits-test", Object.keys(commands["miscrits-test"]));
   connectWebSocket();
 });
 
