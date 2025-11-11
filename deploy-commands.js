@@ -1,4 +1,4 @@
-// ✅ deploy-commands.js — versão corrigida
+// deploy-commands.js - ATUALIZADO PARA INGLÊS
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
@@ -6,74 +6,74 @@ const token = process.env.BOT_TOKEN;
 const clientId = process.env.APPLICATION_ID;
 
 if (!token || !clientId) {
-  console.error("❌ Faltando BOT_TOKEN ou APPLICATION_ID no .env");
+  console.error("❌ Missing BOT_TOKEN or APPLICATION_ID in .env");
   process.exit(1);
 }
 
 (async () => {
   try {
-    console.log("🚀 Registrando comandos globais...");
+    console.log("🚀 Registering global commands...");
 
     const rest = new REST({ version: "10" }).setToken(token);
 
     // ===========================================
-    // 🎯 Comando principal: /miscrits
+    // 🎯 Main command: /miscrits
     // ===========================================
     const miscritsCommand = new SlashCommandBuilder()
       .setName("miscrits")
-      .setDescription("Comandos relacionados aos Miscrits");
+      .setDescription("Miscrits related commands");
 
-    // 📘 Subcomando: /miscrits info
+    // 📘 Subcommand: /miscrits info
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("info")
-        .setDescription("Mostra informações sobre um Miscrit específico")
+        .setDescription("Shows information about a specific Miscrit")
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Nome do Miscrit")
+            .setDescription("Name of the Miscrit")
             .setRequired(true)
-            .setAutocomplete(true) // ✅ CORRIGIDO: autocomplete adicionado
+            .setAutocomplete(true)
         )
     );
 
-    // 📗 Subcomando: /miscrits moves-and-evos
+    // 📗 Subcommand: /miscrits moves-and-evos
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("moves-and-evos")
-        .setDescription("Mostra os golpes e evoluções do Miscrit")
+        .setDescription("Shows moves and evolutions for a Miscrit")
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Nome do Miscrit")
+            .setDescription("Name of the Miscrit")
             .setRequired(true)
-            .setAutocomplete(true) // ✅ CORRIGIDO: autocomplete adicionado
+            .setAutocomplete(true)
         )
     );
 
-    // 📙 Subcomando: /miscrits relics
+    // 📙 Subcommand: /miscrits relics
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("relics")
-        .setDescription("Mostra o conjunto de relíquias recomendado para o Miscrit")
+        .setDescription("Shows recommended relics for a Miscrit")
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Nome do Miscrit")
+            .setDescription("Name of the Miscrit")
             .setRequired(true)
-            .setAutocomplete(true) // ✅ CORRIGIDO: autocomplete adicionado
+            .setAutocomplete(true)
         )
     );
 
-    // 📒 Subcomando: /miscrits spawn-days
+    // 📒 Subcommand: /miscrits spawn-days
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("spawn-days")
-        .setDescription("Mostra os Miscrits que aparecem em um dia da semana")
+        .setDescription("Shows Miscrits that spawn on a specific day")
         .addStringOption(opt =>
           opt
             .setName("day")
-            .setDescription("Dia da semana")
+            .setDescription("Day of the week")
             .setRequired(true)
             .addChoices(
               { name: "Monday", value: "Monday" },
@@ -87,28 +87,28 @@ if (!token || !clientId) {
         )
     );
 
-    // 📕 Subcomando: /miscrits tierlist
+    // 📕 Subcommand: /miscrits tierlist
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("tierlist")
-        .setDescription("Exibe a Tier List PvP dos Miscrits")
+        .setDescription("Shows the Miscrits PvP tier list")
     );
 
     // ===========================================
-    // 🚀 Registrar comando global
+    // 🚀 Register global command
     // ===========================================
     await rest.put(Routes.applicationCommands(clientId), {
       body: [miscritsCommand.toJSON()],
     });
 
-    console.log("✅ Comandos registrados com sucesso!");
-    console.log("📋 Disponíveis globalmente:");
-    console.log("   /miscrits info [nome]");
-    console.log("   /miscrits moves-and-evos [nome]");
-    console.log("   /miscrits relics [nome]");
-    console.log("   /miscrits spawn-days [dia]");
+    console.log("✅ Global commands registered successfully!");
+    console.log("📋 Available globally:");
+    console.log("   /miscrits info [name]");
+    console.log("   /miscrits moves-and-evos [name]");
+    console.log("   /miscrits relics [name]");
+    console.log("   /miscrits spawn-days [day]");
     console.log("   /miscrits tierlist");
   } catch (err) {
-    console.error("❌ Erro ao registrar comandos:", err);
+    console.error("❌ Error registering commands:", err);
   }
 })();

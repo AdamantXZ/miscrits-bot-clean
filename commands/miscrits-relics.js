@@ -7,7 +7,7 @@ const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-relics")
-    .setDescription("Show relics build for a specific Miscrit")
+    .setDescription("Shows relics build for a specific Miscrit")
     .addStringOption((option) =>
       option
         .setName("name")

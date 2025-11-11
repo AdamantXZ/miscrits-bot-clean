@@ -7,7 +7,7 @@ const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-evos-moves")
-    .setDescription("Show wiki page for a specific Miscrit")
+    .setDescription("Shows moves and evolutions for a specific Miscrit")
     .addStringOption((option) =>
       option
         .setName("name")

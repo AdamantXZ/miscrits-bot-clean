@@ -7,7 +7,7 @@ const miscrits = Array.isArray(miscritsData.miscrits) ? miscritsData.miscrits : 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-days")
-    .setDescription("Show Miscrits spawn for a specific day"),
+    .setDescription("Shows Miscrits that spawn on a specific day"),
 
   async execute(interaction) {
     try {

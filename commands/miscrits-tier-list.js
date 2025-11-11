@@ -4,7 +4,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-tier-list")
-    .setDescription("Show the Miscrits PvP tier list"),
+    .setDescription("Shows the Miscrits PvP tier list"),
 
   async execute(interaction) {
     try {

@@ -1,3 +1,6 @@
 .env
 clear-commands.js
 deploy-commands-test.js 
+node_modules/ 
+*.log 
+.DS_Store 

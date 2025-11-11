@@ -12,7 +12,7 @@ function capitalize(str) {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("miscrits-info")
-    .setDescription("Show information about a specific Miscrit")
+    .setDescription("Shows information about a specific Miscrit")
     .addStringOption((option) =>
       option
         .setName("name")

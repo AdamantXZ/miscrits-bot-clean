@@ -1,80 +1,80 @@
-// deploy-commands-test.js - Comandos de TESTE com /test
+// deploy-commands-test.js - ATUALIZADO PARA INGLÊS
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
 const token = process.env.BOT_TOKEN;
 const clientId = process.env.APPLICATION_ID;
-const guildId = process.env.GUILD_ID; // ✅ Servidor específico para testes
+const guildId = process.env.GUILD_ID;
 
 if (!token || !clientId || !guildId) {
-  console.error("❌ Faltando BOT_TOKEN, APPLICATION_ID ou GUILD_ID no .env");
+  console.error("❌ Missing BOT_TOKEN, APPLICATION_ID or GUILD_ID in .env");
   process.exit(1);
 }
 
 (async () => {
   try {
-    console.log("🚀 Registrando comandos de TESTE com /test...");
+    console.log("🚀 Registering TEST commands with /test...");
 
     const rest = new REST({ version: "10" }).setToken(token);
 
     // ===========================================
-    // 🎯 Comando principal: /test
+    // 🎯 Main command: /test
     // ===========================================
     const testCommand = new SlashCommandBuilder()
       .setName("test")
-      .setDescription("Comandos de teste do MiscritBot");
+      .setDescription("MiscritBot test commands");
 
-    // 📘 Subcomando: /test info
+    // 📘 Subcommand: /test info
     testCommand.addSubcommand(sub =>
       sub
         .setName("info")
-        .setDescription("Mostra informações sobre um Miscrit específico")
+        .setDescription("Shows information about a specific Miscrit")  // ← INGLÊS
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Nome do Miscrit")
+            .setDescription("Name of the Miscrit")  // ← INGLÊS
             .setRequired(true)
             .setAutocomplete(true)
         )
     );
 
-    // 📗 Subcomando: /test moves-and-evos
+    // 📗 Subcommand: /test moves-and-evos
     testCommand.addSubcommand(sub =>
       sub
         .setName("moves-and-evos")
-        .setDescription("Mostra os golpes e evoluções do Miscrit")
+        .setDescription("Shows moves and evolutions for a Miscrit")  // ← INGLÊS
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Nome do Miscrit")
+            .setDescription("Name of the Miscrit")  // ← INGLÊS
             .setRequired(true)
             .setAutocomplete(true)
         )
     );
 
-    // 📙 Subcomando: /test relics
+    // 📙 Subcommand: /test relics
     testCommand.addSubcommand(sub =>
       sub
         .setName("relics")
-        .setDescription("Mostra o conjunto de relíquias recomendado para o Miscrit")
+        .setDescription("Shows recommended relics for a Miscrit")  // ← INGLÊS
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Nome do Miscrit")
+            .setDescription("Name of the Miscrit")  // ← INGLÊS
             .setRequired(true)
             .setAutocomplete(true)
         )
     );
 
-    // 📒 Subcomando: /test spawn-days
+    // 📒 Subcommand: /test spawn-days
     testCommand.addSubcommand(sub =>
       sub
         .setName("spawn-days")
-        .setDescription("Mostra os Miscrits que aparecem em um dia da semana")
+        .setDescription("Shows Miscrits that spawn on a specific day")  // ← INGLÊS
         .addStringOption(opt =>
           opt
             .setName("day")
-            .setDescription("Dia da semana")
+            .setDescription("Day of the week")  // ← INGLÊS
             .setRequired(true)
             .addChoices(
               { name: "Monday", value: "Monday" },
@@ -88,30 +88,30 @@ if (!token || !clientId || !guildId) {
         )
     );
 
-    // 📕 Subcomando: /test tierlist
+    // 📕 Subcommand: /test tierlist
     testCommand.addSubcommand(sub =>
       sub
         .setName("tierlist")
-        .setDescription("Exibe a Tier List PvP dos Miscrits")
+        .setDescription("Shows the Miscrits PvP tier list")  // ← INGLÊS
     );
 
     // ===========================================
-    // 🚀 Registrar comando no servidor específico
+    // 🚀 Register command in specific guild
     // ===========================================
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
       body: [testCommand.toJSON()],
     });
 
-    console.log("✅ Comandos de TESTE registrados com sucesso!");
-    console.log("📋 Disponíveis no servidor específico:");
-    console.log("   /test info [nome]");
-    console.log("   /test moves-and-evos [nome]");
-    console.log("   /test relics [nome]");
-    console.log("   /test spawn-days [dia]");
+    console.log("✅ TEST commands registered successfully!");
+    console.log("📋 Available in specific server:");
+    console.log("   /test info [name]");
+    console.log("   /test moves-and-evos [name]");
+    console.log("   /test relics [name]");
+    console.log("   /test spawn-days [day]");
     console.log("   /test tierlist");
     console.log("");
-    console.log("📍 Comandos disponíveis APENAS no servidor:", guildId);
+    console.log("📍 Commands available ONLY in server:", guildId);
   } catch (err) {
-    console.error("❌ Erro ao registrar comandos de teste:", err);
+    console.error("❌ Error registering test commands:", err);
   }
 })();
