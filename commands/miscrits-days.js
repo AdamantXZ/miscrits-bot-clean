@@ -21,20 +21,25 @@ module.exports = {
 
         const appears = days.includes(day.toLowerCase()) || days.includes("everyday");
         const isRareOrEpic = rarity === "rare" || rarity === "epic";
-        const excluded = rarity === "common" || rarity === "exotic" || rarity === "legendary" || location === "shop";
+        const excluded =
+          rarity === "common" ||
+          rarity === "exotic" ||
+          rarity === "legendary" ||
+          location === "shop";
 
         return appears && isRareOrEpic && !excluded;
       });
 
       if (filtered.length === 0) {
-        // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
-        return await interaction.reply({ 
-          content: `❌ No Miscrits found for **${day}**.`, 
-          ephemeral: true 
+        return await interaction.reply({
+          content: `❌ No Miscrits found for **${day}**.`,
+          ephemeral: true
         });
       }
 
-      const chunkSize = 30;
+      // 🔥 AQUI É A ÚNICA ALTERAÇÃO — 30 → 40
+      const chunkSize = 40;
+
       const chunks = [];
       for (let i = 0; i < filtered.length; i += chunkSize) {
         chunks.push(filtered.slice(i, i + chunkSize));
@@ -50,12 +55,12 @@ module.exports = {
             case "exotic": emoji = "🟣"; break;
             case "legendary": emoji = "🟠"; break;
           }
-          
+
           let pvpStatus = "";
           if (m.pvp_desired_status) {
             pvpStatus = ` — ${m.pvp_desired_status}`;
           }
-          
+
           return `${emoji} **${m.name}** — ${m.region || "Unknown Region"}${pvpStatus}`;
         });
 
@@ -77,33 +82,32 @@ module.exports = {
 
       const maxEmbedsPerMessage = 10;
       const firstBatch = embedChunks.slice(0, maxEmbedsPerMessage);
-      
-      // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
-      await interaction.reply({ 
-        embeds: firstBatch, 
-        ephemeral: true 
+
+      await interaction.reply({
+        embeds: firstBatch,
+        ephemeral: true
       });
       console.log("✅ Resposta spawn-days enviada com sucesso!");
 
       for (let i = maxEmbedsPerMessage; i < embedChunks.length; i += maxEmbedsPerMessage) {
         const nextBatch = embedChunks.slice(i, i + maxEmbedsPerMessage);
-        await interaction.followUp({ 
-          embeds: nextBatch, 
-          ephemeral: true 
+        await interaction.followUp({
+          embeds: nextBatch,
+          ephemeral: true
         });
       }
-      
+
     } catch (err) {
       if (err.code === 10062) return;
       console.error("Command execution error:", err);
       try {
-        await interaction.reply({ 
-          content: "❌ Error executing command!", 
-          ephemeral: true 
+        await interaction.reply({
+          content: "❌ Error executing command!",
+          ephemeral: true
         });
       } catch (replyErr) {
         if (replyErr.code !== 10062) {
-          console.error('Error sending error message:', replyErr.message);
+          console.error("Error sending error message:", replyErr.message);
         }
       }
     }

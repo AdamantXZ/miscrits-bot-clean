@@ -4,3 +4,4 @@ deploy-commands-test.js
 node_modules/ 
 *.log 
 .DS_Store 
+list-servers.js 
