@@ -34,7 +34,7 @@ module.exports = {
         });
       }
 
-      const chunkSize = 30;
+      const chunkSize = 40;
       const chunks = [];
       for (let i = 0; i < filtered.length; i += chunkSize) {
         chunks.push(filtered.slice(i, i + chunkSize));
