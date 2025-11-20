@@ -11,8 +11,8 @@ module.exports = {
       console.log("✅ Executando comando tierlist...");
       
       const embed = new EmbedBuilder()
-        .setTitle("Miscrits PvP Tier List (Updated until v1.16.0)")
-        .setImage("https://i.imgur.com/8xdq1SN.png")
+        .setTitle("Miscrits PvP Tier List (Updated until v1.18.0)")
+        .setImage("https://i.imgur.com/A0uSEYK.png")
         .setColor(0x2b6cb0);
 
       // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
