@@ -12,7 +12,7 @@ module.exports = {
       
       const embed = new EmbedBuilder()
         .setTitle("Miscrits PvP Tier List (Updated until v1.18.0)")
-        .setImage("https://i.imgur.com/9jWcgoI.png")
+        .setImage("https://i.imgur.com/A0uSEYK.png")
         .setColor(0x2b6cb0);
 
       // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
