@@ -3867,14 +3867,14 @@
     {
       "name": "Poppet",
       "image_url": "https://i.imgur.com/2nHrTrd.png",
-      "pvp_desired_status": "A+, S+",
+      "pvp_desired_status": "A+, S+ (A+ is better)",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
       "region": "Shack 1st Floor, Shack 2nd Floor",
       "spawn": "Any Object in the area",
       "wiki_page": "https://worldofmiscrits.com/miscripedia/624",
-      "relics_site": "",
+      "relics_site": "https://bow-cilantro-a4b.notion.site/Poppet-2b59812adbd080b88d34c1660e27052c",
       "useless_pvp_status": "Physical Attack"
     },
     {
@@ -3888,7 +3888,7 @@
       "spawn": "Unique Statue",
       "location_url": "https://i.imgur.com/RCgLvmr.png",
       "wiki_page": "https://worldofmiscrits.com/miscripedia/627",
-      "relics_site": "",
+      "relics_site": "https://bow-cilantro-a4b.notion.site/Luvcraft-2b59812adbd080fb8416e3dac082160c",
       "useless_pvp_status": "Physical Attack"
     },
     {
@@ -3901,7 +3901,7 @@
       "region": "Shack Lower Basement",
       "spawn": "Any Object in the area",
       "wiki_page": "https://worldofmiscrits.com/miscripedia/625",
-      "relics_site": "",
+      "relics_site": "https://bow-cilantro-a4b.notion.site/Nubyll-2b59812adbd0804c985cefa2312bf45d",
       "useless_pvp_status": "Physical Attack"
     },
     {
@@ -3929,7 +3929,7 @@
       "spawn": "Floating Table",
       "location_url": "https://i.imgur.com/HPUb2vY.png",
       "wiki_page": "https://worldofmiscrits.com/miscripedia/626",
-      "relics_site": "",
+      "relics_site": "https://bow-cilantro-a4b.notion.site/Elphin-2b59812adbd080b8b388ca9bb3b3aff3",
       "useless_pvp_status": "Physical Attack"
     }
   ]
