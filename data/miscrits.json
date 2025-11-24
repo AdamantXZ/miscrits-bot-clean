@@ -3917,6 +3917,20 @@
       "wiki_page": "https://worldofmiscrits.com/miscripedia/619",
       "relics_site": "https://bow-cilantro-a4b.notion.site/Geneseed-2979812adbd080c39e7be77ac50ebc4a",
       "useless_pvp_status": "Physical Attack"
+    },    
+    {
+      "name": "Elphin",
+      "image_url": "https://i.imgur.com/obn7aI9.png",
+      "pvp_desired_status": "A+",
+      "days": "Monday",
+      "type": "Water",
+      "rarity": "Epic",
+      "region": "Shack Basement",
+      "spawn": "Floating Table",
+      "location_url": "https://i.imgur.com/HPUb2vY.png",
+      "wiki_page": "https://worldofmiscrits.com/miscripedia/626",
+      "relics_site": "",
+      "useless_pvp_status": "Physical Attack"
     }
   ]
 }
