@@ -3867,7 +3867,7 @@
     {
       "name": "Poppet",
       "image_url": "https://i.imgur.com/2nHrTrd.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
