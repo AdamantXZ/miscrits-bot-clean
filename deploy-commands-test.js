@@ -1,4 +1,4 @@
-// deploy-commands-test.js - ATUALIZADO PARA INGLÊS
+// deploy-commands-test.js - ATUALIZADO COM NOVA DESCRIÇÃO
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
@@ -28,11 +28,11 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("info")
-        .setDescription("Shows information about a specific Miscrit")  // ← INGLÊS
+        .setDescription("Shows information about the location, rating and more about a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Name of the Miscrit")  // ← INGLÊS
+            .setDescription("Name of the Miscrit")
             .setRequired(true)
             .setAutocomplete(true)
         )
@@ -42,11 +42,11 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("moves-and-evos")
-        .setDescription("Shows moves and evolutions for a Miscrit")  // ← INGLÊS
+        .setDescription("Shows moves and evolutions for a Miscrit")
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Name of the Miscrit")  // ← INGLÊS
+            .setDescription("Name of the Miscrit")
             .setRequired(true)
             .setAutocomplete(true)
         )
@@ -56,11 +56,11 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("relics")
-        .setDescription("Shows recommended relics for a Miscrit")  // ← INGLÊS
+        .setDescription("Shows recommended relics for a Miscrit")
         .addStringOption(opt =>
           opt
             .setName("name")
-            .setDescription("Name of the Miscrit")  // ← INGLÊS
+            .setDescription("Name of the Miscrit")
             .setRequired(true)
             .setAutocomplete(true)
         )
@@ -70,11 +70,11 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("spawn-days")
-        .setDescription("Shows Miscrits that spawn on a specific day")  // ← INGLÊS
+        .setDescription("Shows Miscrits that spawn on a specific day")
         .addStringOption(opt =>
           opt
             .setName("day")
-            .setDescription("Day of the week")  // ← INGLÊS
+            .setDescription("Day of the week")
             .setRequired(true)
             .addChoices(
               { name: "Monday", value: "Monday" },
@@ -92,7 +92,7 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("tierlist")
-        .setDescription("Shows the Miscrits PvP tier list")  // ← INGLÊS
+        .setDescription("Shows the Miscrits PvP tier list")
     );
 
     // ===========================================
@@ -104,7 +104,7 @@ if (!token || !clientId || !guildId) {
 
     console.log("✅ TEST commands registered successfully!");
     console.log("📋 Available in specific server:");
-    console.log("   /test info [name]");
+    console.log("   /test info [name] - Shows information about the location, rating and more");
     console.log("   /test moves-and-evos [name]");
     console.log("   /test relics [name]");
     console.log("   /test spawn-days [day]");

@@ -1,4 +1,4 @@
-// deploy-commands.js - ATUALIZADO PARA INGLÊS
+// deploy-commands.js - ATUALIZADO COM NOVA DESCRIÇÃO
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
@@ -27,7 +27,7 @@ if (!token || !clientId) {
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("info")
-        .setDescription("Shows information about a specific Miscrit")
+        .setDescription("Shows information about the location, rating and more about a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
         .addStringOption(opt =>
           opt
             .setName("name")
@@ -103,7 +103,7 @@ if (!token || !clientId) {
 
     console.log("✅ Global commands registered successfully!");
     console.log("📋 Available globally:");
-    console.log("   /miscrits info [name]");
+    console.log("   /miscrits info [name] - Shows information about the location, rating and more");
     console.log("   /miscrits moves-and-evos [name]");
     console.log("   /miscrits relics [name]");
     console.log("   /miscrits spawn-days [day]");
