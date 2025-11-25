@@ -1,4 +1,4 @@
-// deploy-commands.js - ATUALIZADO COM NOVA DESCRIÇÃO
+// deploy-commands.js - ATUALIZADO COM NOVAS DESCRIÇÕES
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
@@ -27,7 +27,7 @@ if (!token || !clientId) {
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("info")
-        .setDescription("Shows information about the location, rating and more about a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
+        .setDescription("Shows information about the location, rating and more about a specific Miscrit")
         .addStringOption(opt =>
           opt
             .setName("name")
@@ -41,7 +41,7 @@ if (!token || !clientId) {
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("moves-and-evos")
-        .setDescription("Shows moves and evolutions for a Miscrit")
+        .setDescription("Shows moves and evolutions for a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
         .addStringOption(opt =>
           opt
             .setName("name")
@@ -55,7 +55,7 @@ if (!token || !clientId) {
     miscritsCommand.addSubcommand(sub =>
       sub
         .setName("relics")
-        .setDescription("Shows recommended relics for a Miscrit")
+        .setDescription("Shows recommended relics for a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
         .addStringOption(opt =>
           opt
             .setName("name")
@@ -104,8 +104,8 @@ if (!token || !clientId) {
     console.log("✅ Global commands registered successfully!");
     console.log("📋 Available globally:");
     console.log("   /miscrits info [name] - Shows information about the location, rating and more");
-    console.log("   /miscrits moves-and-evos [name]");
-    console.log("   /miscrits relics [name]");
+    console.log("   /miscrits moves-and-evos [name] - Shows moves and evolutions for a specific Miscrit");
+    console.log("   /miscrits relics [name] - Shows recommended relics for a specific Miscrit");
     console.log("   /miscrits spawn-days [day]");
     console.log("   /miscrits tierlist");
   } catch (err) {

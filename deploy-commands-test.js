@@ -1,4 +1,4 @@
-// deploy-commands-test.js - ATUALIZADO COM NOVA DESCRIÇÃO
+// deploy-commands-test.js - ATUALIZADO COM NOVAS DESCRIÇÕES
 require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 
@@ -28,7 +28,7 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("info")
-        .setDescription("Shows information about the location, rating and more about a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
+        .setDescription("Shows information about the location, rating and more about a specific Miscrit")
         .addStringOption(opt =>
           opt
             .setName("name")
@@ -42,7 +42,7 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("moves-and-evos")
-        .setDescription("Shows moves and evolutions for a Miscrit")
+        .setDescription("Shows moves and evolutions for a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
         .addStringOption(opt =>
           opt
             .setName("name")
@@ -56,7 +56,7 @@ if (!token || !clientId || !guildId) {
     testCommand.addSubcommand(sub =>
       sub
         .setName("relics")
-        .setDescription("Shows recommended relics for a Miscrit")
+        .setDescription("Shows recommended relics for a specific Miscrit")  // ← DESCRIÇÃO ATUALIZADA
         .addStringOption(opt =>
           opt
             .setName("name")
@@ -105,8 +105,8 @@ if (!token || !clientId || !guildId) {
     console.log("✅ TEST commands registered successfully!");
     console.log("📋 Available in specific server:");
     console.log("   /test info [name] - Shows information about the location, rating and more");
-    console.log("   /test moves-and-evos [name]");
-    console.log("   /test relics [name]");
+    console.log("   /test moves-and-evos [name] - Shows moves and evolutions for a specific Miscrit");
+    console.log("   /test relics [name] - Shows recommended relics for a specific Miscrit");
     console.log("   /test spawn-days [day]");
     console.log("   /test tierlist");
     console.log("");
