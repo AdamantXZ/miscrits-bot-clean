@@ -3886,7 +3886,7 @@
       "rarity": "Exotic",
       "region": "Shack Basement",
       "spawn": "Unique Statue",
-      "location_url": "https://i.imgur.com/RCgLvmr.png",
+      "location_url": "https://i.imgur.com/aTu1pG0.png",
       "wiki_page": "https://worldofmiscrits.com/miscripedia/627",
       "relics_site": "https://bow-cilantro-a4b.notion.site/Luvcraft-2b59812adbd080fb8416e3dac082160c",
       "useless_pvp_status": "Physical Attack"
@@ -3920,9 +3920,9 @@
     },    
     {
       "name": "Elphin",
-      "image_url": "https://i.imgur.com/obn7aI9.png",
+      "image_url": "https://i.imgur.com/Ull3RTS.png",
       "pvp_desired_status": "A+",
-      "days": "Monday",
+      "days": "Monday, Tuesday, Wednesday, Thursday",
       "type": "Water",
       "rarity": "Epic",
       "region": "Shack Basement",
