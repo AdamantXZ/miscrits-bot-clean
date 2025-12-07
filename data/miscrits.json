@@ -3905,6 +3905,34 @@
       "useless_pvp_status": "Physical Attack"
     },
     {
+      "name": "Beldame",
+      "image_url": "https://i.imgur.com/QpKSjuO.png",
+      "pvp_desired_status": "S+",
+      "days": "Everyday",
+      "type": "Lightning",
+      "rarity": "Legendary",
+      "region": "Shack 2nd Floor",
+      "spawn": "Bed with Glowing Eyes Under it",
+      "location_url": "https://i.imgur.com/TotTUYu.png",
+      "wiki_page": "https://worldofmiscrits.com/miscripedia/629",
+      "relics_site": "",
+      "useless_pvp_status": "Physical Attack"
+    },
+    {
+      "name": "Damse",
+      "image_url": "https://i.imgur.com/ONxjTvm.png",
+      "pvp_desired_status": "A+",
+      "days": "Everyday",
+      "type": "Lightning",
+      "rarity": "Exotic",
+      "region": "Shack 2nd Floor",
+      "spawn": "Nailed Crossed Planks",
+      "location_url": "https://i.imgur.com/giHyow6.png",
+      "wiki_page": "https://worldofmiscrits.com/miscripedia/628",
+      "relics_site": "",
+      "useless_pvp_status": "None"
+    },
+    {
       "name": "Geneseed",
       "image_url": "https://i.imgur.com/KamGjjG.png",
       "pvp_desired_status": "A+, S+ (S+ is better)",
