@@ -439,7 +439,7 @@
     {
       "name": "Lil Bubs",
       "image_url": "https://i.imgur.com/wL2yOAi.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+ (S+ is better)",
       "days": "Tuesday, Friday, Sunday",
       "type": "Water",
       "rarity": "Rare",
@@ -1027,7 +1027,7 @@
     {
       "name": "Foil Thundercracker",
       "image_url": "https://i.imgur.com/o39awG1.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Exotic",
@@ -1152,7 +1152,7 @@
     {
       "name": "Skustunk",
       "image_url": "https://i.imgur.com/bSx8KEu.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+ (A+ is better)",
       "days": "Wednesday, Saturday",
       "type": "Wind",
       "rarity": "Rare",
@@ -3461,7 +3461,7 @@
     {
       "name": "Rudy",
       "image_url": "https://i.imgur.com/dLfV2jv.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+ (A+ is better)",
       "type": "Earth",
       "rarity": "Exotic",
       "location": "Shop",
