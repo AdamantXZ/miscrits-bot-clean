@@ -2200,7 +2200,7 @@
     {
       "name": "Hydroseal",
       "image_url": "https://i.imgur.com/zWi4u4p.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "A+, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
