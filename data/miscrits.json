@@ -2421,7 +2421,7 @@
     {
       "name": "Warrian",
       "image_url": "https://i.imgur.com/YWcUdvl.png",
-      "pvp_desired_status": "RS, WS (WS is better)",
+      "pvp_desired_status": "WS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2759,7 +2759,7 @@
     {
       "name": "Frozy",
       "image_url": "https://i.imgur.com/hb7YyRT.png",
-      "pvp_desired_status": "RS, WS (WS is better)",
+      "pvp_desired_status": "WS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -3584,7 +3584,7 @@
     {
       "name": "Fickra",
       "image_url": "https://i.imgur.com/FcQPolo.png",
-      "pvp_desired_status": "RS, WS (WS is better)",
+      "pvp_desired_status": "WS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -3666,7 +3666,7 @@
     {
       "name": "Mucora",
       "image_url": "https://i.imgur.com/2nZF89g.png",
-      "pvp_desired_status": "RS, WS (WS is better)",
+      "pvp_desired_status": "WS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Common",
@@ -3800,7 +3800,7 @@
     {
       "name": "Deetle",
       "image_url": "https://i.imgur.com/KY4sE5x.png",
-      "pvp_desired_status": "RS, WS (WS is better)",
+      "pvp_desired_status": "WS",
       "days": "Monday, Tuesday, Wednesday, Thursday",
       "type": "Earth",
       "rarity": "Rare",
