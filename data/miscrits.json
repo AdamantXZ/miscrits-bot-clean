@@ -3,7 +3,7 @@
     {
       "name": "Dark Sparkupine",
       "image_url": "https://i.imgur.com/9LCd2OG.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday",
       "type": "Fire",
       "rarity": "Rare",
@@ -16,7 +16,7 @@
     {
       "name": "Dark Cubsprout",
       "image_url": "https://i.imgur.com/zA0sAJH.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Wednesday, Saturday",
       "type": "Nature",
       "rarity": "Rare",
@@ -29,7 +29,7 @@
     {
       "name": "Waddles",
       "image_url": "https://i.imgur.com/hmXt4RK.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Monday, Thursday, Sunday",
       "type": "Water",
       "rarity": "Rare",
@@ -43,7 +43,7 @@
     {
       "name": "Treemur",
       "image_url": "https://i.imgur.com/Jq7smT3.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Thursday, Sunday",
       "type": "Nature",
       "rarity": "Rare",
@@ -57,7 +57,7 @@
     {
       "name": "Dark Waddles",
       "image_url": "https://i.imgur.com/Rir4tKV.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Water",
       "rarity": "Epic",
@@ -71,7 +71,7 @@
     {
       "name": "Dark Quirk",
       "image_url": "https://i.imgur.com/ngjcmIU.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Thursday",
       "type": "Nature",
       "rarity": "Rare",
@@ -97,7 +97,7 @@
     {
       "name": "Dark Flue",
       "image_url": "https://i.imgur.com/vTcjTAA.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday, Sunday",
       "type": "Fire",
       "rarity": "Rare",
@@ -125,7 +125,7 @@
     {
       "name": "Blighted Cubsprout",
       "image_url": "https://i.imgur.com/WtQg1Ip.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Exotic",
@@ -139,7 +139,7 @@
     {
       "name": "Dark Hotfoot",
       "image_url": "https://i.imgur.com/kCXaxdu.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday",
       "type": "Fire",
       "rarity": "Rare",
@@ -165,7 +165,7 @@
     {
       "name": "Tulipinny",
       "image_url": "https://i.imgur.com/oOmnOz1.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Wednesday, Saturday, Sunday",
       "type": "Nature",
       "rarity": "Rare",
@@ -193,7 +193,7 @@
     {
       "name": "Defilio",
       "image_url": "https://i.imgur.com/skVZqk7.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Dual (Nature/Earth)",
       "rarity": "Exotic",
@@ -207,7 +207,7 @@
     {
       "name": "Mama",
       "image_url": "https://i.imgur.com/upiOqWf.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Exotic",
@@ -221,7 +221,7 @@
     {
       "name": "Dark Flowerpiller",
       "image_url": "https://i.imgur.com/T6DYIts.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday",
       "type": "Nature",
       "rarity": "Rare",
@@ -234,7 +234,7 @@
     {
       "name": "Dark Prawnja",
       "image_url": "https://i.imgur.com/IWFsOxS.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Wednesday, Saturday",
       "type": "Water",
       "rarity": "Rare",
@@ -261,7 +261,7 @@
     {
       "name": "Dark Twiggum",
       "image_url": "https://i.imgur.com/KOh04Af.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Thursday, Friday, Saturday",
       "type": "Nature",
       "rarity": "Epic",
@@ -303,7 +303,7 @@
     {
       "name": "Blighted Flue",
       "image_url": "https://i.imgur.com/d6Jnvzz.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Legendary",
@@ -317,7 +317,7 @@
     {
       "name": "Charix",
       "image_url": "https://i.imgur.com/PyoF1Ip.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Tuesday, Friday, Sunday",
       "type": "Nature",
       "rarity": "Rare",
@@ -330,7 +330,7 @@
     {
       "name": "Dark Squibee",
       "image_url": "https://i.imgur.com/WQeKZTQ.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Thursday",
       "type": "Water",
       "rarity": "Rare",
@@ -343,7 +343,7 @@
     {
       "name": "Dark Steamguin",
       "image_url": "https://i.imgur.com/pu740zf.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Wednesday, Saturday",
       "type": "Fire",
       "rarity": "Rare",
@@ -370,7 +370,7 @@
     {
       "name": "Blazertooth",
       "image_url": "https://i.imgur.com/iqfE72q.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Thursday, Saturday",
       "type": "Fire",
       "rarity": "Epic",
@@ -384,7 +384,7 @@
     {
       "name": "Alpha",
       "image_url": "https://i.imgur.com/XNEgM25.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Exotic",
@@ -398,7 +398,7 @@
     {
       "name": "Freedom",
       "image_url": "https://i.imgur.com/lSlaJU9.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Dual (Fire/Wind)",
       "rarity": "Exotic",
@@ -426,7 +426,7 @@
     {
       "name": "Dark Lavarilla",
       "image_url": "https://i.imgur.com/oqp96Oq.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Thursday, Saturday",
       "type": "Fire",
       "rarity": "Rare",
@@ -439,7 +439,7 @@
     {
       "name": "Lil Bubs",
       "image_url": "https://i.imgur.com/wL2yOAi.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Tuesday, Friday, Sunday",
       "type": "Water",
       "rarity": "Rare",
@@ -452,7 +452,7 @@
     {
       "name": "Dark Tulipinny",
       "image_url": "https://i.imgur.com/kr8D32R.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Epic",
@@ -508,7 +508,7 @@
     {
       "name": "Pillblaze",
       "image_url": "https://i.imgur.com/cU1z9a0.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday, Sunday",
       "type": "Fire",
       "rarity": "Rare",
@@ -534,7 +534,7 @@
     {
       "name": "Dorux",
       "image_url": "https://i.imgur.com/Tw9DL3j.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Dual (Fire/Lightning)",
       "rarity": "Epic",
@@ -548,7 +548,7 @@
     {
       "name": "Hotdog",
       "image_url": "https://i.imgur.com/30MI2Gb.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Epic",
@@ -562,7 +562,7 @@
     {
       "name": "Dark Slithero",
       "image_url": "https://i.imgur.com/looXEU9.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Exotic",
@@ -590,7 +590,7 @@
     {
       "name": "Dark Tongutail",
       "image_url": "https://i.imgur.com/Wg0bUzN.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Wednesday, Saturday",
       "type": "Earth",
       "rarity": "Rare",
@@ -616,7 +616,7 @@
     {
       "name": "Flutterpat",
       "image_url": "https://i.imgur.com/j0khzh6.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday, Sunday",
       "type": "Wind",
       "rarity": "Rare",
@@ -630,7 +630,7 @@
     {
       "name": "Dark Flutterpat",
       "image_url": "https://i.imgur.com/LTlgpck.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Epic",
@@ -644,7 +644,7 @@
     {
       "name": "Nanaslug",
       "image_url": "https://i.imgur.com/wNk35HR.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Dual (Water/Wind)",
       "rarity": "Epic",
@@ -658,7 +658,7 @@
     {
       "name": "Papa",
       "image_url": "https://i.imgur.com/9EOi4ZX.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Exotic",
@@ -672,7 +672,7 @@
     {
       "name": "Da Windy",
       "image_url": "https://i.imgur.com/ywXU5Mr.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Legendary",
@@ -686,7 +686,7 @@
     {
       "name": "Dark Flameling",
       "image_url": "https://i.imgur.com/NNIPx2t.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Rare",
@@ -699,7 +699,7 @@
     {
       "name": "Inferno",
       "image_url": "https://i.imgur.com/NUWMU2n.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Epic",
@@ -740,7 +740,7 @@
     {
       "name": "Dark Hydroseal",
       "image_url": "https://i.imgur.com/cmOlZoc.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Rare",
@@ -753,7 +753,7 @@
     {
       "name": "Ekkult",
       "image_url": "https://i.imgur.com/CxPKcOA.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Exotic",
@@ -767,7 +767,7 @@
     {
       "name": "Opigum",
       "image_url": "https://i.imgur.com/0TqPbrX.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Wednesday, Saturday",
       "type": "Earth",
       "rarity": "Rare",
@@ -780,7 +780,7 @@
     {
       "name": "Poltergust",
       "image_url": "https://i.imgur.com/KNRzJtv.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday",
       "type": "Wind",
       "rarity": "Rare",
@@ -807,7 +807,7 @@
     {
       "name": "Octavio",
       "image_url": "https://i.imgur.com/Ad6h7a4.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Wind",
       "rarity": "Epic",
@@ -821,7 +821,7 @@
     {
       "name": "Dark Luna",
       "image_url": "https://i.imgur.com/YNi8ZUV.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Thursday, Friday, Saturday",
       "type": "Lightning",
       "rarity": "Epic",
@@ -835,7 +835,7 @@
     {
       "name": "Foil Kiloray",
       "image_url": "https://i.imgur.com/INIp4Pz.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Exotic",
@@ -889,7 +889,7 @@
     {
       "name": "Gog",
       "image_url": "https://i.imgur.com/4r26d6i.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Earth",
       "rarity": "Epic",
@@ -917,7 +917,7 @@
     {
       "name": "Foil Vexie",
       "image_url": "https://i.imgur.com/915VM1D.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Exotic",
@@ -971,7 +971,7 @@
     {
       "name": "Eggy",
       "image_url": "https://i.imgur.com/g3Fbdqk.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Thursday, Sunday",
       "type": "Earth",
       "rarity": "Rare",
@@ -1027,7 +1027,7 @@
     {
       "name": "Foil Thundercracker",
       "image_url": "https://i.imgur.com/o39awG1.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Exotic",
@@ -1041,7 +1041,7 @@
     {
       "name": "Foil Croaky",
       "image_url": "https://i.imgur.com/7DHOUQQ.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Legendary",
@@ -1055,7 +1055,7 @@
     {
       "name": "Fossillia",
       "image_url": "https://i.imgur.com/ATysEXD.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday, Thursday, Friday",
       "type": "Earth",
       "rarity": "Rare",
@@ -1069,7 +1069,7 @@
     {
       "name": "Mun Kee",
       "image_url": "https://i.imgur.com/rdbJKHN.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Saturday, Sunday",
       "type": "Wind",
       "rarity": "Rare",
@@ -1097,7 +1097,7 @@
     {
       "name": "Fangly",
       "image_url": "https://i.imgur.com/Tdcodlh.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Thursday, Friday, Saturday",
       "type": "Wind",
       "rarity": "Epic",
@@ -1111,7 +1111,7 @@
     {
       "name": "Foil Fossillia",
       "image_url": "https://i.imgur.com/7hLN9U8.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Exotic",
@@ -1152,7 +1152,7 @@
     {
       "name": "Skustunk",
       "image_url": "https://i.imgur.com/bSx8KEu.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Wednesday, Saturday",
       "type": "Wind",
       "rarity": "Rare",
@@ -1165,7 +1165,7 @@
     {
       "name": "Kelpa",
       "image_url": "https://i.imgur.com/bjvaZcT.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Friday, Sunday",
       "type": "Earth",
       "rarity": "Rare",
@@ -1193,7 +1193,7 @@
     {
       "name": "Winnebeargo",
       "image_url": "https://i.imgur.com/Vc55F9s.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Thursday, Friday, Saturday",
       "type": "Wind",
       "rarity": "Epic",
@@ -1221,7 +1221,7 @@
     {
       "name": "Light Statikat",
       "image_url": "https://i.imgur.com/1R4kqJ6.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Dual (Fire/Lightning)",
       "rarity": "Exotic",
@@ -1235,7 +1235,7 @@
     {
       "name": "Pamboo",
       "image_url": "https://i.imgur.com/QjaX0mr.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Thursday",
       "type": "Earth",
       "rarity": "Rare",
@@ -1261,7 +1261,7 @@
     {
       "name": "Ignios",
       "image_url": "https://i.imgur.com/wST1EMp.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Wednesday, Saturday, Sunday",
       "type": "Fire",
       "rarity": "Rare",
@@ -1275,7 +1275,7 @@
     {
       "name": "Light Quirk",
       "image_url": "https://i.imgur.com/t5L1nWw.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Nature",
       "rarity": "Epic",
@@ -1289,7 +1289,7 @@
     {
       "name": "Fennie",
       "image_url": "https://i.imgur.com/ivfzqhF.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Thursday, Friday, Saturday",
       "type": "Earth",
       "rarity": "Epic",
@@ -1303,7 +1303,7 @@
     {
       "name": "Light Twiggum",
       "image_url": "https://i.imgur.com/hHgQceH.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Exotic",
@@ -1467,7 +1467,7 @@
     {
       "name": "Rockodile",
       "image_url": "https://i.imgur.com/GtErp9V.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Thursday, Sunday",
       "type": "Water",
       "rarity": "Rare",
@@ -1481,7 +1481,7 @@
     {
       "name": "Boneshee",
       "image_url": "https://i.imgur.com/Kuq3wNQ.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Wind",
       "rarity": "Epic",
@@ -1495,7 +1495,7 @@
     {
       "name": "Lavazard",
       "image_url": "https://i.imgur.com/ySvflCp.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Thursday, Friday, Saturday",
       "type": "Fire",
       "rarity": "Epic",
@@ -1509,7 +1509,7 @@
     {
       "name": "Light Bludger",
       "image_url": "https://i.imgur.com/SlB9BEL.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Exotic",
@@ -1523,7 +1523,7 @@
     {
       "name": "Peepsie",
       "image_url": "https://i.imgur.com/OCaxLOL.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Exotic",
@@ -1551,7 +1551,7 @@
     {
       "name": "Dark Arigato",
       "image_url": "https://i.imgur.com/QoRVit1.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Thursday, Saturday",
       "type": "Lightning",
       "rarity": "Rare",
@@ -1564,7 +1564,7 @@
     {
       "name": "Dark Kiloray",
       "image_url": "https://i.imgur.com/w7HQjwu.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Monday, Wednesday, Friday",
       "type": "Lightning",
       "rarity": "Rare",
@@ -1591,7 +1591,7 @@
     {
       "name": "Sledgehog",
       "image_url": "https://i.imgur.com/crktaBN.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Epic",
@@ -1619,7 +1619,7 @@
     {
       "name": "Manio",
       "image_url": "https://i.imgur.com/kqGuz5m.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Legendary",
@@ -1633,7 +1633,7 @@
     {
       "name": "Dark Croaky",
       "image_url": "https://i.imgur.com/REtbGrU.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Thursday, Saturday",
       "type": "Earth",
       "rarity": "Rare",
@@ -1646,7 +1646,7 @@
     {
       "name": "Flintly",
       "image_url": "https://i.imgur.com/ZBjdkmZ.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Wednesday, Friday",
       "type": "Fire",
       "rarity": "Rare",
@@ -1659,7 +1659,7 @@
     {
       "name": "Dark Eggy",
       "image_url": "https://i.imgur.com/pcOAA0F.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Epic",
@@ -1673,7 +1673,7 @@
     {
       "name": "Podo",
       "image_url": "https://i.imgur.com/sMPq7vo.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Epic",
@@ -1701,7 +1701,7 @@
     {
       "name": "Dark Echino",
       "image_url": "https://i.imgur.com/uPUvxMw.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Wednesday, Friday",
       "type": "Nature",
       "rarity": "Rare",
@@ -1727,7 +1727,7 @@
     {
       "name": "Dark Elefauna",
       "image_url": "https://i.imgur.com/VkN8l7h.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Wednesday, Friday",
       "type": "Nature",
       "rarity": "Epic",
@@ -1741,7 +1741,7 @@
     {
       "name": "Dark Snortus",
       "image_url": "https://i.imgur.com/XP2VvjW.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Tuesday, Thursday, Saturday",
       "type": "Water",
       "rarity": "Epic",
@@ -1755,7 +1755,7 @@
     {
       "name": "Foil Waddles",
       "image_url": "https://i.imgur.com/7xSh1WN.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Exotic",
@@ -1809,7 +1809,7 @@
     {
       "name": "Dark Pillblaze",
       "image_url": "https://i.imgur.com/scRcal2.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Epic",
@@ -1823,7 +1823,7 @@
     {
       "name": "Woolly",
       "image_url": "https://i.imgur.com/7lZYX3O.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Legendary",
@@ -1837,7 +1837,7 @@
     {
       "name": "Rephily",
       "image_url": "https://i.imgur.com/TdSirTg.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday",
       "type": "Wind",
       "rarity": "Rare",
@@ -1850,7 +1850,7 @@
     {
       "name": "Lambolt",
       "image_url": "https://i.imgur.com/2nS2Csk.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Wednesday, Thursday",
       "type": "Lightning",
       "rarity": "Rare",
@@ -1863,7 +1863,7 @@
     {
       "name": "Lunako",
       "image_url": "https://i.imgur.com/psieDbX.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Friday, Saturday",
       "type": "Dual (Fire/Earth)",
       "rarity": "Rare",
@@ -1876,7 +1876,7 @@
     {
       "name": "Mooncrit",
       "image_url": "https://i.imgur.com/bmzwEJu.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Sunday",
       "type": "Dual (Water/Earth)",
       "rarity": "Rare",
@@ -1889,7 +1889,7 @@
     {
       "name": "Liothning",
       "image_url": "https://i.imgur.com/eClSqgi.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Lightning",
       "rarity": "Epic",
@@ -1917,7 +1917,7 @@
     {
       "name": "Babakku",
       "image_url": "https://i.imgur.com/nrk8uLs.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Sunday",
       "type": "Earth",
       "rarity": "Epic",
@@ -1930,7 +1930,7 @@
     {
       "name": "Smolderfry",
       "image_url": "https://i.imgur.com/GPvkuUj.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Exotic",
@@ -1972,7 +1972,7 @@
     {
       "name": "Beateorite",
       "image_url": "https://i.imgur.com/J6gtypu.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Legendary",
@@ -1986,7 +1986,7 @@
     {
       "name": "Furiko",
       "image_url": "https://i.imgur.com/92EoTXa.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday",
       "type": "Fire",
       "rarity": "Rare",
@@ -1999,7 +1999,7 @@
     {
       "name": "Oozie",
       "image_url": "https://i.imgur.com/KERJcOr.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Wednesday, Thursday",
       "type": "Dual (Water/Lightning)",
       "rarity": "Rare",
@@ -2012,7 +2012,7 @@
     {
       "name": "Shroolet",
       "image_url": "https://i.imgur.com/leXzPCt.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Friday, Saturday",
       "type": "Water",
       "rarity": "Rare",
@@ -2093,7 +2093,7 @@
     {
       "name": "Pinplar",
       "image_url": "https://i.imgur.com/7GpeH2S.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Exotic",
@@ -2135,7 +2135,7 @@
     {
       "name": "Flue",
       "image_url": "https://i.imgur.com/MaSdDI5.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2161,7 +2161,7 @@
     {
       "name": "Prawnja",
       "image_url": "https://i.imgur.com/116DPxq.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2174,7 +2174,7 @@
     {
       "name": "Cubsprout",
       "image_url": "https://i.imgur.com/wuAcuAH.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2187,7 +2187,7 @@
     {
       "name": "Sparkupine",
       "image_url": "https://i.imgur.com/wLahBIk.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2200,7 +2200,7 @@
     {
       "name": "Hydroseal",
       "image_url": "https://i.imgur.com/zWi4u4p.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2213,7 +2213,7 @@
     {
       "name": "Snortus",
       "image_url": "https://i.imgur.com/zWmZZ6j.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2226,7 +2226,7 @@
     {
       "name": "Quirk",
       "image_url": "https://i.imgur.com/PNTTuCI.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2278,7 +2278,7 @@
     {
       "name": "Snatcher",
       "image_url": "https://i.imgur.com/f5ff3Bf.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2291,7 +2291,7 @@
     {
       "name": "Elefauna",
       "image_url": "https://i.imgur.com/s1nIcio.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2304,7 +2304,7 @@
     {
       "name": "Hotfoot",
       "image_url": "https://i.imgur.com/ZMyKwTn.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2343,7 +2343,7 @@
     {
       "name": "Nessy",
       "image_url": "https://i.imgur.com/vbgiF7J.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2356,7 +2356,7 @@
     {
       "name": "Twiggum",
       "image_url": "https://i.imgur.com/qs92MrN.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2382,7 +2382,7 @@
     {
       "name": "Steamguin",
       "image_url": "https://i.imgur.com/PU4TPE7.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2395,7 +2395,7 @@
     {
       "name": "Crickin",
       "image_url": "https://i.imgur.com/W2DZGoO.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2408,7 +2408,7 @@
     {
       "name": "Flurfy",
       "image_url": "https://i.imgur.com/QqG3Xxf.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2421,7 +2421,7 @@
     {
       "name": "Warrian",
       "image_url": "https://i.imgur.com/YWcUdvl.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS, WS (WS is better)",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2434,7 +2434,7 @@
     {
       "name": "Mech",
       "image_url": "https://i.imgur.com/ICtCkV6.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2447,7 +2447,7 @@
     {
       "name": "Stalkra",
       "image_url": "https://i.imgur.com/DBKHwep.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2499,7 +2499,7 @@
     {
       "name": "Equestrion",
       "image_url": "https://i.imgur.com/AOz3IvY.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Common",
@@ -2512,7 +2512,7 @@
     {
       "name": "Drildent",
       "image_url": "https://i.imgur.com/7rJuP6M.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -2525,7 +2525,7 @@
     {
       "name": "Kiloray",
       "image_url": "https://i.imgur.com/A6CyZD7.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -2603,7 +2603,7 @@
     {
       "name": "Vexie",
       "image_url": "https://i.imgur.com/pLVowTK.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -2616,7 +2616,7 @@
     {
       "name": "Sparkslug",
       "image_url": "https://i.imgur.com/uNXsaF7.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -2629,7 +2629,7 @@
     {
       "name": "Craggy",
       "image_url": "https://i.imgur.com/Vf18Svm.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -2642,7 +2642,7 @@
     {
       "name": "Owlie",
       "image_url": "https://i.imgur.com/WDQwXtB.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Common",
@@ -2655,7 +2655,7 @@
     {
       "name": "Felis",
       "image_url": "https://i.imgur.com/GzSWLDt.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -2720,7 +2720,7 @@
     {
       "name": "Orbling",
       "image_url": "https://i.imgur.com/GH7yTzK.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -2746,7 +2746,7 @@
     {
       "name": "Freezet",
       "image_url": "https://i.imgur.com/G1bEpDn.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2759,7 +2759,7 @@
     {
       "name": "Frozy",
       "image_url": "https://i.imgur.com/hb7YyRT.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS, WS (WS is better)",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2772,7 +2772,7 @@
     {
       "name": "Bubbles",
       "image_url": "https://i.imgur.com/F91hG9l.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2785,7 +2785,7 @@
     {
       "name": "Lavarilla",
       "image_url": "https://i.imgur.com/s0fseIt.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2811,7 +2811,7 @@
     {
       "name": "Tongutail",
       "image_url": "https://i.imgur.com/VOPoNsz.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -2863,7 +2863,7 @@
     {
       "name": "Slithero",
       "image_url": "https://i.imgur.com/i216V6Y.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -2902,7 +2902,7 @@
     {
       "name": "Bludger",
       "image_url": "https://i.imgur.com/He5gszz.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -2915,7 +2915,7 @@
     {
       "name": "Narlope",
       "image_url": "https://i.imgur.com/TkXuhBe.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -2928,7 +2928,7 @@
     {
       "name": "Pestling",
       "image_url": "https://i.imgur.com/SnrEuLB.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2941,7 +2941,7 @@
     {
       "name": "Nero",
       "image_url": "https://i.imgur.com/XcGnnGn.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -2954,7 +2954,7 @@
     {
       "name": "Grubbean",
       "image_url": "https://i.imgur.com/wuKuHUv.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -2967,7 +2967,7 @@
     {
       "name": "Wavesling",
       "image_url": "https://i.imgur.com/DGX2nvO.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -2993,7 +2993,7 @@
     {
       "name": "Digsy",
       "image_url": "https://i.imgur.com/MwEJtpr.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -3006,7 +3006,7 @@
     {
       "name": "Echino",
       "image_url": "https://i.imgur.com/wAdIdDL.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -3110,7 +3110,7 @@
     {
       "name": "Quebble",
       "image_url": "https://i.imgur.com/N2aU2jM.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -3136,7 +3136,7 @@
     {
       "name": "Orcatide",
       "image_url": "https://i.imgur.com/2rYE9zM.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -3149,7 +3149,7 @@
     {
       "name": "Blub",
       "image_url": "https://i.imgur.com/1eaFgO3.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -3162,7 +3162,7 @@
     {
       "name": "Brainzer",
       "image_url": "https://i.imgur.com/b4asSTr.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -3175,7 +3175,7 @@
     {
       "name": "Enex",
       "image_url": "https://i.imgur.com/XxvMmKW.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -3188,7 +3188,7 @@
     {
       "name": "Flaclay",
       "image_url": "https://i.imgur.com/nNMaEtU.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Dual (Fire/Earth)",
       "rarity": "Common",
@@ -3201,7 +3201,7 @@
     {
       "name": "Lumite",
       "image_url": "https://i.imgur.com/hawUm9V.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Common",
@@ -3227,7 +3227,7 @@
     {
       "name": "Zephry",
       "image_url": "https://i.imgur.com/z1SQX33.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Common",
@@ -3240,7 +3240,7 @@
     {
       "name": "Drilune",
       "image_url": "https://i.imgur.com/DLw79Iq.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Common",
@@ -3253,7 +3253,7 @@
     {
       "name": "Eluzar",
       "image_url": "https://i.imgur.com/r1NYyQB.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -3279,7 +3279,7 @@
     {
       "name": "Moondrip",
       "image_url": "https://i.imgur.com/wau1enp.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Water",
       "rarity": "Common",
@@ -3292,7 +3292,7 @@
     {
       "name": "Silkire",
       "image_url": "https://i.imgur.com/yWzdCaM.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -3318,7 +3318,7 @@
     {
       "name": "Light Squibee",
       "image_url": "https://i.imgur.com/DH8Ca7Z.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Water",
       "rarity": "Rare",
       "location": "Shop",
@@ -3329,7 +3329,7 @@
     {
       "name": "Light Slithero",
       "image_url": "https://i.imgur.com/FUsWFGN.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Fire",
       "rarity": "Rare",
       "location": "Shop",
@@ -3351,7 +3351,7 @@
     {
       "name": "Light Jack",
       "image_url": "https://i.imgur.com/E3sM7li.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Wind",
       "rarity": "Rare",
       "location": "Shop",
@@ -3362,7 +3362,7 @@
     {
       "name": "Light Wavesling",
       "image_url": "https://i.imgur.com/xdHQcxz.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "type": "Dual (Water/Wind)",
       "rarity": "Rare",
       "location": "Shop",
@@ -3373,7 +3373,7 @@
     {
       "name": "Ribos",
       "image_url": "https://i.imgur.com/5cNV5GD.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Water",
       "rarity": "Rare",
       "location": "Shop",
@@ -3384,7 +3384,7 @@
     {
       "name": "Light Flurfy",
       "image_url": "https://i.imgur.com/V26BAoi.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Nature",
       "rarity": "Rare",
       "location": "Shop",
@@ -3406,7 +3406,7 @@
     {
       "name": "Light Digsy",
       "image_url": "https://i.imgur.com/XSpVFUD.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Dual (Fire/Earth)",
       "rarity": "Epic",
       "location": "Shop",
@@ -3428,7 +3428,7 @@
     {
       "name": "Light Flue",
       "image_url": "https://i.imgur.com/xfxctou.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Dual (Fire/Wind)",
       "rarity": "Epic",
       "location": "Shop",
@@ -3439,7 +3439,7 @@
     {
       "name": "Light Fossillia",
       "image_url": "https://i.imgur.com/HK68coe.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "type": "Dual (Water/Earth)",
       "rarity": "Epic",
       "location": "Shop",
@@ -3461,7 +3461,7 @@
     {
       "name": "Rudy",
       "image_url": "https://i.imgur.com/dLfV2jv.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "type": "Earth",
       "rarity": "Exotic",
       "location": "Shop",
@@ -3494,7 +3494,7 @@
     {
       "name": "Blobroller",
       "image_url": "https://i.imgur.com/j0wOvgT.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Dual (Nature/Lightning)",
       "rarity": "Exotic",
       "location": "Shop",
@@ -3549,7 +3549,7 @@
     {
       "name": "Flurrious",
       "image_url": "https://i.imgur.com/37mqiXW.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "type": "Water",
       "rarity": "Exotic",
       "location": "Shop",
@@ -3584,7 +3584,7 @@
     {
       "name": "Fickra",
       "image_url": "https://i.imgur.com/FcQPolo.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, WS (WS is better)",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Common",
@@ -3597,7 +3597,7 @@
     {
       "name": "Lutox",
       "image_url": "https://i.imgur.com/vrBbICL.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Earth",
       "rarity": "Rare",
@@ -3610,7 +3610,7 @@
     {
       "name": "Scarecrow Charix",
       "image_url": "https://i.imgur.com/tGCtiWl.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Friday, Saturday, Sunday",
       "type": "Nature",
       "rarity": "Epic",
@@ -3624,7 +3624,7 @@
     {
       "name": "Grimm Kiloray",
       "image_url": "https://i.imgur.com/EC6kRTp.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Monday, Tuesday, Wednesday, Thusday",
       "type": "Lightning",
       "rarity": "Epic",
@@ -3638,7 +3638,7 @@
     {
       "name": "Patchkin",
       "image_url": "https://i.imgur.com/lGpSf1G.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Exotic",
@@ -3652,7 +3652,7 @@
     {
       "name": "Rocker Octavio",
       "image_url": "https://i.imgur.com/T8vWjbi.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Exotic",
@@ -3666,7 +3666,7 @@
     {
       "name": "Mucora",
       "image_url": "https://i.imgur.com/2nZF89g.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, WS (WS is better)",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Common",
@@ -3679,7 +3679,7 @@
     {
       "name": "Pirate Bludger",
       "image_url": "https://i.imgur.com/5tDoAgc.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Friday, Saturday, Sunday",
       "type": "Earth",
       "rarity": "Rare",
@@ -3692,7 +3692,7 @@
     {
       "name": "Hekatom",
       "image_url": "https://i.imgur.com/xDJuwTu.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Dual (Nature/Wind)",
       "rarity": "Epic",
@@ -3706,7 +3706,7 @@
     {
       "name": "Boo Blazertooth",
       "image_url": "https://i.imgur.com/282OAad.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Exotic",
@@ -3720,7 +3720,7 @@
     {
       "name": "Goo",
       "image_url": "https://i.imgur.com/gHvvkLk.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Dual (Water/Earth)",
       "rarity": "Common",
@@ -3733,7 +3733,7 @@
     {
       "name": "Beakka",
       "image_url": "https://i.imgur.com/1YawvSj.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Common",
@@ -3746,7 +3746,7 @@
     {
       "name": "Ampupine",
       "image_url": "https://i.imgur.com/TfAxfmd.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Rare",
@@ -3759,7 +3759,7 @@
     {
       "name": "Vamp Skustunk",
       "image_url": "https://i.imgur.com/PnPDIDp.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Friday, Saturday, Sunday",
       "type": "Wind",
       "rarity": "Epic",
@@ -3773,7 +3773,7 @@
     {
       "name": "Skelepup",
       "image_url": "https://i.imgur.com/iUotJYd.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Exotic",
@@ -3800,7 +3800,7 @@
     {
       "name": "Deetle",
       "image_url": "https://i.imgur.com/KY4sE5x.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, WS (WS is better)",
       "days": "Monday, Tuesday, Wednesday, Thursday",
       "type": "Earth",
       "rarity": "Rare",
@@ -3813,7 +3813,7 @@
     {
       "name": "Dark Sparkslug",
       "image_url": "https://i.imgur.com/vDBdwU4.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday, Thursday",
       "type": "Lightning",
       "rarity": "Rare",
@@ -3840,7 +3840,7 @@
     {
       "name": "Phoboros",
       "image_url": "https://i.imgur.com/qxOnWvp.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Epic",
@@ -3854,7 +3854,7 @@
     {
       "name": "Sora",
       "image_url": "https://i.imgur.com/dhLka6A.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Everyday",
       "type": "Wind",
       "rarity": "Common",
@@ -3867,7 +3867,7 @@
     {
       "name": "Poppet",
       "image_url": "https://i.imgur.com/2nHrTrd.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -3921,7 +3921,7 @@
     {
       "name": "Damse",
       "image_url": "https://i.imgur.com/ONxjTvm.png",
-      "pvp_desired_status": "A+, S+ (A+ is better)",
+      "pvp_desired_status": "RS, S+ (RS is better)",
       "days": "Everyday",
       "type": "Lightning",
       "rarity": "Exotic",
@@ -3935,7 +3935,7 @@
     {
       "name": "Geneseed",
       "image_url": "https://i.imgur.com/KamGjjG.png",
-      "pvp_desired_status": "A+, S+ (S+ is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Nature",
       "rarity": "Legendary",
@@ -3949,7 +3949,7 @@
     {
       "name": "Elphin",
       "image_url": "https://i.imgur.com/Ull3RTS.png",
-      "pvp_desired_status": "A+",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday, Thursday",
       "type": "Water",
       "rarity": "Epic",
