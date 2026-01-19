@@ -4004,17 +4004,17 @@
     },
     {
       "name": "Squawcat",
-      "image_url": "",
-      "pvp_desired_status": "",
+      "image_url": "https://i.imgur.com/KgJp8w9.png",
+      "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Fire",
       "rarity": "Rare",
       "region": "Miscrian Jungle Area 1",
-      "spawn": "",
+      "spawn": "Any Object in the area",
       "location_url": "",
       "wiki_page": "",
       "relics_site": "",
-      "useless_pvp_status": ""
+      "useless_pvp_status": "Elemental Attack"
     },
     {
       "name": "Blowpuffle",
@@ -4088,17 +4088,17 @@
     },
     {
       "name": "Dark Whik",
-      "image_url": "",
+      "image_url": "https://i.imgur.com/Ylvp6Mo.png",
       "pvp_desired_status": "S+",
       "days": "Monday, Tuesday",
       "type": "Fire",
       "rarity": "Rare",
       "region": "Miscrian Jungle Area 2",
-      "spawn": "",
+      "spawn": "Any object in the area",
       "location_url": "",
       "wiki_page": "",
       "relics_site": "",
-      "useless_pvp_status": ""
+      "useless_pvp_status": "Physical Attack"
     },
     {
       "name": "Hoghedge",
@@ -4298,14 +4298,14 @@
     },
     {
       "name": "Dark bubbles",
-      "image_url": "",
+      "image_url": "https://i.imgur.com/AJNh0VT.png",
       "pvp_desired_status": "RS",
       "days": "Monday, Tuesday, Wednesday",
       "type": "Water",
       "rarity": "Rare",
       "region": "Miscrian Jungle Area 4",
-      "spawn": "",
-      "location_url": "",
+      "spawn": "Any of the Water Puddles in the area",
+      "location_url": "https://i.imgur.com/YyuLDtB.png",
       "wiki_page": "",
       "relics_site": "",
       "useless_pvp_status": "Physical Attack"
