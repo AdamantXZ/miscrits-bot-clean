@@ -4200,17 +4200,17 @@
     },
     {
       "name": "Liquifien",
-      "image_url": "",
+      "image_url": "https://i.imgur.com/1gtlyIz.png",
       "pvp_desired_status": "",
       "days": "Wednesday, Thursday, Friday",
       "type": "Water",
       "rarity": "Rare",
       "region": "Miscrian Jungle Area 3",
-      "spawn": "",
-      "location_url": "",
+      "spawn": "Any of the Piles of Rocks Behind the Mun Kee Statues",
+      "location_url": "https://i.imgur.com/b6p8Pql.png",
       "wiki_page": "",
       "relics_site": "",
-      "useless_pvp_status": ""
+      "useless_pvp_status": "Physical Attack"
     },
     {
       "name": "Glary",
