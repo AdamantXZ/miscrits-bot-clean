@@ -4159,7 +4159,7 @@
     {
       "name": "Beetor",
       "image_url": "https://i.imgur.com/nSSeeZM.png",
-      "pvp_desired_status": "RS",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Everyday",
       "type": "Fire",
       "rarity": "Common",
@@ -4201,7 +4201,7 @@
     {
       "name": "Liquifien",
       "image_url": "https://i.imgur.com/1gtlyIz.png",
-      "pvp_desired_status": "RS",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Wednesday, Thursday, Friday",
       "type": "Water",
       "rarity": "Rare",
