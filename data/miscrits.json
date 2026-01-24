@@ -29,7 +29,7 @@
     {
       "name": "Waddles",
       "image_url": "https://i.imgur.com/hmXt4RK.png",
-      "pvp_desired_status": "RS, S+ (RS is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Monday, Thursday, Sunday",
       "type": "Water",
       "rarity": "Rare",
@@ -43,7 +43,7 @@
     {
       "name": "Treemur",
       "image_url": "https://i.imgur.com/Jq7smT3.png",
-      "pvp_desired_status": "RS",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Monday, Thursday, Sunday",
       "type": "Nature",
       "rarity": "Rare",
@@ -1261,7 +1261,7 @@
     {
       "name": "Ignios",
       "image_url": "https://i.imgur.com/wST1EMp.png",
-      "pvp_desired_status": "RS, S+ (RS is better)",
+      "pvp_desired_status": "RS, S+ (S+ is better)",
       "days": "Wednesday, Saturday, Sunday",
       "type": "Fire",
       "rarity": "Rare",
