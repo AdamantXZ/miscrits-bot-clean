@@ -11,14 +11,13 @@ module.exports = {
       console.log("✅ Executando comando tierlist...");
       
       const embed = new EmbedBuilder()
-        .setTitle("Miscrits PvP Tier List (Updated until v1.20.0)")
+        .setTitle("Miscrits PvP Tier List (Updated until v2.1.0)")
         .setDescription(
-          "This tier list does not indicate ALL viable crits, just the best CURRENT meta crits.\n" +
-          "This does not mean crits not mentioned here are bad, just not as good.\n\n" +
-          "There are well over 100 viable crits to use — by all means, experiment.\n\n" +
-          "**Credits:** @SammyTW @frac wants to merry & pig josh"
+          "PSA. This does not mean crits that did not make the list are not good or usable.\n" +
+          "This is based off the current meta and which crits are performing the best.\n\n" +         
+          "**Credits: @frac pigs josh @add me in game chewyjosh @Charles do Bronx @fl∞ rugu @riftwalker "
   )
-        .setImage("https://i.imgur.com/kCtcX4p.png")
+        .setImage("https://i.imgur.com/TZ5fRA2.png")
         .setColor(0x2b6cb0);
 
       // ✅ CORREÇÃO: ephemeral: true em vez de flags: 64
